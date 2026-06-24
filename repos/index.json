@@ -3,6 +3,7 @@
     "id": "aif",
     "title": "AIF",
     "desc": "AI Factory — Developer Guide & Usage Guide",
+    "repo_url": "https://github.com/NVIDIA-Omniverse/aif-pipeline-samples",
     "has_en": false,
     "has_zh": false,
     "files": [
@@ -15,6 +16,7 @@
     "id": "content-agents",
     "title": "Content Agents",
     "desc": "NVIDIA AI-driven 3D content automation framework — VLM-based USD asset analysis",
+    "repo_url": "https://github.com/NVIDIA-Omniverse/content-agents",
     "has_en": true,
     "has_zh": true,
     "files": [
@@ -27,6 +29,7 @@
     "id": "omniverse-dsx-blueprint",
     "title": "DSX Blueprint",
     "desc": "NVIDIA Omniverse DSX Blueprint for AI Factory Digital Twins",
+    "repo_url": "https://github.com/NVIDIA-Omniverse-blueprints/omniverse-dsx-blueprint-for-ai-factories",
     "has_en": true,
     "has_zh": true,
     "files": [

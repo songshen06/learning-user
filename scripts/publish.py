@@ -39,6 +39,7 @@ def main():
     parser.add_argument("--repo-id", required=True, help="Short repo identifier (folder name), e.g. 'omniverse-dsx-blueprint'")
     parser.add_argument("--title", required=True, help="Display title for the guide")
     parser.add_argument("--desc", default="", help="Short description")
+    parser.add_argument("--repo-url", default="", help="Original GitHub repo URL (shown on landing page)")
     parser.add_argument("--repo-path", default="/tmp/songshen06-learning-user", help="Local clone of songshen06/learning-user")
     parser.add_argument("--no-push", action="store_true", help="Skip git push (local test)")
     args = parser.parse_args()
@@ -86,7 +87,7 @@ def main():
     entries = [e for e in entries if e.get("id") != args.repo_id]
 
     timestamp = datetime.now().strftime("%Y-%m-%d")
-    entries.insert(0, {
+    entry = {
         "id": args.repo_id,
         "title": args.title,
         "desc": args.desc,
@@ -94,7 +95,10 @@ def main():
         "has_zh": has_zh,
         "files": copied,
         "updated": timestamp
-    })
+    }
+    if args.repo_url:
+        entry["repo_url"] = args.repo_url
+    entries.insert(0, entry)
 
     index_json_path.write_text(json.dumps(entries, indent=2, ensure_ascii=False) + "\n")
     print(f"  Updated: repos/index.json ({len(entries)} entries)")

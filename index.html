@@ -33,6 +33,9 @@ main { max-width:900px; margin:0 auto; padding:32px 24px 64px; }
 .lang-en { background:#e3f2fd; color:#1565c0; }
 .lang-zh { background:#fff3e0; color:#e65100; }
 .lang-both { background:#e8f5e0; color:#2e7d32; }
+.repo-link { display:inline-block; margin-top:8px; font-size:0.75rem; }
+.repo-link a { color:var(--text-secondary); text-decoration:none; }
+.repo-link a:hover { color:var(--accent); }
 .empty { text-align:center; padding:48px 20px; color:var(--text-secondary); }
 footer { text-align:center; padding:24px; font-size:0.8rem; color:#999; border-top:1px solid var(--border); }
 footer a { color:var(--accent); }
@@ -93,6 +96,7 @@ footer a { color:var(--accent); }
         <h3><a href="${titleHref}">${e.title}</a></h3>
         <div class="desc">${e.desc || 'Usage guide for ' + e.id}</div>
         <div class="langs">${fileLinks}</div>
+        ${e.repo_url ? `<div class="repo-link"><a href="${e.repo_url}" target="_blank">&#128279; ${e.repo_url.replace('https://github.com/','')}</a></div>` : ''}
         <div class="meta">${e.updated || ''}</div>
       `;
       grid.appendChild(card);
