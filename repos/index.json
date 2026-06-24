@@ -1,5 +1,17 @@
 [
   {
+    "id": "aif",
+    "title": "AIF",
+    "desc": "AI Factory — Developer Guide & Usage Guide",
+    "has_en": false,
+    "has_zh": false,
+    "files": [
+      "developer.html",
+      "usage-guide.html"
+    ],
+    "updated": "2026-06-24"
+  },
+  {
     "id": "content-agents",
     "title": "Content Agents",
     "desc": "NVIDIA AI-driven 3D content automation framework — VLM-based USD asset analysis",

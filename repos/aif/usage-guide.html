@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>aif-pipeline · 使用者指南</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg-soft: #161b22;
+    --bg-card: #1c2128;
+    --border: #30363d;
+    --text: #c9d1d9;
+    --text-dim: #8b949e;
+    --accent: #58a6ff;
+    --accent-2: #79c0ff;
+    --green: #7ee787;
+    --yellow: #f2cc60;
+    --orange: #ffa657;
+    --red: #ff7b72;
+    --purple: #d2a8ff;
+    --max: 1400px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", Helvetica, Arial, sans-serif;
+    line-height: 1.65;
+    font-size: 15.5px;
+  }
+  code, pre, .mono {
+    font-family: "SF Mono", "JetBrains Mono", "Fira Code", Menlo, Consolas, monospace;
+    font-size: 0.88em;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(13,17,23,0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 24px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .topbar .brand { font-weight: 700; font-size: 16px; color: var(--text); }
+  .topbar .tag {
+    background: var(--bg-card); border: 1px solid var(--border);
+    padding: 2px 8px; border-radius: 4px; font-size: 12px; color: var(--text-dim);
+  }
+  .topbar .grow { flex: 1; }
+  .topbar nav a {
+    color: var(--text-dim); margin-left: 14px; font-size: 13px;
+  }
+  .topbar nav a:hover { color: var(--accent); }
+
+  .layout {
+    max-width: var(--max);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 32px;
+    padding: 24px;
+  }
+  @media (max-width: 980px) {
+    .layout { grid-template-columns: 1fr; padding: 16px; }
+    .sidebar { position: static !important; }
+  }
+
+  .sidebar {
+    position: sticky; top: 72px;
+    align-self: start;
+    max-height: calc(100vh - 96px);
+    overflow-y: auto;
+    padding: 8px 0;
+    font-size: 13.5px;
+  }
+  .sidebar h3 {
+    font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text-dim); margin: 18px 0 6px 0; padding-left: 10px;
+  }
+  .sidebar a {
+    display: block; color: var(--text-dim);
+    padding: 5px 10px; border-radius: 5px;
+    border-left: 2px solid transparent;
+  }
+  .sidebar a:hover { background: var(--bg-soft); color: var(--text); text-decoration: none; }
+  .sidebar a.active { color: var(--accent); border-left-color: var(--accent); background: var(--bg-soft); }
+  .sidebar a.sub { padding-left: 22px; font-size: 13px; }
+
+  main { min-width: 0; }
+  section {
+    padding: 28px 0 8px 0;
+    border-bottom: 1px solid var(--border);
+    scroll-margin-top: 70px;
+  }
+  section:last-child { border-bottom: none; }
+  h1 {
+    font-size: 32px; margin: 0 0 4px 0;
+    background: linear-gradient(120deg, var(--green), var(--accent-2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  h1 + p { color: var(--text-dim); margin-top: 0; }
+  h2 {
+    font-size: 22px; margin: 0 0 14px 0;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  h2 .num {
+    display: inline-block; min-width: 32px;
+    color: var(--green); font-variant-numeric: tabular-nums;
+  }
+  h3 { font-size: 17px; margin: 18px 0 8px 0; color: var(--accent-2); }
+  h4 { font-size: 14.5px; margin: 12px 0 6px 0; color: var(--text); }
+  p { margin: 8px 0; }
+  ul, ol { padding-left: 22px; margin: 8px 0; }
+  li { margin: 4px 0; }
+
+  code {
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    padding: 1px 6px; border-radius: 4px;
+    color: var(--orange);
+  }
+  pre {
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    line-height: 1.55;
+    position: relative;
+  }
+  pre code { background: none; border: none; padding: 0; color: var(--text); }
+  pre .cmt { color: var(--text-dim); }
+  pre .var { color: var(--orange); }
+
+  .callout {
+    border-left: 3px solid var(--accent);
+    background: var(--bg-soft);
+    padding: 10px 14px;
+    margin: 12px 0;
+    border-radius: 0 6px 6px 0;
+  }
+  .callout.warn { border-left-color: var(--yellow); }
+  .callout.tip { border-left-color: var(--green); }
+  .callout.danger { border-left-color: var(--red); }
+  .callout strong { color: var(--text); }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 12px 0;
+    font-size: 14px;
+  }
+  th, td {
+    text-align: left;
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  th {
+    background: var(--bg-soft);
+    color: var(--accent-2);
+    font-weight: 600;
+    font-size: 13px;
+  }
+
+  /* Tabs (OS) */
+  .tabs { margin: 10px 0; }
+  .tabs .tab-bar { display: flex; gap: 4px; border-bottom: 1px solid var(--border); }
+  .tabs .tab-bar button {
+    background: none; border: none; color: var(--text-dim);
+    padding: 8px 16px; cursor: pointer; font-size: 13px;
+    border-bottom: 2px solid transparent;
+    font-family: inherit;
+  }
+  .tabs .tab-bar button.active { color: var(--green); border-bottom-color: var(--green); }
+  .tabs .pane { display: none; padding-top: 8px; }
+  .tabs .pane.active { display: block; }
+
+  details {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0;
+    margin: 10px 0;
+  }
+  details > summary {
+    cursor: pointer;
+    padding: 10px 14px;
+    font-weight: 500;
+    color: var(--text);
+    user-select: none;
+    list-style: none;
+  }
+  details > summary::-webkit-details-marker { display: none; }
+  details > summary::before {
+    content: "▸"; color: var(--green); margin-right: 8px;
+    display: inline-block; transition: transform 0.15s;
+  }
+  details[open] > summary::before { transform: rotate(90deg); }
+  details > div.pad { padding: 0 14px 12px 14px; }
+
+  .pipeline {
+    display: grid;
+    grid-template-columns: repeat(7, auto);
+    align-items: center;
+    gap: 8px;
+    margin: 20px 0;
+    font-size: 13px;
+  }
+  .pipeline .stage {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    border-radius: 8px;
+    text-align: center;
+    min-width: 90px;
+  }
+  .pipeline .stage b { display: block; color: var(--accent-2); font-size: 14px; }
+  .pipeline .stage .sub { color: var(--text-dim); font-size: 11.5px; }
+  .pipeline .arrow { color: var(--green); font-size: 18px; font-weight: 700; }
+  @media (max-width: 880px) {
+    .pipeline { grid-template-columns: 1fr; }
+    .pipeline .arrow { transform: rotate(90deg); }
+  }
+
+  .step-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin: 14px 0;
+  }
+  .step-card h3 { margin-top: 0; }
+  .step-card .num {
+    display: inline-block; width: 28px; height: 28px;
+    line-height: 26px; text-align: center;
+    border-radius: 50%;
+    background: var(--green); color: var(--bg);
+    font-weight: 700; font-size: 14px;
+    margin-right: 8px;
+  }
+
+  .copy {
+    position: absolute; top: 6px; right: 6px;
+    background: var(--bg); border: 1px solid var(--border);
+    color: var(--text-dim); padding: 2px 8px; border-radius: 4px;
+    font-size: 11px; cursor: pointer; font-family: inherit;
+  }
+  .copy:hover { color: var(--green); border-color: var(--green); }
+
+  footer {
+    text-align: center; color: var(--text-dim);
+    padding: 30px 24px; font-size: 13px;
+    border-top: 1px solid var(--border);
+    margin-top: 24px;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 1px 7px; border-radius: 10px;
+    font-size: 11px; font-weight: 600;
+    border: 1px solid var(--border);
+    background: var(--bg-soft);
+    color: var(--text-dim);
+  }
+  .badge.green { color: var(--green); border-color: rgba(126,231,135,0.4); }
+  .badge.orange { color: var(--orange); border-color: rgba(255,166,87,0.4); }
+  .badge.red { color: var(--red); border-color: rgba(255,123,114,0.4); }
+
+  .checklist {
+    list-style: none; padding: 0; margin: 10px 0;
+  }
+  .checklist li {
+    padding: 6px 0 6px 28px;
+    position: relative;
+  }
+  .checklist li::before {
+    content: "☐";
+    position: absolute; left: 4px; top: 6px;
+    color: var(--text-dim); font-size: 16px;
+  }
+  .checklist li.done::before { content: "☑"; color: var(--green); }
+  .checklist li.done { color: var(--text-dim); text-decoration: line-through; }
+
+  @media print {
+    .topbar, .sidebar { display: none; }
+    .layout { display: block; }
+    body { background: white; color: black; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="brand">🚀 aif-pipeline</span>
+  <span class="tag">使用者指南 · <b style="color:var(--green);">不折腾代码</b></span>
+  <span class="grow"></span>
+  <nav>
+    <a href="index.html" style="color:var(--purple);" title="想看代码内部实现？">🔧 开发者指南 →</a>
+    <a href="#start">快速开始</a>
+    <a href="#install">安装</a>
+    <a href="#workflows">工作流</a>
+    <a href="#troubleshoot">故障排查</a>
+    <a href="#cheatsheet">速查表</a>
+  </nav>
+</div>
+
+<div class="layout">
+
+<aside class="sidebar">
+  <h3>导航</h3>
+  <a href="#is-this-for-me">这工具适合我吗</a>
+  <a href="#what-it-does">能做什么 / 不能做什么</a>
+  <a href="#start">5 分钟上手</a>
+  <a href="#install">第 1 步 · 安装</a>
+  <a href="#kit-config">第 2 步 · 配 Kit</a>
+  <a href="#first-run">第 3 步 · 第一次跑</a>
+  <h3>4 阶段流水线</h3>
+  <a href="#stage-convert" class="sub">Convert · CAD→USD</a>
+  <a href="#stage-optimize" class="sub">Optimize · 优化</a>
+  <a href="#stage-validate" class="sub">Validate · 校验</a>
+  <a href="#stage-metadata" class="sub">Metadata · 元数据</a>
+  <h3>实战</h3>
+  <a href="#workflows" class="sub">常用工作流（复制粘贴）</a>
+  <a href="#presets-choose" class="sub">选 preset</a>
+  <a href="#read-reports" class="sub">读懂校验报告</a>
+  <a href="#webui" class="sub">不想敲命令？用 Web UI</a>
+  <a href="#troubleshoot" class="sub">报错怎么办</a>
+  <a href="#cheatsheet" class="sub">一页速查表</a>
+  <a href="#glossary" class="sub">术语</a>
+</aside>
+
+<main>
+
+<section id="is-this-for-me">
+<h1>aif-pipeline 使用者指南</h1>
+<p>把 CAD 文件变成 NVIDIA Omniverse / 数字孪生可用的 SimReady USD 资产。<b>不读源码、不改代码，只跑命令。</b></p>
+
+<h3 style="color:var(--green);">这份指南适合你吗？</h3>
+
+<div class="callout tip">
+<p style="margin:0;"><b>✅ 适合</b> —— 如果你想：</p>
+<ul style="margin:6px 0 0 0;">
+<li>把 STEP / JT / Creo / DGN 文件批量转成 USD</li>
+<li>给客户/项目交付符合 NVIDIA SimReady 标准的资产</li>
+<li>优化 USD 文件（减面、清拓扑、修法线）让 Omniverse 跑得动</li>
+<li>校验 USD 是否合规、是否符合 AIF（AI Factory）元数据规范</li>
+<li>给设备资产（CDU/CRAH/UPS/GB300 机柜）添加标准元数据</li>
+</ul>
+</div>
+
+<div class="callout warn">
+<p style="margin:0;"><b>⚠️ 可能不适合</b> —— 如果你是：</p>
+<ul style="margin:6px 0 0 0;">
+<li><b>没有 NVIDIA RTX GPU</b> → Convert/Optimize 必须用 Kit，Kit 必须有 RTX。无 GPU 只能跑 OAV 校验。</li>
+<li><b>想实时渲染 USD</b> → 这是离线流水线工具，不是渲染器。渲染请用 USD Composer / USDView。</li>
+<li><b>想直接编辑 USD</b> → 这是命令行批处理工具。手工编辑用 USD Composer GUI。</li>
+<li><b>想改工具自身的行为</b> → 那是开发者向，请看 <a href="index.html">开发者指南</a>。</li>
+</ul>
+</div>
+</section>
+
+<section id="what-it-does">
+<h2><span class="num">§</span>这工具能做什么 / 不能做什么</h2>
+
+<h3>✅ 能做</h3>
+<table>
+  <tr><th>能力</th><th>说明</th><th>对应命令</th></tr>
+  <tr><td>CAD → USD 转换</td><td>STEP/JT/Creo/DGN → USD，批量并发</td><td><code>aif-pipeline convert</code></td></tr>
+  <tr><td>USD 优化</td><td>减面、合并顶点、修法线、去重几何、清材质</td><td><code>aif-pipeline optimize</code></td></tr>
+  <tr><td>USD 校验</td><td>检查合规性（upAxis/单位/原点/拓扑/元数据）</td><td><code>aif-pipeline validate</code> 或 <code>uv run validate</code></td></tr>
+  <tr><td>元数据注入</td><td>给资产加 AIF 标准属性（设备类型、尺寸、厂商等）</td><td><code>aif-pipeline metadata</code></td></tr>
+  <tr><td>电气时序</td><td>CSV 时序数据 → 高效二进制 USD（百万点级）</td><td><code>aif-pipeline metadata electrical</code></td></tr>
+  <tr><td>一键全流程</td><td>Convert + Optimize + Validate 串起来跑</td><td><code>aif-pipeline run</code></td></tr>
+  <tr><td>可视化 preset 构建</td><td>浏览器拖拽组合优化操作 → 导出 JSON</td><td>Asset Processor Web UI</td></tr>
+</table>
+
+<h3>❌ 不能做</h3>
+<table>
+  <tr><th>不能做</th><th>替代方案</th></tr>
+  <tr><td>实时渲染 / 互动查看 USD</td><td>USD Composer / USDView</td></tr>
+  <tr><td>手工建模 / 改几何</td><td>Blender / Maya / USD Composer</td></tr>
+  <tr><td>转 CAD 之外的格式（FBX/OBJ/glTF→USD）</td><td>USD Composer 的通用 importer</td></tr>
+  <tr><td>无 GPU 的 CAD 转换 / 优化</td><td>必须装 Kit + RTX GPU。无 GPU 环境只能跑 OAV 校验</td></tr>
+  <tr><td>CI 里跑 Convert/Optimize</td><td>CI 通常无 GPU，只能跑 OAV 校验进 CI</td></tr>
+</table>
+</section>
+
+<section id="start">
+<h2><span class="num">§</span>5 分钟看懂全局</h2>
+
+<p>整个工具就一条流水线，<b>4 个阶段，每个阶段独立可单独跑</b>：</p>
+
+<div class="pipeline">
+  <div class="stage"><b>CAD</b><span class="sub">.step/.jt/.prt/.dgn</span></div>
+  <div class="arrow">→</div>
+  <div class="stage"><b>Convert</b><span class="sub">→ .usd</span></div>
+  <div class="arrow">→</div>
+  <div class="stage"><b>Optimize</b><span class="sub">减面/清理</span></div>
+  <div class="arrow">→</div>
+  <div class="stage"><b>Validate</b><span class="sub">查合规</span></div>
+  <div class="arrow">→</div>
+  <div class="stage"><b>Metadata</b><span class="sub">加属性</span></div>
+</div>
+
+<p>每个阶段的输入输出都是<b>独立的 USD 文件</b>。可以只跑其中一两个阶段，也可以一键串起来。</p>
+
+<h3>最小可用流程（3 个命令搞定）</h3>
+<pre><code><span class="cmt"># 1. 一次性配置：告诉工具你的 Kit 装在哪</span>
+aif-pipeline config add my_kit <span class="var">--from</span> "D:/build/kit-app-template"
+
+<span class="cmt"># 2. 转换 + 优化 + 校验（一气呵成）</span>
+aif-pipeline run input_cad/ output/ <span class="var">--spec</span> scripts/data/creo_spec.json <span class="var">--preset</span> so/generic/generic_preset.json
+
+<span class="cmt"># 3. 给某个 CDU 设备加元数据</span>
+aif-pipeline metadata create <span class="var">--type</span> cdu <span class="var">--output</span> cdu.json
+<span class="cmt"># ...人工填值...</span>
+aif-pipeline metadata apply cdu.json <span class="var">--output</span> CDU_01_Properties.usda <span class="var">--prim</span> CDU_01</code></pre>
+
+<div class="callout tip">
+<strong>不想敲命令？</strong> 这个工具还有一个 Web UI（<code>asset_processor/</code>）。浏览器拖拽就能跑同样的事，详见 <a href="#webui">Web UI 章节</a>。
+</div>
+</section>
+
+<section id="install">
+<h2><span class="num">①</span>安装（一次性，约 30 分钟）</h2>
+
+<h3>前提条件</h3>
+<table>
+  <tr><th>项</th><th>要求</th></tr>
+  <tr><td>操作系统</td><td>Windows 10/11 或 Linux（Ubuntu 20.04+）<span class="badge red">不支持 macOS</span></td></tr>
+  <tr><td>GPU</td><td><b>NVIDIA RTX GPU</b>（Convert/Optimize/Kit-Validate 必需）</td></tr>
+  <tr><td>内存</td><td>16 GB+ 推荐（每个 Kit 实例占 4-8 GB）</td></tr>
+  <tr><td>磁盘</td><td>~20 GB（Kit SDK + USD Composer build）</td></tr>
+  <tr><td>Python</td><td>3.10–3.12（<code>uv</code> 会自动下载，无需手工装）</td></tr>
+  <tr><td>Git</td><td>需要（clone 仓库用）</td></tr>
+  <tr><td>Windows 特别</td><td>PowerShell 执行策略：第一次报 <code>UnauthorizedAccess</code> 时跑 <code>Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned</code></td></tr>
+</table>
+
+<div class="step-card">
+<h3><span class="num">1</span>装 USD Composer（Kit App）</h3>
+<p>有两条路，选一条：</p>
+
+<details>
+  <summary><b>选项 A · Kit App Template（推荐，需联网）</b></summary>
+  <div class="pad">
+  <p>跟着官方 quickstart 走：<a href="https://github.com/NVIDIA-Omniverse/kit-app-template?tab=readme-ov-file#quick-start">Kit App Template Quickstart</a></p>
+  <p>完成后你已经有了 <code>repo.bat</code>（Windows）或 <code>repo.sh</code>（Linux）所在的 Kit project root 目录。<b>记住这个目录路径</b>，下一步要用。</p>
+  <div class="callout warn"><strong>企业网/受限网络？</strong> 走选项 B（NGC 离线包）。</div>
+  </div>
+</details>
+
+<details>
+  <summary><b>选项 B · NGC 离线包（air-gapped / 公司网络）</b></summary>
+  <div class="pad">
+  <p>适合不能跑 kit-app-template 自动化的环境。从 NGC 下载两个包：</p>
+  <ul>
+    <li><a href="https://catalog.ngc.nvidia.com/orgs/nvidia/teams/omniverse/resources/kit-sdk-airgap-windows-pb25h2/version/109.0.3">Kit SDK Air Gap</a>（Windows / Linux 各一）</li>
+    <li><a href="https://catalog.ngc.nvidia.com/orgs/nvidia/teams/omniverse/resources/kit-extensions-registry-pb25h2/version">Kit Extensions Registry</a></li>
+  </ul>
+  <p>解压 → <code>new_project.bat</code>（或 <code>.sh</code>）建 USD Composer project → 编辑 <code>repo.toml</code> 加 registry → <code>repo.bat build</code> → <code>repo.bat launch</code>。</p>
+  <p>详细步骤见 <a href="https://nvidia-omniverse.github.io/aif-pipeline-samples/get-started/setup.html">官方 Setup 文档 Option 2</a>。</p>
+  </div>
+</details>
+</div>
+
+<div class="step-card">
+<h3><span class="num">2</span>装 aif-pipeline CLI</h3>
+
+<div class="tabs">
+  <div class="tab-bar">
+    <button class="active" data-pane="win">Windows</button>
+    <button data-pane="linux">Linux</button>
+  </div>
+  <div class="pane active" id="win">
+    <pre><code><span class="cmt"># clone 仓库（任何位置都行，建议在 D:\projects\）</span>
+cd D:\projects
+git clone https://github.com/NVIDIA-Omniverse/aif-pipeline-samples.git
+cd aif-pipeline-samples
+
+<span class="cmt"># 一键安装（自动装 uv / Python / 依赖 / 设环境变量）</span>
+.\setup.ps1</code></pre>
+  </div>
+  <div class="pane" id="linux">
+    <pre><code><span class="cmt"># clone 仓库</span>
+cd ~/projects
+git clone https://github.com/NVIDIA-Omniverse/aif-pipeline-samples.git
+cd aif-pipeline-samples
+
+<span class="cmt"># 一键安装</span>
+./setup.sh
+<span class="cmt"># 如果报 Permission denied：bash setup.sh 或 chmod +x setup.sh</span></code></pre>
+  </div>
+</div>
+
+<p>看到这三段输出说明成功：</p>
+<pre><code>=== AIF Pipeline Samples Setup ===
+[1/3] Checking uv...                                  <span class="cmt"># ✓</span>
+[2/3] Setting AIF_PIPELINE_SAMPLES_ROOT...            <span class="cmt"># ✓</span>
+[3/3] Running uv sync (venv + all dependencies)...    <span class="cmt"># ✓</span>
+=== Setup Complete ===</code></pre>
+
+<div class="callout warn">
+<strong>setup 失败？</strong> 走手工三步：(1) 装 <a href="https://docs.astral.sh/uv/">uv</a>；(2) 设环境变量 <code>AIF_PIPELINE_SAMPLES_ROOT</code> 指向 repo root；(3) 跑 <code>uv sync</code>。详见 <a href="https://nvidia-omniverse.github.io/aif-pipeline-samples/get-started/setup.html#option-b-manual-steps">官方文档 Option B</a>。
+</div>
+</div>
+
+<div class="step-card">
+<h3><span class="num">3</span>验证安装</h3>
+<pre><code><span class="cmt"># 每次开新终端都要先激活 venv，或者所有命令前面加 uv run</span>
+<span class="cmt"># Windows: .\.venv\Scripts\Activate.ps1</span>
+<span class="cmt"># Linux:   source .venv/bin/activate</span>
+
+aif-pipeline --version    <span class="cmt"># 应该打印版本号</span>
+aif-pipeline --help       <span class="cmt"># 应该列出 6 个子命令</span></code></pre>
+
+<p>看到版本号 = 装好了。<b>但还不能用</b>，下一步要告诉它 Kit 在哪。</p>
+</div>
+</section>
+
+<section id="kit-config">
+<h2><span class="num">②</span>配置 Kit 路径（关键一步）</h2>
+
+<p>这是从"装好了"到"能跑了"之间唯一的拦路虎。CLI 必须知道你的 Kit 装在哪。</p>
+
+<div class="callout danger">
+<strong>最关键的认知</strong>：<code>--from</code> 后面跟的是 <b>Kit project root</b> —— 含 <code>repo.bat</code> / <code>repo.sh</code> 的目录，<b>不是</b> <code>_build/</code> 或它下面的子目录。工具会自动从 project root 找到 <code>kit.exe</code>。
+</div>
+
+<div class="tabs">
+  <div class="tab-bar">
+    <button class="active" data-pane="win2">Windows</button>
+    <button data-pane="linux2">Linux</button>
+  </div>
+  <div class="pane active" id="win2">
+    <pre><code><span class="cmt"># Kit App Template 装的：</span>
+aif-pipeline config add kat_109 <span class="var">--from</span> "D:/build/kit-app-template"
+
+<span class="cmt"># NGC 手动装的：</span>
+aif-pipeline config add ngc_109 <span class="var">--from</span> "D:/build/ngc/USD_Composer_109.0.3"</code></pre>
+  </div>
+  <div class="pane" id="linux2">
+    <pre><code><span class="cmt"># Kit App Template 装的：</span>
+aif-pipeline config add kat_109 <span class="var">--from</span> ~/kit-app-template
+
+<span class="cmt"># NGC 手动装的：</span>
+aif-pipeline config add ngc_109 <span class="var">--from</span> ~/build/ngc/USD_Composer_109.0.3</code></pre>
+  </div>
+</div>
+
+<p>成功的输出长这样：</p>
+<pre><code>OK Kit executable: D:\build\kit-app-template\_build\windows-x86_64\release\kit\kit.exe
+OK Release directory: D:\build\kit-app-template\_build\windows-x86_64\release
+OK Configuration saved to: C:\Users\&lt;you&gt;\.aif-pipeline\config.yaml</code></pre>
+
+<h3>验证配置</h3>
+<pre><code>aif-pipeline config show</code></pre>
+<p>应该看到 <code>kit.path</code> 和 <code>kit.release_dir</code> 都有值（不是 <code>null</code>）。如果是 <code>null</code>，说明 <code>--from</code> 路径不对，回去重做。</p>
+
+<h3>管理多个 Kit 版本（按需）</h3>
+<pre><code><span class="cmt"># 加多个 Kit 配置</span>
+aif-pipeline config add kat_109 <span class="var">--from</span> ~/kit-app-template
+aif-pipeline config add ngc_110 <span class="var">--from</span> ~/build/ngc/USD_Composer_110.0.0
+
+<span class="cmt"># 看所有</span>
+aif-pipeline config list
+
+<span class="cmt"># 切换默认</span>
+aif-pipeline config use ngc_110
+
+<span class="cmt"># 单次命令用某个 config，不改默认</span>
+aif-pipeline <span class="var">--config</span> ngc_109 convert input/ output/ --spec spec.json</code></pre>
+</section>
+
+<section id="first-run">
+<h2><span class="num">③</span>第一次跑（端到端）</h2>
+
+<p>准备一个含 CAD 文件的目录，跑这一条命令完成 Convert + Optimize + Validate：</p>
+
+<pre><code>aif-pipeline run input_cad/ output/ \
+  <span class="var">--spec</span> scripts/data/creo_spec.json \
+  <span class="var">--preset</span> so/generic/generic_preset.json</code></pre>
+
+<p>跑完会在 <code>output/</code> 看到：</p>
+<pre><code>output/
+├── Converted/    <span class="cmt"># CAD → USD 的原始结果</span>
+└── Optimized/    <span class="cmt"># 经过 generic_preset.json 优化后的结果</span></code></pre>
+
+<p>校验结果会直接打印在终端。看到 <code>PASSED</code> 就说明合规。</p>
+
+<h3>spec 文件怎么选</h3>
+<table>
+  <tr><th>你的 CAD 格式</th><th>扩展名</th><th>用哪个 spec</th></tr>
+  <tr><td>Creo / PTC</td><td><code>.prt</code> <code>.asm</code></td><td><code>scripts/data/creo_spec.json</code></td></tr>
+  <tr><td>JT</td><td><code>.jt</code></td><td><code>scripts/data/jt_spec.json</code></td></tr>
+  <tr><td>MicroStation DGN</td><td><code>.dgn</code></td><td><code>scripts/data/dgn_spec.json</code></td></tr>
+  <tr><td>STEP / 其他</td><td><code>.step</code> <code>.stp</code></td><td>先用 <code>creo_spec.json</code> 试，不行查 CAD Converter 文档</td></tr>
+</table>
+
+<div class="callout tip">
+<strong>不想跑全部 3 步？</strong> 用 <code>--steps</code> 自定义：<code>--steps convert,optimize</code> 跳校验；<code>--no-validate</code> 也是跳校验的简写。
+</div>
+</section>
+
+<section id="stage-convert">
+<h2><span class="num">④</span>阶段 1 · Convert（CAD → USD）</h2>
+
+<h3>什么时候单独跑</h3>
+<ul>
+<li>只想拿到原始 USD，不想优化</li>
+<li>批量转换大量文件，想用高并发</li>
+<li>之前中途中断了，想续跑</li>
+</ul>
+
+<h3>典型命令</h3>
+<pre><code><span class="cmt"># 标准批量</span>
+aif-pipeline convert input_cad/ output_usd/ \
+  <span class="var">--spec</span> scripts/data/creo_spec.json
+
+<span class="cmt"># 高并发 + 跳过已转过的（断点续跑）</span>
+aif-pipeline convert input_cad/ output_usd/ \
+  <span class="var">--spec</span> scripts/data/creo_spec.json \
+  <span class="var">--concurrent</span> 64 \
+  <span class="var">--skip-existing</span>
+
+<span class="cmt"># 超时控制（复杂装配可能很慢）</span>
+aif-pipeline convert input_cad/ output_usd/ \
+  <span class="var">--spec</span> scripts/data/creo_spec.json \
+  <span class="var">--timeout</span> 7200</code></pre>
+
+<h3>常用 flag</h3>
+<table>
+  <tr><th>flag</th><th>含义</th><th>默认</th></tr>
+  <tr><td><code>--spec</code></td><td>CAD 格式 spec（必填或在 config 设）</td><td>config 的 <code>conversion.spec</code></td></tr>
+  <tr><td><code>--concurrent</code></td><td>并发进程数</td><td>64</td></tr>
+  <tr><td><code>--timeout</code></td><td>单文件超时秒数</td><td>7200（2 小时）</td></tr>
+  <tr><td><code>--skip-existing</code></td><td>已转过的跳过（断点续跑神器）</td><td>false</td></tr>
+</table>
+
+<div class="callout warn">
+<strong>需要 Kit</strong>：convert 通过 Kit 的 CAD Converter 扩展干活。每个并发进程占 4-8 GB 内存，<code>--concurrent</code> 别设太大（一般 16-64，看内存）。
+</div>
+</section>
+
+<section id="stage-optimize">
+<h2><span class="num">⑤</span>阶段 2 · Optimize（优化）</h2>
+
+<h3>什么时候单独跑</h3>
+<ul>
+<li>已经有 USD（外部来源，不是本工具转的）</li>
+<li>想用不同 preset 重新优化对比</li>
+<li>校验失败后，针对性修复</li>
+</ul>
+
+<h3>典型命令</h3>
+<pre><code><span class="cmt"># 非破坏式（推荐）：输出到新目录，保留原始</span>
+aif-pipeline optimize output_usd/ optimized/ \
+  <span class="var">--preset</span> so/generic/generic_preset.json
+
+<span class="cmt"># 破坏式：原地改（不推荐，除非磁盘紧张）</span>
+aif-pipeline optimize output_usd/ \
+  <span class="var">--preset</span> so/generic/generic_preset.json
+
+<span class="cmt"># 单文件优化</span>
+aif-pipeline optimize one_file.usd one_file_optimized.usd \
+  <span class="var">--preset</span> so/generic/generic_preset.json</code></pre>
+
+<h3>选哪个 preset</h3>
+<table>
+  <tr><th>preset</th><th>用途</th><th>路径</th></tr>
+  <tr><td><b>Generic</b></td><td>通用 CAD 资产，<b>不知道选哪个就选它</b></td><td><code>so/generic/generic_preset.json</code></td></tr>
+  <tr><td>Vertiv 厂商</td><td>Vertiv 电源设备（UPS/PDU）</td><td><code>so/vertiv/</code></td></tr>
+  <tr><td>SPT 厂商</td><td>SPT 设备（含 GB300 机柜）</td><td><code>so/spt/</code></td></tr>
+  <tr><td>Trane 厂商</td><td>Trane HVAC（空调）</td><td><code>so/trane/</code></td></tr>
+  <tr><td>自定义</td><td>用 <a href="#webui">Web UI</a> 拖拽生成</td><td>你保存的 JSON</td></tr>
+</table>
+
+<div class="callout tip">
+<strong>generic_preset.json 做了什么</strong>（按顺序）：设单位/朝向 → 合并重复层级 → 清理网格 → 减面 → 算法线 → 清未绑定材质 → 去重几何 → 清空叶子 → 精简 primvar → 去重材质 → 修材质绑定 → 清小几何 → 算包围盒。<b>12 步全套</b>，不需要你操心顺序。
+</div>
+</section>
+
+<section id="stage-validate">
+<h2><span class="num">⑥</span>阶段 3 · Validate（校验）</h2>
+
+<h3>两条校验路径，选一条</h3>
+<table>
+  <tr><th>路径</th><th>命令</th><th>需要 Kit?</th><th>什么时候用</th></tr>
+  <tr><td><b>Kit 校验</b></td><td><code>aif-pipeline validate</code></td><td>是（要 GPU）</td><td>本地开发、要 Scene Optimizer 加速版规则</td></tr>
+  <tr><td><b>OAV 校验</b></td><td><code>uv run --directory oav validate</code></td><td><b>否</b>（CI 友好）</td><td>无 GPU 环境、CI/CD、跑 AIF 专用规则</td></tr>
+</table>
+
+<h3>Kit 校验</h3>
+<pre><code><span class="cmt"># 标准：Basic + Usd + Omni 三类规则</span>
+aif-pipeline validate optimized/ validation/
+
+<span class="cmt"># 加 metadata 前后的分阶段校验</span>
+aif-pipeline validate optimized/ validation_pre/ <span class="var">--stage</span> pre
+aif-pipeline validate optimized/ validation_post/ <span class="var">--stage</span> post
+
+<span class="cmt"># 针对 SimReady 特性校验</span>
+aif-pipeline validate optimized/ validation/ \
+  <span class="var">--feature</span> minimal_placeable_visual \
+  <span class="var">--predicate</span> IsError
+
+<span class="cmt"># 自动修复（小心，会改文件）</span>
+aif-pipeline validate optimized/ validation/ <span class="var">--fix</span> <span class="var">--output-assets</span> fixed/
+
+<span class="cmt"># 每条规则单独跑（诊断慢规则用）</span>
+aif-pipeline validate optimized/ validation/ <span class="var">--fine-grained</span></code></pre>
+
+<h3>OAV 校验（无 Kit/GPU 也能跑）</h3>
+<pre><code><span class="cmt"># 跑所有 AIF 规则</span>
+uv run <span class="var">--directory</span> oav validate <span class="var">--category</span> AIF /path/to/asset.usd
+
+<span class="cmt"># 只跑某条规则</span>
+uv run <span class="var">--directory</span> oav validate <span class="var">--rule</span> AIFMetadataChecker /path/to/asset.usd
+
+<span class="cmt"># 只看错误（不显示警告）</span>
+uv run <span class="var">--directory</span> oav validate <span class="var">--category</span> AIF /path/to/asset.usd 2&gt;&amp;1 | findstr Error <span class="cmt"># Windows</span></code></pre>
+
+<div class="callout tip">
+<strong>注意</strong>：<code>aif-pipeline run</code> 命令的 validate 步骤<b>用的是 OAV</b>（不是 Kit 校验），所以 run 在 validate 这步不需要 Kit 启动。
+</div>
+</section>
+
+<section id="stage-metadata">
+<h2><span class="num">⑦</span>阶段 4 · Metadata（AIF 元数据）</h2>
+
+<p>给资产加属性，让仿真运行时知道"这是台 CDU，制冷量 200kW，重 800kg"。这是 SimReady 资产区别于普通 USD 的关键。</p>
+
+<h3>支持 4 种设备</h3>
+<table>
+  <tr><th>类型</th><th>设备</th><th>属性数</th><th>是否预填值</th></tr>
+  <tr><td><code>cdu</code></td><td>冷却液分配单元</td><td>81</td><td>否，需手填</td></tr>
+  <tr><td><code>crah</code></td><td>机房空调</td><td>51</td><td>否，需手填</td></tr>
+  <tr><td><code>ups</code></td><td>不间断电源</td><td>51</td><td>否，需手填</td></tr>
+  <tr><td><code>gb300_rack</code></td><td>NVIDIA DGX GB300 机柜</td><td>28</td><td><b>是</b>（NVIDIA 默认值）</td></tr>
+</table>
+
+<h3>标准流程</h3>
+<pre><code><span class="cmt"># 1. 生成空白模板</span>
+aif-pipeline metadata create <span class="var">--type</span> cdu <span class="var">--output</span> cdu.json
+
+<span class="cmt"># 2. 用编辑器打开 cdu.json，把 value 字段填上真实值</span>
+<span class="cmt">#    （manufacturer / modelNumber / 各种规格参数...）</span>
+
+<span class="cmt"># 3. 应用到 USD，生成 properties 子层</span>
+aif-pipeline metadata apply cdu.json \
+  <span class="var">--output</span> CDU_01_Properties.usda \
+  <span class="var">--prim</span> CDU_01
+
+<span class="cmt"># 4. 把 properties.usda 作为 sublayer 组合进主资产 USD</span>
+<span class="cmt">#    （在 USD Composer 里做，或用 preset 的 add_layers 处理器）</span>
+
+<span class="cmt"># 5. 校验元数据是否齐全</span>
+uv run <span class="var">--directory</span> oav validate <span class="var">--rule</span> AIFMetadataChecker CDU_01.usd</code></pre>
+
+<h3>更新已有元数据（不删旧值）</h3>
+<pre><code><span class="cmt"># 比对当前模板，补缺失的属性，自动检测设备类型</span>
+aif-pipeline metadata update CDU_01_Properties.usda
+
+<span class="cmt"># 先看会改什么，不写盘</span>
+aif-pipeline metadata update CDU_01_Properties.usda <span class="var">--dry-run</span></code></pre>
+
+<h3>电气时序（特殊路径）</h3>
+<pre><code><span class="cmt"># 把百万级 TIME,VALUE CSV 转成高效二进制 USDC</span>
+aif-pipeline metadata electrical phase1.csv phase1.usdc \
+  <span class="var">--prim</span> Root \
+  <span class="var">--property</span> Phase1_AC_Current</code></pre>
+</section>
+
+<section id="workflows">
+<h2><span class="num">§</span>常用工作流（复制粘贴）</h2>
+
+<details open>
+  <summary><b>工作流 A · 全流程一键跑（最常用）</b></summary>
+  <div class="pad">
+  <pre><code>aif-pipeline run input_cad/ output/ \
+  <span class="var">--spec</span> scripts/data/creo_spec.json \
+  <span class="var">--preset</span> so/generic/generic_preset.json</code></pre>
+  <p>跑 Convert + Optimize + OAV 校验。Metadata 之后手工补。</p>
+  </div>
+</details>
+
+<details>
+  <summary><b>工作流 B · 只转 CAD（拿到原始 USD）</b></summary>
+  <div class="pad">
+  <pre><code>aif-pipeline convert input_cad/ output_usd/ \
+  <span class="var">--spec</span> scripts/data/creo_spec.json \
+  <span class="var">--concurrent</span> 32 \
+  <span class="var">--skip-existing</span></code></pre>
+  </div>
+</details>
+
+<details>
+  <summary><b>工作流 C · 只优化（USD 已经有了）</b></summary>
+  <div class="pad">
+  <pre><code>aif-pipeline optimize input_usd/ optimized/ \
+  <span class="var">--preset</span> so/generic/generic_preset.json</code></pre>
+  </div>
+</details>
+
+<details>
+  <summary><b>工作流 D · 只校验（CI 友好，无 GPU）</b></summary>
+  <div class="pad">
+  <pre><code><span class="cmt"># 适合加进 CI/CD，机器不必有 GPU</span>
+uv run <span class="var">--directory</span> oav validate <span class="var">--category</span> AIF path/to/asset.usd
+<span class="cmt"># 退出码 0 = 通过，非 0 = 有失败</span></code></pre>
+  </div>
+</details>
+
+<details>
+  <summary><b>工作流 E · 只加 metadata（设备资产交付前）</b></summary>
+  <div class="pad">
+  <pre><code>aif-pipeline metadata create <span class="var">--type</span> cdu <span class="var">--output</span> cdu.json
+<span class="cmt"># 编辑 cdu.json 填值</span>
+aif-pipeline metadata apply cdu.json <span class="var">--output</span> CDU_01_Properties.usda <span class="var">--prim</span> CDU_01
+uv run <span class="var">--directory</span> oav validate <span class="var">--rule</span> AIFMetadataChecker CDU_01.usd</code></pre>
+  </div>
+</details>
+
+<details>
+  <summary><b>工作流 F · 多项目不同 Kit 配置</b></summary>
+  <div class="pad">
+  <pre><code><span class="cmt"># 项目 A 用 Kit 109，项目 B 用 Kit 110</span>
+cd ~/projects/project_a
+aif-pipeline config add <span class="var">--project</span> <span class="var">--from</span> ~/build/ngc/USD_Composer_109.0.3
+<span class="cmt"># 生成 ./aif-pipeline.yaml（项目级，优先级最高）</span>
+
+cd ~/projects/project_b
+aif-pipeline config add <span class="var">--project</span> <span class="var">--from</span> ~/build/ngc/USD_Composer_110.0.0</code></pre>
+  <p>进哪个项目目录就用哪个 Kit，互不干扰。</p>
+  </div>
+</details>
+
+<details>
+  <summary><b>工作流 G · 大批量断点续跑</b></summary>
+  <div class="pad">
+  <pre><code><span class="cmt"># 第 1 次跑，跑了 500 个文件后机器挂了</span>
+aif-pipeline run input/ output/ --spec ... --preset ...
+
+<span class="cmt"># 第 2 次接着跑（跳过已转的）</span>
+aif-pipeline run input/ output/ --spec ... --preset ... <span class="var">--skip-existing</span></code></pre>
+  </div>
+</details>
+
+<details>
+  <summary><b>工作流 H · 校验失败 → 自动修复 → 再校验</b></summary>
+  <div class="pad">
+  <pre><code><span class="cmt"># 1. 第一次校验，发现错误</span>
+aif-pipeline validate input/ report/
+
+<span class="cmt"># 2. 让工具自动修复（输出到新目录，不动原始）</span>
+aif-pipeline validate input/ report/ <span class="var">--fix</span> <span class="var">--output-assets</span> fixed/
+
+<span class="cmt"># 3. 重新校验修复后的</span>
+aif-pipeline validate fixed/ report2/
+
+<span class="cmt"># 4. 如果自动修复不够，可能要改 preset 加针对性操作，</span>
+<span class="cmt">#    详见下方"读懂校验报告"</span></code></pre>
+  </div>
+</details>
+</section>
+
+<section id="presets-choose">
+<h2><span class="num">§</span>怎么选 preset</h2>
+
+<h3>决策树</h3>
+<pre><code>你的资产是什么？
+│
+├─ 通用机械 / 不确定
+│  └─→ so/generic/generic_preset.json  <span class="cmt"># 90% 场景选这个</span>
+│
+├─ Vertiv 电源设备（UPS/PDU）
+│  └─→ 看 so/vertiv/ 下面有没有对应型号
+│
+├─ SPT 设备或 GB300 机柜
+│  └─→ 看 so/spt/（含 GB300 专用 preset）
+│
+├─ Trane HVAC
+│  └─→ 看 so/trane/
+│
+└─ 上面都不匹配 / 想自定义
+   └─→ 用 <a href="#webui">Web UI</a> 拖一个出来</code></pre>
+
+<h3>generic_preset.json 一定适合吗？</h3>
+<p>90% 情况适合。但有 2 种例外要调：</p>
+<ul>
+<li><b>不能减面</b>（高精度仿真）→ 复制 generic_preset.json，删掉 <code>decimateMeshes</code> 那一步</li>
+<li><b>需要外部 payloads</b>（GB300 这种大量重复结构的）→ 看 <code>so/spt/gb300/gb300_payloads.json</code> 的写法</li>
+</ul>
+</section>
+
+<section id="read-reports">
+<h2><span class="num">§</span>读懂校验报告</h2>
+
+<p>校验报告分 3 种严重性：</p>
+<table>
+  <tr><th>级别</th><th>含义</th><th>要不要管</th></tr>
+  <tr><td><b>Error</b></td><td>严重不合规</td><td><b>必须修</b>，否则资产不合格</td></tr>
+  <tr><td><b>Warning</b></td><td>建议修</td><td>看情况，AIFMetadataChecker 缺属性只报 Warning</td></tr>
+  <tr><td><b>Failure</b></td><td>规则自身没跑成</td><td>环境问题（Kit 没装好 / USD 损坏）</td></tr>
+</table>
+
+<h3>常见报错 → 修复对应表</h3>
+<table>
+  <tr><th>报错规则</th><th>什么意思</th><th>怎么修</th></tr>
+  <tr><td><code>UpAxisZ</code></td><td>upAxis 不是 Z</td><td>preset 加 <code>editStageMetrics</code>（upAxis=2）</td></tr>
+  <tr><td><code>AIFMetersPerUnit</code></td><td>单位不对</td><td>preset 加 <code>editStageMetrics</code>（metersPerUnit=1.0）</td></tr>
+  <tr><td><code>stage_has_default_prim</code></td><td>没设 defaultPrim</td><td>USD Composer 里 Set as Default Prim</td></tr>
+  <tr><td><code>AIFRootIsXformable</code></td><td>root 不是 Xform</td><td>结构问题，需要重构层级</td></tr>
+  <tr><td><code>AIFAssetAtOrigin</code></td><td>资产不在原点</td><td>调 transform，让 root 在 (0,0,0)</td></tr>
+  <tr><td><code>normals_valid</code> / <code>normals_exist</code></td><td>没法线或法线坏</td><td>preset 加 <code>generateNormals</code>（sharpnessAngle=60）</td></tr>
+  <tr><td><code>usdgeom_extent</code></td><td>包围盒不对</td><td>preset 最后一步加 <code>computeExtents</code></td></tr>
+  <tr><td><code>geom_shall_be_mesh</code></td><td>有非 Mesh 几何（如 Curves）</td><td>需要重转 CAD，或手工转 Mesh</td></tr>
+  <tr><td><code>winding_order</code></td><td>面绕序错</td><td>preset 加 mesh cleanup 操作</td></tr>
+  <tr><td><code>AIFMetadataChecker</code>（缺 common）</td><td>缺 <code>aif:core:*</code> 属性</td><td>跑 <code>metadata create + apply</code> 补全</td></tr>
+  <tr><td><code>AIFMetadataChecker</code>（缺 spec）</td><td>缺 <code>aif:spec:*</code> 设备属性</td><td>对应设备模板，填具体规格值</td></tr>
+  <tr><td><code>AIFMetadataChecker</code>（缺 sublayer）</td><td>主 USD 没引用 properties.usda</td><td>把 *_Properties.usda 加为 sublayer</td></tr>
+</table>
+
+<div class="callout tip">
+<strong>修复闭环</strong>：报错 → 查上表 → 改 preset 或补 metadata → 重跑 optimize → 重跑 validate。<b>不要改校验规则本身</b>，那是规范。
+</div>
+</section>
+
+<section id="webui">
+<h2><span class="num">§</span>不想敲命令？用 Web UI</h2>
+
+<p><b>Asset Processor</b> 是个浏览器界面，能做 CLI 能做的所有事，且可以拖拽构建 preset。</p>
+
+<h3>启动</h3>
+<pre><code><span class="cmt"># 在 repo root 跑（专用 terminal，会锁住）</span>
+uv run python asset_processor/server.py
+
+<span class="cmt"># 浏览器打开</span>
+http://127.0.0.1:8080</code></pre>
+
+<div class="callout warn">
+<strong>停止服务</strong>：在跑 server 的 terminal 按 <code>Ctrl+C</code>。<b>关浏览器不算停</b>。忘了停下次启动会报 "Address already in use"，按 <a href="#troubleshoot">故障排查</a> 杀进程。
+</div>
+
+<h3>Web UI 能做的</h3>
+<ul>
+<li><b>Preset Factory</b>：拖拽组合 45+ Scene Optimizer 操作 → 配参数 → 保存 JSON</li>
+<li><b>Convert / Optimize / Validate</b>：填路径点按钮跑 CLI 同款命令</li>
+<li><b>Metadata</b>：管理设备模板</li>
+<li><b>Config 管理</b>：点 <code>+ Add</code> 加 Kit 配置（等同 <code>config add</code>）</li>
+</ul>
+
+<h3>Web UI 不能做的</h3>
+<ul>
+<li>批量上千文件（CLI 更适合）</li>
+<li>无人值守定时任务（用 CLI + cron/Task Scheduler）</li>
+<li>CI 集成（用 OAV CLI）</li>
+</ul>
+</section>
+
+<section id="troubleshoot">
+<h2><span class="num">§</span>故障排查</h2>
+
+<table>
+  <tr><th>报错 / 现象</th><th>原因</th><th>解决</th></tr>
+  <tr>
+    <td><code>command not found: aif-pipeline</code></td>
+    <td>没激活 venv，或没用 <code>uv run</code></td>
+    <td>所有命令前加 <code>uv run</code>，或先 <code>source .venv/bin/activate</code>（Linux）/<code>.\.venv\Scripts\Activate.ps1</code>（Win）</td>
+  </tr>
+  <tr>
+    <td><code>Kit path not configured</code></td>
+    <td>没跑过 <code>config add</code></td>
+    <td>见 <a href="#kit-config">配置 Kit 路径</a>章节</td>
+  </tr>
+  <tr>
+    <td><code>WARNING Kit executable not found</code></td>
+    <td><code>--from</code> 传了 <code>_build/</code> 而非 project root</td>
+    <td>用含 <code>repo.bat</code>/<code>repo.sh</code> 的目录</td>
+  </tr>
+  <tr>
+    <td><code>--spec required</code></td>
+    <td>没在命令行或 config 给 spec</td>
+    <td>加 <code>--spec scripts/data/creo_spec.json</code>，或 <code>aif-pipeline config set conversion.spec "..."</code></td>
+  </tr>
+  <tr>
+    <td>转换/优化超时</td>
+    <td>装配太复杂或文件太大</td>
+    <td><code>--timeout</code> 调大；降 <code>--concurrent</code></td>
+  </tr>
+  <tr>
+    <td>Out of memory</td>
+    <td>并发太高，每进程 4-8 GB</td>
+    <td>降 <code>--concurrent</code>，16GB 内存建议 ≤ 2</td>
+  </tr>
+  <tr>
+    <td>批量部分失败</td>
+    <td>个别文件损坏或异常</td>
+    <td>重跑加 <code>--skip-existing</code>，只处理失败的</td>
+  </tr>
+  <tr>
+    <td><code>Address already in use :8080</code></td>
+    <td>Web UI server 没停</td>
+    <td>Linux: <code>kill $(lsof -t -i:8080)</code>；Win: <code>netstat -ano \| findstr :8080</code> 然后 <code>taskkill /PID &lt;pid&gt; /F</code></td>
+  </tr>
+  <tr>
+    <td><code>OAV ImportError</code></td>
+    <td>依赖没装全</td>
+    <td>从 repo root 跑 <code>uv sync</code></td>
+  </tr>
+  <tr>
+    <td>Web UI 加载 preset 报错</td>
+    <td>JSON 不是合法的 Scene Optimizer 格式</td>
+    <td>JSON 必须是"操作对象数组"，F12 看 console 错误</td>
+  </tr>
+  <tr>
+    <td>pythonScript 操作报错</td>
+    <td><code>AIF_PIPELINE_SAMPLES_ROOT</code> 没设</td>
+    <td>重新跑 <code>setup.sh</code>/<code>setup.ps1</code>，或手工设环境变量</td>
+  </tr>
+  <tr>
+    <td>Windows <code>UnauthorizedAccess</code></td>
+    <td>PowerShell 执行策略限制</td>
+    <td><code>Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned</code></td>
+  </tr>
+  <tr>
+    <td>Python 3.13+ 报错</td>
+    <td>部分依赖不支持 3.13</td>
+    <td><code>uv sync</code> 会自动选 3.10–3.12，不用手工装</td>
+  </tr>
+</table>
+</section>
+
+<section id="cheatsheet">
+<h2><span class="num">§</span>一页速查表</h2>
+
+<h3>准备（一次性）</h3>
+<pre><code>git clone https://github.com/NVIDIA-Omniverse/aif-pipeline-samples.git
+cd aif-pipeline-samples
+./setup.sh                       <span class="cmt"># 或 .\setup.ps1</span>
+aif-pipeline config add my_kit --from &lt;kit_project_root&gt;
+aif-pipeline config show         <span class="cmt"># 验证</span></code></pre>
+
+<h3>日常（5 条命令记住就行）</h3>
+<pre><code><span class="cmt"># 1. 一键全流程</span>
+aif-pipeline run IN OUT --spec S --preset P
+
+<span class="cmt"># 2. 单步：转 CAD</span>
+aif-pipeline convert IN OUT --spec scripts/data/creo_spec.json
+
+<span class="cmt"># 3. 单步：优化</span>
+aif-pipeline optimize IN OUT --preset so/generic/generic_preset.json
+
+<span class="cmt"># 4. 单步：校验（有 Kit）</span>
+aif-pipeline validate IN OUT
+
+<span class="cmt"># 5. 单步：校验（无 Kit，CI 友好）</span>
+uv run --directory oav validate --category AIF &lt;asset.usd&gt;</code></pre>
+
+<h3>元数据（设备资产）</h3>
+<pre><code>aif-pipeline metadata create --type cdu --output cdu.json
+<span class="cmt"># 编辑 cdu.json</span>
+aif-pipeline metadata apply cdu.json --output CDU_Properties.usda --prim CDU_01</code></pre>
+
+<h3>spec 速查</h3>
+<table>
+  <tr><th>CAD</th><th>spec</th></tr>
+  <tr><td>Creo (.prt/.asm)</td><td><code>scripts/data/creo_spec.json</code></td></tr>
+  <tr><td>JT (.jt)</td><td><code>scripts/data/jt_spec.json</code></td></tr>
+  <tr><td>DGN (.dgn)</td><td><code>scripts/data/dgn_spec.json</code></td></tr>
+</table>
+
+<h3>preset 速查</h3>
+<table>
+  <tr><th>场景</th><th>preset</th></tr>
+  <tr><td>通用（默认）</td><td><code>so/generic/generic_preset.json</code></td></tr>
+  <tr><td>Vertiv 电源</td><td><code>so/vertiv/</code></td></tr>
+  <tr><td>SPT / GB300</td><td><code>so/spt/</code></td></tr>
+  <tr><td>Trane HVAC</td><td><code>so/trane/</code></td></tr>
+</table>
+
+<h3>必要约定</h3>
+<ul class="checklist">
+  <li>所有命令前 <code>uv run</code> 或先激活 <code>.venv</code></li>
+  <li>每次新开 terminal 要重激活 venv</li>
+  <li>convert/optimize/Kit-validate 必须有 Kit + RTX GPU</li>
+  <li>OAV 校验（无 Kit）可进 CI</li>
+  <li>非破坏式输出（独立目录）优于原地改</li>
+  <li><code>--skip-existing</code> 是断点续跑神器</li>
+  <li>metadata 必须作为 sublayer 组合进主 USD</li>
+  <li>每跑完必校验，看到 PASSED 才算合格</li>
+</ul>
+</section>
+
+<section id="glossary">
+<h2><span class="num">§</span>术语（使用者向）</h2>
+<table>
+  <tr><th>术语</th><th>大白话解释</th></tr>
+  <tr><td><b>USD</b></td><td>3D 场景文件格式（.usd/.usda/.usdc）。Omniverse 的通用语言。</td></tr>
+  <tr><td><b>SimReady</b></td><td>NVIDIA 的"仿真就绪"标准。普通 USD 不一定能仿真，SimReady USD 可以。</td></tr>
+  <tr><td><b>AIF</b></td><td>AI Factory。本工具针对的数据中心设备标准。</td></tr>
+  <tr><td><b>Kit</b></td><td>Omniverse 的引擎。USD Composer 就是基于 Kit 的应用。本工具的 convert/optimize 借 Kit 的能力干活。</td></tr>
+  <tr><td><b>USD Composer</b></td><td>官方 Kit App，相当于 Omniverse 的"编辑器"。</td></tr>
+  <tr><td><b>Scene Optimizer</b></td><td>Kit 的优化扩展，本工具的 optimize 步就是调它。</td></tr>
+  <tr><td><b>preset</b></td><td>优化操作序列的 JSON 文件，告诉工具"按这些步骤优化"。</td></tr>
+  <tr><td><b>spec 文件</b></td><td>CAD 转换的配置 JSON，告诉工具"Creo/JT/DGN 怎么转"。</td></tr>
+  <tr><td><b>OAV</b></td><td>离线版 USD 校验器，无 Kit 无 GPU 也能跑，CI 友好。</td></tr>
+  <tr><td><b>metadata</b></td><td>资产的"身份证"属性（厂商、型号、规格等）。</td></tr>
+  <tr><td><b>aif:core:</b></td><td>所有设备共用的属性（厂商、尺寸、重量等 15 个）。</td></tr>
+  <tr><td><b>aif:spec:</b></td><td>设备专属属性（CDU 制冷量、UPS 功率等）。</td></tr>
+  <tr><td><b>CDU</b></td><td>冷却液分配单元。</td></tr>
+  <tr><td><b>CRAH</b></td><td>机房空调。</td></tr>
+  <tr><td><b>UPS</b></td><td>不间断电源。</td></tr>
+  <tr><td><b>GB300</b></td><td>NVIDIA DGX GB300 机柜，AI Factory 标准计算单元。</td></tr>
+  <tr><td><b>connection points</b></td><td>标记设备开口（水管/电源/风道接口）的几何 prim。</td></tr>
+  <tr><td><b>prim</b></td><td>USD 场景里的一个对象（一个 mesh、一个相机、一盏灯）。</td></tr>
+  <tr><td><b>sublayer</b></td><td>USD 文件叠加机制。metadata 写成单独 .usda，作为 sublayer 拼进主 USD。</td></tr>
+  <tr><td><b>uv</b></td><td>Python 包管理器（替代 pip），本工具用它管依赖。</td></tr>
+</table>
+</section>
+
+<section>
+<h2><span class="num">§</span>下一步</h2>
+
+<h3>交付一个 SimReady 资产的标准清单</h3>
+<p>来自官方 workflow-checklist，每个资产交付前都该过一遍：</p>
+<ul class="checklist">
+  <li>CAD 成功转成 USD（pivot 在原点）</li>
+  <li>USD 校验通过（OAV 跑 <code>--category AIF</code> 全绿）</li>
+  <li>用 generic_preset.json 跑过优化</li>
+  <li>添加 AIF metadata（<code>*_Properties.usda</code>）</li>
+  <li>添加 connection points（<code>*_ConnectionPoints.usd</code>）</li>
+  <li>把 properties 和 connection points 作为 sublayer 拼进主 USD</li>
+  <li>在 USD Composer 里目视检查无异常</li>
+</ul>
+
+<h3>交付物结构</h3>
+<pre><code>&lt;model_name&gt;/
+├── &lt;model_name&gt;.usd                          <span class="cmt"># 主资产（含 sublayer 引用）</span>
+├── layers/
+│   ├── &lt;model_name&gt;_Properties.usda          <span class="cmt"># AIF 元数据</span>
+│   └── &lt;model_name&gt;_ConnectionPoints.usd     <span class="cmt"># 接口定义</span>
+├── payloads/                                  <span class="cmt"># 可选：外部几何</span>
+│   ├── internal.usd
+│   └── external.usd
+└── data/                                      <span class="cmt"># 可选：preset 备份</span>
+    └── &lt;model_name&gt;.json</code></pre>
+
+<div class="callout tip">
+<strong>停在这里？记住 3 件事：</strong>
+<ol style="margin:6px 0 0 0;">
+<li>4 阶段：<code>Convert → Optimize → Validate → Metadata</code>，可单跑可串跑。</li>
+<li>Kit 是命脉：<code>config add</code> 配错什么都跑不动。所有 GPU 操作走 Kit。</li>
+<li>OAV 是 CI 友好校验：无 GPU 也能跑，<code>uv run --directory oav validate --category AIF</code>。</li>
+</ol>
+</div>
+
+<h3>想深入代码实现？</h3>
+<p>这份是<b>使用者指南</b>。如果你想理解 CLI 内部、preset 的 pythonScript 处理器怎么写、OAV 规则怎么扩展 —— 那是开发者向，看 <a href="index.html">开发者指南</a>。</p>
+</section>
+
+</main>
+</div>
+
+<footer>
+  Generated for <b>aif-pipeline-samples</b> · 使用者指南 ·
+  与 <a href="index.html">开发者指南</a> 配套 ·
+  命令来源：cli/README.md + docs/get-started/* + docs/reference/workflow-checklist.md
+</footer>
+
+<script>
+// ---- Sidebar active link ----
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.sidebar a[href^="#"]');
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const id = e.target.id;
+      navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + id));
+    }
+  });
+}, { rootMargin: '-30% 0px -60% 0px' });
+sections.forEach(s => obs.observe(s));
+
+// ---- Smooth scroll ----
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', (e) => {
+    const t = document.querySelector(a.getAttribute('href'));
+    if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  });
+});
+
+// ---- OS tabs ----
+document.querySelectorAll('.tabs').forEach(group => {
+  const buttons = group.querySelectorAll('.tab-bar button');
+  const panes = group.querySelectorAll('.pane');
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      buttons.forEach(b => b.classList.remove('active'));
+      panes.forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.pane).classList.add('active');
+    });
+  });
+});
+</script>
+
+</body>
+</html>

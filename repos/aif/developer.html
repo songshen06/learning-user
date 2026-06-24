@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>aif-pipeline-samples · Deep Dive Learning</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg-soft: #161b22;
+    --bg-card: #1c2128;
+    --border: #30363d;
+    --text: #c9d1d9;
+    --text-dim: #8b949e;
+    --accent: #58a6ff;
+    --accent-2: #79c0ff;
+    --green: #7ee787;
+    --yellow: #f2cc60;
+    --orange: #ffa657;
+    --red: #ff7b72;
+    --purple: #d2a8ff;
+    --pink: #ff7b72;
+    --max: 1400px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", Helvetica, Arial, sans-serif;
+    line-height: 1.65;
+    font-size: 15px;
+  }
+  code, pre, .mono {
+    font-family: "SF Mono", "JetBrains Mono", "Fira Code", Menlo, Consolas, monospace;
+    font-size: 0.88em;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ---------- Layout ---------- */
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(13,17,23,0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 24px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .topbar .brand { font-weight: 700; font-size: 16px; color: var(--text); }
+  .topbar .tag {
+    background: var(--bg-card); border: 1px solid var(--border);
+    padding: 2px 8px; border-radius: 4px; font-size: 12px; color: var(--text-dim);
+  }
+  .topbar .grow { flex: 1; }
+  .topbar nav a {
+    color: var(--text-dim); margin-left: 14px; font-size: 13px;
+  }
+  .topbar nav a:hover { color: var(--accent); }
+
+  .layout {
+    max-width: var(--max);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 32px;
+    padding: 24px;
+  }
+  @media (max-width: 980px) {
+    .layout { grid-template-columns: 1fr; padding: 16px; }
+    .sidebar { position: static !important; }
+  }
+
+  .sidebar {
+    position: sticky; top: 72px;
+    align-self: start;
+    max-height: calc(100vh - 96px);
+    overflow-y: auto;
+    padding: 8px 0;
+    font-size: 13.5px;
+  }
+  .sidebar h3 {
+    font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text-dim); margin: 18px 0 6px 0; padding-left: 10px;
+  }
+  .sidebar a {
+    display: block; color: var(--text-dim);
+    padding: 5px 10px; border-radius: 5px;
+    border-left: 2px solid transparent;
+  }
+  .sidebar a:hover { background: var(--bg-soft); color: var(--text); text-decoration: none; }
+  .sidebar a.active { color: var(--accent); border-left-color: var(--accent); background: var(--bg-soft); }
+  .sidebar a.sub { padding-left: 22px; font-size: 13px; }
+
+  /* ---------- Main content ---------- */
+  main { min-width: 0; }
+  section {
+    padding: 28px 0 8px 0;
+    border-bottom: 1px solid var(--border);
+    scroll-margin-top: 70px;
+  }
+  section:last-child { border-bottom: none; }
+  h1 {
+    font-size: 30px; margin: 0 0 4px 0;
+    background: linear-gradient(120deg, var(--accent), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  h1 + p { color: var(--text-dim); margin-top: 0; }
+  h2 {
+    font-size: 22px; margin: 0 0 14px 0;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  h2 .num {
+    display: inline-block; min-width: 32px;
+    color: var(--accent); font-variant-numeric: tabular-nums;
+  }
+  h3 { font-size: 17px; margin: 18px 0 8px 0; color: var(--accent-2); }
+  h4 { font-size: 14px; margin: 12px 0 6px 0; color: var(--text); }
+
+  p { margin: 8px 0; }
+  ul, ol { padding-left: 22px; margin: 8px 0; }
+  li { margin: 4px 0; }
+
+  code {
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    padding: 1px 6px; border-radius: 4px;
+    color: var(--orange);
+  }
+  pre {
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    line-height: 1.55;
+  }
+  pre code { background: none; border: none; padding: 0; color: var(--text); }
+
+  /* ---------- Callouts ---------- */
+  .callout {
+    border-left: 3px solid var(--accent);
+    background: var(--bg-soft);
+    padding: 10px 14px;
+    margin: 12px 0;
+    border-radius: 0 6px 6px 0;
+  }
+  .callout.warn { border-left-color: var(--yellow); }
+  .callout.tip { border-left-color: var(--green); }
+  .callout.danger { border-left-color: var(--red); }
+  .callout strong { color: var(--text); }
+
+  /* ---------- Tables ---------- */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 12px 0;
+    font-size: 14px;
+  }
+  th, td {
+    text-align: left;
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  th {
+    background: var(--bg-soft);
+    color: var(--accent-2);
+    font-weight: 600;
+    font-size: 13px;
+  }
+  td code { white-space: nowrap; }
+
+  /* ---------- Module cards ---------- */
+  .modules-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 16px;
+    margin-top: 14px;
+  }
+  .module-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+  .module-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .module-card .step {
+    display: inline-block;
+    background: var(--bg-soft); color: var(--accent);
+    border: 1px solid var(--border);
+    padding: 1px 8px; border-radius: 10px;
+    font-size: 11px; font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .module-card h3 {
+    margin: 4px 0 6px 0;
+    font-size: 16px; color: var(--text);
+  }
+  .module-card h3 a { color: inherit; }
+  .module-card .resp { color: var(--text-dim); font-size: 13.5px; margin: 0; }
+  .module-card .keys {
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+  .module-card .keys b { color: var(--accent-2); font-weight: 500; }
+  .module-card .start {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--border);
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+  .module-card .start b { color: var(--green); font-weight: 500; }
+
+  /* ---------- Details (collapsible) ---------- */
+  details {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0;
+    margin: 10px 0;
+  }
+  details > summary {
+    cursor: pointer;
+    padding: 10px 14px;
+    font-weight: 500;
+    color: var(--text);
+    user-select: none;
+    list-style: none;
+    position: relative;
+  }
+  details > summary::-webkit-details-marker { display: none; }
+  details > summary::before {
+    content: "▸";
+    color: var(--accent);
+    margin-right: 8px;
+    display: inline-block;
+    transition: transform 0.15s;
+  }
+  details[open] > summary::before { transform: rotate(90deg); }
+  details > div.pad { padding: 0 14px 12px 14px; }
+
+  /* ---------- Step pills for learning path ---------- */
+  .path-list {
+    list-style: none;
+    padding: 0;
+    counter-reset: step;
+    margin: 16px 0;
+  }
+  .path-list li {
+    counter-increment: step;
+    position: relative;
+    padding: 10px 14px 10px 50px;
+    margin: 6px 0;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    transition: border-color 0.15s;
+  }
+  .path-list li:hover { border-color: var(--accent); }
+  .path-list li::before {
+    content: counter(step);
+    position: absolute;
+    left: 14px; top: 50%; transform: translateY(-50%);
+    width: 26px; height: 26px;
+    background: var(--bg);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600; font-size: 13px;
+  }
+  .path-list li b { color: var(--text); }
+  .path-list li .ref { color: var(--text-dim); font-size: 13px; }
+
+  /* ---------- Pipeline diagram ---------- */
+  .pipeline {
+    display: grid;
+    grid-template-columns: repeat(7, auto);
+    align-items: center;
+    gap: 8px;
+    margin: 20px 0;
+    font-size: 13px;
+  }
+  .pipeline .stage {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    border-radius: 8px;
+    text-align: center;
+    min-width: 90px;
+  }
+  .pipeline .stage b { display: block; color: var(--accent-2); font-size: 14px; }
+  .pipeline .stage .sub { color: var(--text-dim); font-size: 11.5px; }
+  .pipeline .arrow {
+    color: var(--green); font-size: 18px; font-weight: 700;
+  }
+  @media (max-width: 880px) {
+    .pipeline { grid-template-columns: 1fr; }
+    .pipeline .arrow { transform: rotate(90deg); }
+  }
+
+  /* ---------- Footer ---------- */
+  footer {
+    text-align: center; color: var(--text-dim);
+    padding: 30px 24px; font-size: 13px;
+    border-top: 1px solid var(--border);
+    margin-top: 24px;
+  }
+
+  /* ---------- Badges ---------- */
+  .badge {
+    display: inline-block;
+    padding: 1px 7px; border-radius: 10px;
+    font-size: 11px; font-weight: 600;
+    border: 1px solid var(--border);
+    background: var(--bg-soft);
+    color: var(--text-dim);
+    margin-left: 4px;
+  }
+  .badge.green { color: var(--green); border-color: rgba(126,231,135,0.4); }
+  .badge.orange { color: var(--orange); border-color: rgba(255,166,87,0.4); }
+  .badge.purple { color: var(--purple); border-color: rgba(210,168,255,0.4); }
+  .badge.blue { color: var(--accent); border-color: rgba(88,166,255,0.4); }
+
+  /* print */
+  @media print {
+    .topbar, .sidebar { display: none; }
+    .layout { display: block; }
+    body { background: white; color: black; }
+    details > div.pad { display: block !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="brand">📦 aif-pipeline-samples</span>
+  <span class="tag">Deep-Dive Learning Web App · <b style="color:var(--purple);">开发者向</b></span>
+  <span class="grow"></span>
+  <nav>
+    <a href="usage-guide.html" style="color:var(--green);" title="不折腾代码的使用者指南">📚 使用者指南 →</a>
+    <a href="#overview">概览</a>
+    <a href="#architecture">架构</a>
+    <a href="#path">学习路径</a>
+    <a href="#modules">模块</a>
+    <a href="#tutorial">教程</a>
+    <a href="#glossary">术语</a>
+    <a href="#exercises">练习</a>
+  </nav>
+</div>
+
+<div class="layout">
+
+<aside class="sidebar">
+  <h3>导航</h3>
+  <a href="#overview">概览</a>
+  <a href="#architecture">架构</a>
+  <a href="#path">学习路径</a>
+  <a href="#modules">9 个模块</a>
+  <h3>模块</h3>
+  <a href="#m-concepts" class="sub">① 心智模型</a>
+  <a href="#m-cli-overview" class="sub">② CLI 总览</a>
+  <a href="#m-cli-internals" class="sub">③ CLI 内部</a>
+  <a href="#m-presets" class="sub">④ Scene Optimizer</a>
+  <a href="#m-validators" class="sub">⑤ OAV 校验</a>
+  <a href="#m-metadata" class="sub">⑥ Metadata / AIF</a>
+  <a href="#m-scripts" class="sub">⑦ Pipeline 脚本</a>
+  <a href="#m-webui" class="sub">⑧ Web UI</a>
+  <a href="#m-connections" class="sub">⑨ Connection Points</a>
+  <a href="#m-agent-rules" class="sub">⑩ Agent Rules</a>
+  <h3>实操</h3>
+  <a href="#tutorial" class="sub">教程（Trace tasks）</a>
+  <a href="#exercises" class="sub">练习（Practice tasks）</a>
+  <a href="#glossary" class="sub">术语表</a>
+</aside>
+
+<main>
+
+<section id="overview">
+<h1>aif-pipeline-samples</h1>
+<p>NVIDIA 官方样本仓库 · CAD → SimReady USD 资产流水线 · 数字孪生 / AI Factory 场景</p>
+
+<h3>这个仓库做什么</h3>
+<p>把 <b>CAD 文件</b>（STEP / JT / Creo / DGN）批量转换成 <b>SimReady USD 资产</b>，并提供一条 <b>4 阶段流水线</b>：<code>Convert → Optimize → Validate → Metadata</code>。仓库本身是 <i>samples</i>（参考实现），真正干活的是 Omniverse Kit / Scene Optimizer / asset-validator，本仓库把这些能力封装成 CLI + 可复用 preset + 自定义校验器。</p>
+
+<h3>技术栈</h3>
+<table>
+  <tr><th>维度</th><th>选型</th></tr>
+  <tr><td>语言</td><td>Python 3.10–3.12（snake_case）<span class="badge blue">uv workspace</span></td></tr>
+  <tr><td>包管理</td><td><code>uv</code>（不是 pip），workspace 成员：<code>cli/</code> + <code>oav/</code></td></tr>
+  <tr><td>CLI 框架</td><td><code>click</code> + <code>rich</code> + <code>pyyaml</code></td></tr>
+  <tr><td>Web UI</td><td>Flask + Flask-CORS + Flask-WTF（asset_processor）</td></tr>
+  <tr><td>文档</td><td>Sphinx + MyST-Parser + nvidia-sphinx-theme，发布到 GitHub Pages</td></tr>
+  <tr><td>外部依赖（必装）</td><td>NVIDIA Omniverse Kit App（USD Composer）+ <code>omniverse-asset-validator</code></td></tr>
+  <tr><td>License</td><td>MIT（SPDX 头）· NVIDIA CORPORATION</td></tr>
+</table>
+
+<h3>核心能力（4 阶段）</h3>
+<div class="pipeline">
+  <div class="stage"><b>CAD</b><span class="sub">STEP/JT/Creo/DGN</span></div>
+  <div class="arrow">→</div>
+  <div class="stage"><b>Convert</b><span class="sub">CAD → USD</span></div>
+  <div class="arrow">→</div>
+  <div class="stage"><b>Optimize</b><span class="sub">Scene Optimizer</span></div>
+  <div class="arrow">→</div>
+  <div class="stage"><b>Validate</b><span class="sub">Kit / OAV</span></div>
+  <div class="arrow">→</div>
+  <div class="stage"><b>Metadata</b><span class="sub">AIF profile</span></div>
+</div>
+
+<div class="callout tip">
+<strong>谁该学这个仓库？</strong>
+<ul style="margin:6px 0 0 0;">
+<li><b>Pipeline Engineers</b> — 构建 CAD→USD 工业级流水线</li>
+<li><b>Digital Twin Developers</b> — 制作 SimReady 数字孪生资产</li>
+<li><b>Technical Artists</b> — 优化 USD 资产性能</li>
+<li><b>Automation Engineers</b> — 批量处理大型资产库 + CI 校验</li>
+</ul>
+</div>
+</section>
+
+<section id="architecture">
+<h2><span class="num">§</span>架构总览</h2>
+
+<h3>顶层目录速查</h3>
+<table>
+  <tr><th>目录</th><th>角色</th><th>对流水线的重要性</th></tr>
+  <tr><td><code>cli/</code></td><td>统一 CLI（<code>aif-pipeline</code>）源码</td><td><b>中枢</b>。6 个子命令 = 流水线全部能力入口</td></tr>
+  <tr><td><code>scripts/</code></td><td>CLI 底层的直接 Python 脚本</td><td>CLI 包装的就是这些；<code>examples/</code> 是教学版</td></tr>
+  <tr><td><code>so/</code></td><td>Scene Optimizer presets（JSON）</td><td>Optimize 阶段的核心产物；含通用 + 厂商预设</td></tr>
+  <tr><td><code>oav/</code></td><td>自定义 USD 校验规则集</td><td>Validate 阶段的 AIF 专用规则（无 Kit/GPU）</td></tr>
+  <tr><td><code>metadata/</code></td><td>元数据模板与工具</td><td>Metadata 阶段；4 种 AIF 设备属性集合</td></tr>
+  <tr><td><code>connections/</code></td><td>Connection points 工作流</td><td>设备接口契约（热/电/气流）</td></tr>
+  <tr><td><code>asset_processor/</code></td><td>Flask + vanilla JS Web UI</td><td>可视化 preset 构建器（非流水线必需）</td></tr>
+  <tr><td><code>docs/</code></td><td>Sphinx/MyST 文档源</td><td>权威参考；双语教程</td></tr>
+  <tr><td><code>.cursor/rules/</code></td><td>5 个 agent 知识文件</td><td>给 AI agent 的领域知识包；人也能用</td></tr>
+  <tr><td><code>assets/</code></td><td>样本 USD 资产</td><td>跑 demo / 测试</td></tr>
+</table>
+
+<h3>模块依赖关系（数据流向）</h3>
+<pre><code>              ┌─────────────────────────────────────────────────────┐
+              │              aif-pipeline CLI  (cli/)                │
+              │  convert · optimize · validate · metadata · run     │
+              └─────────┬──────────────┬──────────────┬─────────────┘
+                        │              │              │
+              ┌─────────▼─────┐ ┌──────▼──────┐ ┌─────▼──────────┐
+              │ scripts/      │ │ scripts/    │ │ oav/           │
+              │ cad_convert   │ │ optimize    │ │ aif_validators │
+              │ (CAD→USD,     │ │ (Kit 调用)  │ │ (无 Kit 校验)  │
+              │  需 Kit)      │ │             │ │                │
+              └───────────────┘ └──────┬──────┘ └─────┬──────────┘
+                                       │              │
+                                ┌──────▼──────┐ ┌─────▼──────────┐
+                                │ so/         │ │ metadata/      │
+                                │ presets.json│ │ templates/*.py │
+                                │ + lib/*.py  │ │ (aif:core/spec)│
+                                └─────────────┘ └────────────────┘
+                                       ▲              ▲
+                                       │              │
+                                ┌──────┴──────────────┴──────┐
+                                │   asset_processor/ (Web)   │
+                                │   可视化构建 preset / 跑   │
+                                │   CLI 命令                 │
+                                └────────────────────────────┘
+
+横向贯穿：.cursor/rules/*.mdc（agent 知识包，调度上述所有模块）</code></pre>
+
+<h3>关键设计约定</h3>
+<ul>
+<li><b>CLI 是薄包装</b>：每个子命令 lazy-import 一个 <code>commands/&lt;name&gt;.py</code> 的 <code>run_*</code> 函数</li>
+<li><b>Config 三级优先</b>：显式 <code>--config</code> &gt; 项目 <code>./aif-pipeline.yaml</code> &gt; 用户 <code>~/.aif-pipeline/config.yaml</code></li>
+<li><b>所有命令需 <code>uv run</code> 前缀</code></b>（或激活 <code>.venv</code>）</li>
+<li><b>非破坏式</b>：每步独立输出目录（<code>Converted/</code>、<code>Optimized/</code>）</li>
+<li><b>metadata 是子层</b>：写到 <code>*_Properties.usda</code> 作为 sublayer 组合进主资产</li>
+<li><b>OAV 校验 subprocess</b>：<code>run</code> 命令通过 <code>uv run --directory oav validate</code> 调用</li>
+</ul>
+</section>
+
+<section id="path">
+<h2><span class="num">§</span>推荐学习路径（8 步）</h2>
+<p>按顺序学，每一步都建立在前一步的心智模型上。前 2 步是概念，3-7 步是流水线核心，第 8 步是按需进阶。</p>
+
+<ol class="path-list">
+  <li><b>心智模型</b>：先建立 USD / SimReady / AIF / 数字孪生的概念<br><span class="ref">→ 模块① · 读 README.md + CLAUDE.md + docs/about/*</span></li>
+  <li><b>整体工作流</b>：Convert → Optimize → Validate → Metadata，先理解输入输出，不深入<br><span class="ref">→ CLAUDE.md "Core Workflow" 段</span></li>
+  <li><b>CLI 总览</b>：6 个子命令、config 优先级、<code>uv run</code> 约定<br><span class="ref">→ 模块② · cli/README.md</span></li>
+  <li><b>CLI 内部实现</b>：click 命令树、lazy import、Config 类、run 编排<br><span class="ref">→ 模块③ · cli/aif_pipeline/{cli.py,commands/,config.py}</span></li>
+  <li><b>Scene Optimizer preset</b>：12 步通用 preset + pythonScript 处理器<br><span class="ref">→ 模块④ · so/generic/generic_preset.json + lib/*.py</span></li>
+  <li><b>OAV 校验规则</b>：每条规则一个文件，AIFMetadataChecker 是桥梁<br><span class="ref">→ 模块⑤ · oav/aif_validators/</span></li>
+  <li><b>Metadata 与 AIF profile</b>：aif:core: / aif:spec: + 4 种设备模板<br><span class="ref">→ 模块⑥ · metadata/templates/</span></li>
+  <li><b>进阶专题</b>：Pipeline 脚本 / Web UI / Connection points / Agent rules<br><span class="ref">→ 模块⑦⑧⑨⑩ · 按需深入</span></li>
+</ol>
+</section>
+
+<section id="modules">
+<h2><span class="num">§</span>9 个模块详解</h2>
+<p>每个模块独立可读。卡片显示概要，点击标题跳到完整笔记（在 <code>.learning/modules/&lt;name&gt;.md</code>）。</p>
+
+<div class="modules-grid">
+
+  <div class="module-card" id="m-concepts">
+    <span class="step">STEP 1</span>
+    <h3><a href="../modules/conceptual-foundation.md">① 心智模型（USD / SimReady / AIF）</a></h3>
+    <p class="resp">建立领域心智模型。在学代码前先理解"为什么这套工具存在"。</p>
+    <div class="keys"><b>关键文件：</b>README.md, CLAUDE.md, docs/about/{what-is-usd,what-is-simready,cad-vs-simulation-assets}.md</div>
+    <div class="start"><b>起点：</b>README.md 的 4 条 Key Capabilities —— 这就是 4 阶段流水线的产品映射。</div>
+  </div>
+
+  <div class="module-card" id="m-cli-overview">
+    <span class="step">STEP 2-3</span>
+    <h3><a href="../modules/cli-overview.md">② CLI 总览（用户命令面）</a></h3>
+    <p class="resp">用户与仓库交互的唯一前端：6 个子命令覆盖整条流水线。</p>
+    <div class="keys"><b>关键文件：</b>cli/README.md (582 行), cli/aif_pipeline/cli.py</div>
+    <div class="start"><b>起点：</b>cli/README.md 的 "Quick Start"（line 129）—— 4 行命令示范全流程。</div>
+  </div>
+
+  <div class="module-card" id="m-cli-internals">
+    <span class="step">STEP 4</span>
+    <h3><a href="../modules/cli-internals.md">③ CLI 内部实现</a></h3>
+    <p class="resp">click 命令树、Config 类、lazy import 模式、run 编排器。</p>
+    <div class="keys"><b>关键文件：</b>cli/aif_pipeline/{cli.py, config.py, commands/run.py}</div>
+    <div class="start"><b>起点：</b>cli.py:25-38 —— 主 Group + <code>--config</code> + <code>load_config</code> 注入 ctx。</div>
+  </div>
+
+  <div class="module-card" id="m-presets">
+    <span class="step">STEP 5</span>
+    <h3><a href="../modules/scene-optimizer-presets.md">④ Scene Optimizer Presets</a></h3>
+    <p class="resp">Optimize 阶段的核心产物。preset = 操作序列 JSON，含 base64 python 处理器。</p>
+    <div class="keys"><b>关键文件：</b>so/generic/generic_preset.json (12 步), so/generic/lib/*.py (9 个处理器)</div>
+    <div class="start"><b>起点：</b>generic_preset.json 从上到下读 —— 每个字段就是一步。</div>
+  </div>
+
+  <div class="module-card" id="m-validators">
+    <span class="step">STEP 6</span>
+    <h3><a href="../modules/oav-validators.md">⑤ OAV 校验规则</a></h3>
+    <p class="resp">AIF 专用 USD 校验规则集，不依赖 Kit/GPU，可入 CI。</p>
+    <div class="keys"><b>关键文件：</b>oav/aif_validators/{__init__.py, up_axis_z.py, aif_metadata_checker.py}</div>
+    <div class="start"><b>起点：</b>up_axis_z.py（24 行）—— 最小规则范例，学会写新规则从这里抄。</div>
+  </div>
+
+  <div class="module-card" id="m-metadata">
+    <span class="step">STEP 7</span>
+    <h3><a href="../modules/metadata-aif-profile.md">⑥ Metadata 与 AIF Profile</a></h3>
+    <p class="resp">为资产注入结构化属性。AIF profile 定义 4 种设备的属性集。</p>
+    <div class="keys"><b>关键文件：</b>metadata/templates/{common_properties.py, cdu/crah/ups/gb300_rack_template.py}</div>
+    <div class="start"><b>起点：</b>common_properties.py:18 的 get_common_properties() —— 15 个 aif:core: 属性。</div>
+  </div>
+
+  <div class="module-card" id="m-scripts">
+    <span class="step">STEP 8a</span>
+    <h3><a href="../modules/pipeline-scripts.md">⑦ Pipeline 脚本（scripts/）</a></h3>
+    <p class="resp">CLI 的底层实现，也是无 CLI 时的逃生通道。examples/ 是教学版。</p>
+    <div class="keys"><b>关键文件：</b>scripts/{cad_convert.py, optimize.py, validate.py}, scripts/data/*.json, scripts/examples/</div>
+    <div class="start"><b>起点：</b>scripts/examples/cad_convert.py —— 精简版，理解 CLI 子命令的"真身"。</div>
+  </div>
+
+  <div class="module-card" id="m-webui">
+    <span class="step">STEP 8b</span>
+    <h3><a href="../modules/asset-processor-webui.md">⑧ Asset Processor Web UI</a></h3>
+    <p class="resp">浏览器可视化构建 Scene Optimizer preset。非必需但极有教学价值。</p>
+    <div class="keys"><b>关键文件：</b>asset_processor/{index.html, app.js, processors.js, server.py}</div>
+    <div class="start"><b>起点：</b>asset_processor/README.md 的 "Opening the Tool"（line 34）—— 静态模式或 Flask server。</div>
+  </div>
+
+  <div class="module-card" id="m-connections">
+    <span class="step">STEP 8c</span>
+    <h3><a href="../modules/connections.md">⑨ Connection Points</a></h3>
+    <p class="resp">设备开口的几何 prim 命名约定，标记热/电/气流接口。</p>
+    <div class="keys"><b>关键文件：</b>connections/README.md, docs/workflows/connection-points.md</div>
+    <div class="start"><b>起点：</b>connections/README.md（5 行）+ docs/workflows/connection-points.md 命名约定表。</div>
+  </div>
+
+  <div class="module-card" id="m-agent-rules">
+    <span class="step">STEP 8d</span>
+    <h3><a href="../modules/agent-knowledge-rules.md">⑩ Agent Knowledge Rules</a></h3>
+    <p class="resp">.cursor/rules/ 下的 5 个 .mdc 是 AI agent（也是人）的领域知识包。</p>
+    <div class="keys"><b>关键文件：</b>.cursor/rules/{aif-pipeline-cli.mdc, usd-universal.mdc, usd-aif-profile.mdc, scene-optimizer-presets.mdc, usd-issues-catalog.mdc}</div>
+    <div class="start"><b>起点：</b>aif-pipeline-cli.mdc（alwaysApply: true）—— 自然语言意图 → CLI 命令的映射表。</div>
+  </div>
+
+</div>
+</section>
+
+<section id="tutorial">
+<h2><span class="num">§</span>教程 · 跟读任务（Trace Tasks）</h2>
+<p>每个模块的"跟读任务"——按学习路径顺序串成一条完整跟读教程。做完这条线 = 真正理解了仓库。</p>
+
+<details open>
+  <summary>① 建立 CAD → SimReady 心智模型</summary>
+  <div class="pad">
+  <p>依次读 <code>docs/about/what-is-usd.md</code>（5 分钟）→ <code>docs/about/what-is-simready.md</code>（5 分钟）→ <code>docs/about/cad-vs-simulation-assets.md</code>（5 分钟）。然后用 1 段话（不超过 100 字）向一个完全外行的朋友解释"为什么 NVIDIA 需要这个仓库"。如果能解释清楚，说明心智模型建立了。</p>
+  </div>
+</details>
+
+<details>
+  <summary>② 熟悉 CLI 命令面</summary>
+  <div class="pad">
+  <p>跑 <code>aif-pipeline --help</code> 和 <code>aif-pipeline run --help</code>，对照 <code>cli/README.md</code> "Commands" 段逐一核验每个 flag 是否真实存在；并在 <code>cli/aif_pipeline/cli.py</code> 找到每个 <code>@cli.command()</code> / <code>@config.command()</code> 装饰器对应的 line，确认 README 与源码一致。</p>
+  </div>
+</details>
+
+<details>
+  <summary>③ 追 CLI 内部实现：一次 spec 路径解析</summary>
+  <div class="pad">
+  <p>在 <code>cli.py</code> 找 <code>convert</code> 命令（<code>cli.py:120</code>），跟到 <code>cli.py:138</code> 的 <code>spec or config.get_conversion_spec()</code>，再跳进 <code>config.py:271</code> 的 <code>get_conversion_spec()</code>，最后看 <code>config.py:280</code> 推算 repo root 的 <code>Path(__file__).parent.parent</code>。完整理解一次 spec 路径从空到默认值的全过程。</p>
+  </div>
+</details>
+
+<details>
+  <summary>④ 解码 preset 的 pythonScript</summary>
+  <div class="pad">
+  <p>跑 <code>echo '&lt;generic_preset.json 第 11 行的 python 字段&gt;' | base64 -d</code> 解码，对照 <code>so/generic/lib/deduplicate_hierarchies_by_display_name.py</code> 的开头注释，确认 loader 是通过 <code>AIF_PIPELINE_SAMPLES_ROOT</code> 环境变量拼路径、再 <code>exec(compile(...))</code> 调用 <code>process_duplicate_hierarchies()</code> 函数。然后在 <code>deduplicate_hierarchies_by_display_name.py:1142</code> 找 <code>process_duplicate_hierarchies()</code> 主入口，看 <code>use_payloads</code> / <code>merge_prototype_hierarchies</code> 两个 flag 如何切换 3 种模式。</p>
+  </div>
+</details>
+
+<details>
+  <summary>⑤ 追 OAV 校验调用链</summary>
+  <div class="pad">
+  <p>从 <code>cli run</code> 的 validate 步骤开始追：<code>cli/aif_pipeline/commands/run.py:31</code> → <code>_run_oav_validate</code> → subprocess <code>uv run validate --category AIF</code> → <code>oav/aif_validators/__main__.py</code>（入口）→ <code>__init__.py:10-23</code>（注册所有规则）→ 任一规则的 <code>CheckStage</code>。完整还原"CLI 调用 → subprocess → 规则注册 → 实际检查"链路。</p>
+  </div>
+</details>
+
+<details>
+  <summary>⑥ 走通一次 metadata 创建与应用</summary>
+  <div class="pad">
+  <p>跑 <code>aif-pipeline metadata create --type cdu --output /tmp/cdu.json</code>，打开生成的 JSON，对照 <code>metadata/templates/cdu_template.py</code> 的 <code>get_cdu_properties()</code> 返回值，逐一核对每个 <code>aif:spec:*</code> 字段。然后跑 <code>aif-pipeline metadata apply /tmp/cdu.json --output /tmp/cdu.usda --prim CDU_01</code>，用文本编辑器打开 <code>/tmp/cdu.usda</code>，观察 USD 层文件结构（sublayer、defaultPrim、attributes）。</p>
+  </div>
+</details>
+
+<details>
+  <summary>⑦ 对照 CLI 命令与底层脚本</summary>
+  <div class="pad">
+  <p>打开 <code>scripts/cad_convert.py</code>，找到 (a) 解析输入目录的循环、(b) 构造 Kit subprocess 命令的部分、(c) <code>--num_concurrent</code> 参数如何映射到并发。对照 <code>cli/aif_pipeline/commands/convert.py</code> 的 <code>run_convert()</code>，看 CLI 是怎么把 <code>--concurrent</code> flag 翻译成脚本的 <code>--num_concurrent</code>。这能解释为什么 README 同时有两个参数名。</p>
+  </div>
+</details>
+
+<details>
+  <summary>⑧ 用 Web UI 构建并对比 preset</summary>
+  <div class="pad">
+  <p>启动 server 模式，浏览器打开 <code>index.html</code>，从左侧库拖 <code>editStageMetrics</code> 到中间，在右侧把 <code>metersPerUnit</code> 改为 0.01、<code>upAxis</code> 改为 1（Y）。点 Save，下载 JSON。打开 JSON 与 <code>so/generic/generic_preset.json</code> 的第 1 个操作对比，验证：字段名、值类型、顺序都完全一致。</p>
+  </div>
+</details>
+
+<details>
+  <summary>⑨ 核对 connection points 命名约定</summary>
+  <div class="pad">
+  <p>读 <code>docs/workflows/connection-points.md</code> 的命名约定表。然后打开 <code>assets/</code> 下的样本 USD（如果有），用 <code>usdcat</code> 或 USDView 找出所有看起来像 connection point 的 prim（按命名前缀过滤），核对它们的几何类型（plane/disk）是否与文档一致。</p>
+  </div>
+</details>
+
+<details>
+  <summary>⑩ 走通 agent 规则的调度闭环</summary>
+  <div class="pad">
+  <p>读 <code>CLAUDE.md</code> 的 "Agent Behavior > Validation Failure Fix Loop" 段（约 line 134）。然后读 <code>.cursor/rules/usd-universal.mdc</code> 的开头 symptom-to-fix 表。最后回看 <code>oav/aif_validators/aif_metadata_checker.py</code> 的 <code>COMMON_ATTRIBUTES</code>（line 55）。完整还原一次"validation 报 AIFMetadataChecker failed → CLAUDE.md 路由到读 usd-universal.mdc → 找到 symptom 对应的 metadata 缺失修复 → 在 preset 加 metadata 属性"的闭环。</p>
+  </div>
+</details>
+
+</section>
+
+<section id="exercises">
+<h2><span class="num">§</span>练习 · 实战检查点（Practice Tasks）</h2>
+<p>每个练习都是一次动手操作。做完任意 5 个就具备改动这个仓库的基础能力。</p>
+
+<details>
+  <summary>练习 1 · 写一个 convert_only.sh 自动化脚本</summary>
+  <div class="pad">
+  <p><b>模块：</b>CLI 总览　<b>难度：</b>★☆☆　<b>预计耗时：</b>30 分钟</p>
+  <p>写一个最小 shell 脚本 <code>convert_only.sh</code>：接受 3 个参数（input_dir / output_dir / cad_format），根据 cad_format 自动选择 spec（creo/jt/dgn），先跑 <code>config show</code> 校验 Kit，再跑 <code>convert --skip-existing</code>。脚本必须在 Kit 未配置时退出码非 0 并打印提示。</p>
+  </div>
+</details>
+
+<details>
+  <summary>练习 2 · 给 CLI 加 config export 子命令</summary>
+  <div class="pad">
+  <p><b>模块：</b>CLI 内部　<b>难度：</b>★★☆　<b>预计耗时：</b>45 分钟</p>
+  <p>新增一个 <code>aif-pipeline config export &lt;output.yaml&gt;</code> 子命令，调用现有 <code>Config.save()</code> 但写入用户指定路径（不覆盖活动 config）。需要在 <code>cli.py</code> 加 <code>@config.command('export')</code>，在 <code>commands/config_cmd.py</code> 加 <code>run_config_export(output_path)</code>，并实现"先复制当前 data，再 save 到 output"的逻辑。验收：跑完后能在指定路径看到带注释的 YAML。</p>
+  </div>
+</details>
+
+<details>
+  <summary>练习 3 · 定制一个不减面的 preset</summary>
+  <div class="pad">
+  <p><b>模块：</b>Scene Optimizer　<b>难度：</b>★★☆　<b>预计耗时：</b>45 分钟</p>
+  <p>复制 <code>generic_preset.json</code> 为 <code>generic_preset_no_decimate.json</code>，<b>移除第 4 步 <code>decimateMeshes</code></b>（保留减面会导致精度损失的场景常用）。然后用 <code>aif-pipeline optimize input/ output/ --preset generic_preset_no_decimate.json</code> 对一个样本 USD 跑一遍，比较输出顶点数与原版差异。最后思考：如果调换第 2 步（dedup hierarchies）和第 3 步（meshCleanup）会发生什么？写一段假设并验证。</p>
+  </div>
+</details>
+
+<details>
+  <summary>练习 4 · 写一条新的 OAV 校验规则</summary>
+  <div class="pad">
+  <p><b>模块：</b>OAV Validators　<b>难度：</b>★★☆　<b>预计耗时：</b>1 小时</p>
+  <p>在 <code>oav/aif_validators/</code> 新增 <code>default_prim_is_xform.py</code>，写一个 <code>DefaultPrimIsXformChecker</code>：检查 stage 的 defaultPrim 是 <code>Xform</code> 类型。提示：用 <code>stage.GetDefaultPrim().GetTypeName()</code>，期望值 <code>"Xform"</code>。注册到 <code>"AIF"</code> category，更新 <code>__init__.py</code>，然后跑 <code>uv run --directory oav validate --rule DefaultPrimIsXformChecker /path/to/sample.usd</code> 验证。最后给 <code>assets/</code> 下的样本 USD 跑 <code>--category AIF</code> 看你的新规则是否出现在报告里。</p>
+  </div>
+</details>
+
+<details>
+  <summary>练习 5 · 对比 4 种设备模板的属性集</summary>
+  <div class="pad">
+  <p><b>模块：</b>Metadata　<b>难度：</b>★★☆　<b>预计耗时：</b>1 小时</p>
+  <p>写一个 Python 脚本 <code>compare_templates.py</code>，对比 4 种设备模板（CDU/CRAH/UPS/GB300）的 <code>aif:spec:*</code> 属性集合，输出一个 markdown 表格列出"哪些属性是某设备独有 / 哪些是 4 种都有"。提示：<code>import</code> 4 个 <code>get_*_properties()</code> 函数，做 set 运算。这能帮你建立"为什么 GB300 只有 8 个专属属性而 CDU 有 61 个"的直觉。</p>
+  </div>
+</details>
+
+<details>
+  <summary>练习 6 · 写一个脱离 Kit 的 USD prim 列举器</summary>
+  <div class="pad">
+  <p><b>模块：</b>Pipeline Scripts　<b>难度：</b>★★☆　<b>预计耗时：</b>45 分钟</p>
+  <p>写一个 <code>scripts/examples/list_default_prims.py</code>：接受一个 USD 文件路径，打开 stage，遍历所有根级 prim，打印每个 prim 的 path / typeName / 是否是 defaultPrim。要求能脱离 Kit 运行（用 <code>pxr.Usd</code> 即可，不需要 <code>omni.*</code>）。这是连接本模块和 OAV 模块的桥梁练习（validator 也读 defaultPrim）。</p>
+  </div>
+</details>
+
+<details>
+  <summary>练习 7 · 用 Web UI 复刻 generic preset 前 5 步</summary>
+  <div class="pad">
+  <p><b>模块：</b>Asset Processor Web UI　<b>难度：</b>★★☆　<b>预计耗时：</b>1 小时</p>
+  <p>用 UI 拖出 <code>generic_preset.json</code> 的前 5 步（editStageMetrics + pythonScript(dedup) + meshCleanup + decimateMeshes + generateNormals），保存为 <code>my_first_preset.json</code>。然后在 cli 跑 <code>aif-pipeline optimize &lt;sample_usd&gt; &lt;output&gt; --preset my_first_preset.json</code>。如果没装 Kit，至少跑 <code>python -c "import json; print(json.dumps(json.load(open('my_first_preset.json')), indent=2)[:500])"</code> 验证 JSON 结构合法，并尝试 base64 解码 pythonScript 字段看 loader 代码。</p>
+  </div>
+</details>
+
+<details>
+  <summary>练习 8 · 手工添加 connection points</summary>
+  <div class="pad">
+  <p><b>模块：</b>Connection Points　<b>难度：</b>★★★　<b>预计耗时：</b>1.5 小时</p>
+  <p>为某个简单设备（一个立方体 mesh，representing CDU）在 USD 里手工添加 2 个 connection point prim：1 个 thermal 进水口（plane，位于顶面）、1 个 thermal 出水口（plane，位于底面），命名遵循 <code>docs/workflows/connection-points.md</code> 约定。然后用 <code>aif-pipeline validate &lt;file&gt;</code> 跑校验，观察是否有规则报错（可能没有专门的 connection point 校验规则，思考为什么 —— 是 schema 还是 prim 命名约束）。</p>
+  </div>
+</details>
+
+<details>
+  <summary>练习 9 · 写一份 agent 处理流程文档</summary>
+  <div class="pad">
+  <p><b>模块：</b>Agent Knowledge Rules　<b>难度：</b>★★☆　<b>预计耗时：</b>1 小时</p>
+  <p>模拟一个 agent 场景：用户报告"我的 CRAH 资产 validation 显示 AIFMetadataChecker 失败"。写一份 agent 处理流程文档（markdown），列出：(a) 应读哪些规则文件及顺序（参考 CLAUDE.md 的调度）、(b) 可能的根因清单（参考 aif_metadata_checker.py 的 <code>_validate_metadata</code>）、(c) 修复步骤（结合 metadata apply 命令 + 重跑 validate）。这份文档将构成你自己 agent workflow 的模板。</p>
+  </div>
+</details>
+
+<details>
+  <summary>练习 10 · CAD 转换问题预判（无代码）</summary>
+  <div class="pad">
+  <p><b>模块：</b>心智模型　<b>难度：</b>★☆☆　<b>预计耗时：</b>30 分钟</p>
+  <p>挑一个真实的 CAD 文件（任选 <code>.step</code> 或 <code>.jt</code>，可从公开样本库下载）。基于本模块学到的概念，<b>预判</b>它在转换成 USD 后会有哪些问题（顶点过多？单位错？朝向错？无材质？无元数据？）。把预判写下来。后续学完其他模块后，回看你的预判是否被 validate 命令的报告证实。这个练习建立"工程预判"能力。</p>
+  </div>
+</details>
+
+</section>
+
+<section id="glossary">
+<h2><span class="num">§</span>术语表（Glossary）</h2>
+<p>笔记中出现的关键术语。按字母顺序。</p>
+
+<table>
+  <tr><th>术语</th><th>简释</th><th>相关模块</th></tr>
+  <tr><td><code>aif:core:</code></td><td>AIF 元数据的通用命名空间，所有设备类型共享的属性（manufacturer, weight, assetClass 等 15 个）</td><td>⑥</td></tr>
+  <tr><td><code>aif:spec:</code></td><td>AIF 元数据的设备专属命名空间（无 aif:cdu: 这种分设备的）</td><td>⑥</td></tr>
+  <tr><td>AIF</td><td>AI Factory，本仓库定义的数据中心设备 SimReady profile</td><td>①⑥</td></tr>
+  <tr><td>asset-validator</td><td>NVIDIA 的 USD 校验框架；OAV 是其离线/无 Kit 版本</td><td>⑤</td></tr>
+  <tr><td>CDU</td><td>Coolant Distribution Unit，冷却液分配单元（81 属性）</td><td>⑥</td></tr>
+  <tr><td>connection points</td><td>设备开口处的几何 prim，标记热/电/气流接口</td><td>⑨</td></tr>
+  <tr><td>CRAH</td><td>Computer Room Air Handler，机房空调（51 属性）</td><td>⑥</td></tr>
+  <tr><td>defaultPrim</td><td>USD stage 的根 prim，每个 stage 必须有</td><td>①⑤</td></tr>
+  <tr><td>GB300</td><td>NVIDIA DGX GB300 Rack，AI Factory 标准计算机柜（28 属性，预填值）</td><td>⑥</td></tr>
+  <tr><td>Kit</td><td>NVIDIA Omniverse 的运行时（USD Composer 是基于 Kit 的应用）</td><td>①②</td></tr>
+  <tr><td>layer composition</td><td>USD 的核心特性：多个 .usd/.usda/.usdc 文件可叠加成最终场景</td><td>①⑥</td></tr>
+  <tr><td>MyST</td><td>Markdown 方言，Sphinx 兼容；本仓库 docs/ 用的格式</td><td>①</td></tr>
+  <tr><td>OAV</td><td>omniverse-asset-validator，本仓库 oav/ 用的 PyPI 包</td><td>⑤</td></tr>
+  <tr><td>preset</td><td>Scene Optimizer 的操作序列 JSON 文件</td><td>④⑧</td></tr>
+  <tr><td>prim</td><td>USD 场景里的对象，最基础单元</td><td>①⑤</td></tr>
+  <tr><td>Scene Optimizer</td><td>Kit 扩展，提供本仓库 preset 用的操作（meshCleanup、decimateMeshes 等）</td><td>④</td></tr>
+  <tr><td>SimReady</td><td>NVIDIA 的"仿真就绪"USD 资产规范</td><td>①</td></tr>
+  <tr><td>spec</td><td>CAD Converter 的格式配置 JSON（不是 SimReady spec）</td><td>⑦</td></tr>
+  <tr><td>sublayer</td><td>USD layer composition 的子层，叠加成最终 stage</td><td>①⑥</td></tr>
+  <tr><td>UPS</td><td>Uninterruptible Power Supply，不间断电源（51 属性）</td><td>⑥</td></tr>
+  <tr><td>USD</td><td>Universal Scene Description，Pixar 的 3D 场景格式</td><td>①</td></tr>
+  <tr><td>uv</td><td>Python 包管理器（替代 pip），本仓库用 workspace 模式</td><td>②③</td></tr>
+  <tr><td>Xform</td><td>USD 的可变换 prim 类型，defaultPrim 通常是这个</td><td>⑤</td></tr>
+</table>
+</section>
+
+<section>
+<h2><span class="num">§</span>关键参考与下一步</h2>
+
+<h3>已建成的产物（在 <code>.learning/</code>）</h3>
+<ul>
+  <li><code>.learning/repo-map.md</code> —— 仓库总览（Phase 1 产物）</li>
+  <li><code>.learning/modules/*.md</code> × 9 —— 模块笔记（Phase 2 产物）</li>
+  <li><code>.learning/out/index.html</code> —— 本页（Phase 3 产物）</li>
+</ul>
+
+<h3>外部权威资源</h3>
+<ul>
+  <li><a href="https://nvidia-omniverse.github.io/aif-pipeline-samples/">已发布的 Sphinx 文档</a>（docs/ 的渲染版）</li>
+  <li><a href="https://docs.omniverse.nvidia.com/simready/latest/overview.html">SimReady 官方文档</a></li>
+  <li><a href="https://docs.omniverse.nvidia.com/kit/docs/asset-validator/latest/index.html">asset-validator API</a></li>
+  <li><a href="https://docs.omniverse.nvidia.com/extensions/latest/ext_scene-optimizer.html">Scene Optimizer 文档</a></li>
+</ul>
+
+<h3>继续深入的方向</h3>
+<ol>
+  <li>读 <code>docs/about/simready-maturity-phases.md</code> 理解资产成熟度分级</li>
+  <li>读 <code>docs/reference/scene-optimizer-presets.md</code> 的完整操作目录</li>
+  <li>读 <code>docs/reference/validators.md</code> 的 OAV vs Kit 校验对比</li>
+  <li>读 <code>.cursor/rules/usd-issues-catalog.mdc</code> 学习常见故障模式</li>
+  <li>试跑 <code>scripts/examples/</code> 里的精简脚本（需要 Kit 环境）</li>
+</ol>
+
+<div class="callout tip">
+<strong>停在这里？记住 3 件事：</strong>
+<ol style="margin:6px 0 0 0;">
+<li>本仓库是 <b>samples</b>，不是引擎。引擎是 Kit + Scene Optimizer + asset-validator。</li>
+<li>4 阶段流水线：<code>Convert → Optimize → Validate → Metadata</code>，每步独立输出。</li>
+<li><code>aif-pipeline</code> CLI 是入口，<code>uv run</code> 前缀必备，<code>config show</code> 先自检。</li>
+</ol>
+</div>
+</section>
+
+</main>
+</div>
+
+<footer>
+  Generated by <b>learning-experience-designer</b> skill ·
+  Source: <code>.learning/repo-map.md</code> + 9 module notes ·
+  Built for <code>aif-pipeline-samples</code>
+</footer>
+
+<script>
+// ---- Sidebar active link on scroll ----
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.sidebar a[href^="#"]');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const id = e.target.id;
+      navLinks.forEach(a => {
+        a.classList.toggle('active', a.getAttribute('href') === '#' + id);
+      });
+    }
+  });
+}, { rootMargin: '-30% 0px -60% 0px' });
+sections.forEach(s => observer.observe(s));
+
+// ---- Smooth scroll ----
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', (e) => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+</script>
+
+</body>
+</html>
