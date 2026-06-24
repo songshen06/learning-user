@@ -37,6 +37,7 @@ main { max-width:900px; margin:0 auto; padding:32px 24px 64px; }
 .repo-link a { color:var(--text-secondary); text-decoration:none; }
 .repo-link a:hover { color:var(--accent); }
 .empty { text-align:center; padding:48px 20px; color:var(--text-secondary); }
+.empty .zh-desc { font-size:0.9rem; margin-top:6px; color:#999; }
 footer { text-align:center; padding:24px; font-size:0.8rem; color:#999; border-top:1px solid var(--border); }
 footer a { color:var(--accent); }
 </style>
@@ -44,8 +45,9 @@ footer a { color:var(--accent); }
 <body>
 
 <header>
-  <h1>📘 Learning User Guides</h1>
+  <h1>📘 Learning User Guides · 学习指南</h1>
   <p>Usage guides generated from open-source repositories — for end users who don't read source code.</p>
+  <p style="font-size:0.9rem;color:rgba(255,255,255,0.5)">从开源仓库自动生成的使用指南 —— 面向无需阅读源代码的最终用户。</p>
 </header>
 
 <main>
@@ -54,6 +56,7 @@ footer a { color:var(--accent); }
   </div>
   <div class="empty" id="empty-state">
     <p>No guides published yet. Generate a usage guide and publish it here.</p>
+    <p class="zh-desc">暂无已发布指南。生成使用指南后发布至此即可显示。</p>
   </div>
 </main>
 
