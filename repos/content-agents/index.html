@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>content-agents · Deep Dive Learning</title>
+<style>
+  :root {
+    --bg: #0d1117; --bg-soft: #161b22; --bg-card: #1c2128;
+    --border: #30363d; --text: #c9d1d9; --text-dim: #8b949e;
+    --accent: #58a6ff; --accent-2: #79c0ff; --green: #7ee787;
+    --yellow: #f2cc60; --orange: #ffa657; --red: #ff7b72;
+    --purple: #d2a8ff; --max: 1400px;
+  }
+  *{box-sizing:border-box}html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",Helvetica,Arial,sans-serif;line-height:1.65;font-size:15px}
+  code,pre,.mono{font-family:"SF Mono","JetBrains Mono","Fira Code",Menlo,Consolas,monospace;font-size:.88em}
+  a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  .topbar{position:sticky;top:0;z-index:50;background:rgba(13,17,23,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding:10px 24px;display:flex;align-items:center;gap:16px}
+  .topbar .brand{font-weight:700;font-size:16px;color:var(--text)}
+  .topbar .tag{background:var(--bg-card);border:1px solid var(--border);padding:2px 8px;border-radius:4px;font-size:12px;color:var(--text-dim)}
+  .topbar .grow{flex:1}
+  .topbar nav a{color:var(--text-dim);margin-left:14px;font-size:13px}
+  .topbar nav a:hover{color:var(--accent)}
+  .layout{max-width:var(--max);margin:0 auto;display:grid;grid-template-columns:260px 1fr;gap:32px;padding:24px}
+  @media(max-width:980px){.layout{grid-template-columns:1fr;padding:16px}.sidebar{position:static!important}}
+  .sidebar{position:sticky;top:72px;align-self:start;max-height:calc(100vh - 96px);overflow-y:auto;padding:8px 0;font-size:13.5px}
+  .sidebar h3{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);margin:18px 0 6px 0;padding-left:10px}
+  .sidebar a{display:block;color:var(--text-dim);padding:5px 10px;border-radius:5px;border-left:2px solid transparent}
+  .sidebar a:hover{background:var(--bg-soft);color:var(--text);text-decoration:none}
+  .sidebar a.active{color:var(--accent);border-left-color:var(--accent);background:var(--bg-soft)}
+  .sidebar a.sub{padding-left:22px;font-size:13px}
+  main{min-width:0}
+  section{padding:28px 0 8px 0;border-bottom:1px solid var(--border);scroll-margin-top:70px}
+  section:last-child{border-bottom:none}
+  h1{font-size:30px;margin:0 0 4px 0;background:linear-gradient(120deg,var(--accent),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  h1+p{color:var(--text-dim);margin-top:0}
+  h2{font-size:22px;margin:0 0 14px 0;padding-bottom:6px;border-bottom:1px solid var(--border)}
+  h2 .num{display:inline-block;min-width:32px;color:var(--accent);font-variant-numeric:tabular-nums}
+  h3{font-size:17px;margin:18px 0 8px 0;color:var(--accent-2)}
+  h4{font-size:14px;margin:12px 0 6px 0;color:var(--text)}
+  p{margin:8px 0}ul,ol{padding-left:22px;margin:8px 0}li{margin:4px 0}
+  code{background:var(--bg-soft);border:1px solid var(--border);padding:1px 6px;border-radius:4px;color:var(--orange)}
+  pre{background:var(--bg-soft);border:1px solid var(--border);padding:14px 16px;border-radius:8px;overflow-x:auto;line-height:1.55}pre code{background:none;border:none;padding:0;color:var(--text)}
+  .callout{border-left:3px solid var(--accent);background:var(--bg-soft);padding:10px 14px;margin:12px 0;border-radius:0 6px 6px 0}
+  .callout.warn{border-left-color:var(--yellow)}.callout.tip{border-left-color:var(--green)}.callout.danger{border-left-color:var(--red)}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+  th{background:var(--bg-soft);color:var(--accent-2);font-weight:600;font-size:13px}td code{white-space:nowrap}
+  .modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;margin-top:14px}
+  .module-card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:16px 18px;transition:border-color .15s,transform .15s}
+  .module-card:hover{border-color:var(--accent);transform:translateY(-1px)}
+  .module-card .step{display:inline-block;background:var(--bg-soft);color:var(--accent);border:1px solid var(--border);padding:1px 8px;border-radius:10px;font-size:11px;font-weight:600;margin-bottom:6px}
+  .module-card h3{margin:4px 0 6px 0;font-size:16px;color:var(--text)}
+  .module-card .resp{color:var(--text-dim);font-size:13.5px;margin:0}
+  .module-card .keys{margin-top:10px;font-size:13px;color:var(--text-dim)}
+  .module-card .keys b{color:var(--accent-2);font-weight:500}
+  .module-card .start{margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);font-size:13px;color:var(--text-dim)}
+  .module-card .start b{color:var(--green);font-weight:500}
+  details{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:0;margin:10px 0}
+  details>summary{cursor:pointer;padding:10px 14px;font-weight:500;color:var(--text);user-select:none;list-style:none}
+  details>summary::-webkit-details-marker{display:none}
+  details>summary::before{content:"▸";color:var(--accent);margin-right:8px;display:inline-block;transition:transform .15s}
+  details[open]>summary::before{transform:rotate(90deg)}
+  details>div.pad{padding:0 14px 12px 14px}
+  .path-list{list-style:none;padding:0;counter-reset:step;margin:16px 0}
+  .path-list li{counter-increment:step;position:relative;padding:10px 14px 10px 50px;margin:6px 0;background:var(--bg-soft);border:1px solid var(--border);border-radius:8px;transition:border-color .15s}
+  .path-list li:hover{border-color:var(--accent)}
+  .path-list li::before{content:counter(step);position:absolute;left:14px;top:50%;transform:translateY(-50%);width:26px;height:26px;background:var(--bg);color:var(--accent);border:1px solid var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px}
+  .path-list li b{color:var(--text)}.path-list li .ref{color:var(--text-dim);font-size:13px}
+  .pipeline{display:grid;grid-template-columns:repeat(7,auto);align-items:center;gap:8px;margin:20px 0;font-size:13px}
+  .pipeline .stage{background:var(--bg-card);border:1px solid var(--border);padding:10px 14px;border-radius:8px;text-align:center;min-width:90px}
+  .pipeline .stage b{display:block;color:var(--accent-2);font-size:14px}
+  .pipeline .stage .sub{color:var(--text-dim);font-size:11.5px}
+  .pipeline .arrow{color:var(--green);font-size:18px;font-weight:700}
+  @media(max-width:880px){.pipeline{grid-template-columns:1fr}.pipeline .arrow{transform:rotate(90deg)}}
+  footer{text-align:center;color:var(--text-dim);padding:30px 24px;font-size:13px;border-top:1px solid var(--border);margin-top:24px}
+  .badge{display:inline-block;padding:1px 7px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid var(--border);background:var(--bg-soft);color:var(--text-dim)}
+  .badge.green{color:var(--green);border-color:rgba(126,231,135,.4)}.badge.orange{color:var(--orange);border-color:rgba(255,166,87,.4)}
+  .badge.purple{color:var(--purple);border-color:rgba(210,168,255,.4)}.badge.blue{color:var(--accent);border-color:rgba(88,166,255,.4)}
+  @media print{.topbar,.sidebar{display:none}.layout{display:block}body{background:white;color:black}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="brand">🤖 content-agents</span>
+  <span class="tag">Deep-Dive Learning Web App</span>
+  <span class="grow"></span>
+  <nav>
+    <a href="#overview">概览</a>
+    <a href="#architecture">架构</a>
+    <a href="#path">学习路径</a>
+    <a href="#modules">模块</a>
+    <a href="#tutorial">教程</a>
+    <a href="#glossary">术语</a>
+    <a href="#exercises">练习</a>
+  </nav>
+</div>
+
+<div class="layout">
+
+<aside class="sidebar">
+  <h3>导航</h3>
+  <a href="#overview">概览</a>
+  <a href="#architecture">架构</a>
+  <a href="#path">学习路径</a>
+  <a href="#modules">10 个模块</a>
+  <h3>模块</h3>
+  <a href="#m-concepts" class="sub">① 心智模型</a>
+  <a href="#m-modes" class="sub">② 双模式架构</a>
+  <a href="#m-core" class="sub">③ 核心库</a>
+  <a href="#m-tool-registry" class="sub">④ Tool Registry</a>
+  <a href="#m-material" class="sub">⑤ Material Agent</a>
+  <a href="#m-physics" class="sub">⑥ Physics Agent</a>
+  <a href="#m-texture" class="sub">⑦ Texture Agent</a>
+  <a href="#m-validation" class="sub">⑧ Validation Agent</a>
+  <a href="#m-skills" class="sub">⑨ Agent Skills</a>
+  <a href="#m-render" class="sub">⑩ Rendering</a>
+  <h3>实操</h3>
+  <a href="#tutorial" class="sub">教程 · Trace tasks</a>
+  <a href="#exercises" class="sub">练习 · Practice tasks</a>
+  <a href="#glossary" class="sub">术语表</a>
+</aside>
+
+<main>
+
+<section id="overview">
+<h1>content-agents</h1>
+<p>NVIDIA 的 AI 驱动 3D 内容自动化框架 · VLM 看图分析 USD 资产 · v0.4.3</p>
+
+<h3>这个仓库做什么</h3>
+<p>用 <b>VLM</b>（Vision-Language Model）分析 USD 资产的多视角渲染图，<b>自动分配材质、分类物理属性、生成纹理、校验生成内容</b>。4 个 agent（Material / Physics / Texture / Validation）各有 CLI + REST 服务两种形态。本质上是 <code>"3D 渲染 → VLM 看 → 推理 → 改 USD"</code> 的 agentic pipeline。</p>
+
+<p>所有 agent 标 <b>Beta</b> 或 Research Preview。仅支持 Linux/WSL2 —— 无原生 Windows/macOS。</p>
+
+<h3>技术栈</h3>
+<table>
+  <tr><th>维度</th><th>选型</th></tr>
+  <tr><td>语言</td><td>Python 3.12+</td></tr>
+  <tr><td>包管理</td><td><code>uv</code>（editable install <code>-e .</code> + <code>-e apps/&lt;agent&gt;</code>）</td></tr>
+  <tr><td>CLI 框架</td><td>typer==0.16.1 + rich（不是 click）</td></tr>
+  <tr><td>核心库</td><td><code>world-understanding</code>（<code>world_understanding/</code>）</td></tr>
+  <tr><td>VLM 后端</td><td>langchain-{openai,anthropic,google-genai,nvidia-ai-endpoints}</td></tr>
+  <tr><td>USD</td><td>usd-core>=24.11 + usd-validation-nvidia>=1.19.3</td></tr>
+  <tr><td>Rendering</td><td>OVRTX（GPU accelerated），Docker Compose sidecar 或 local subprocess</td></tr>
+  <tr><td>REST 服务</td><td>FastAPI（<code>apps/&lt;agent&gt;_service/</code>）</td></tr>
+  <tr><td>Agent skills</td><td>25 个 checked-in SKILL.md（.agents/ canonical + .codex/.claude mirror）</td></tr>
+  <tr><td>License</td><td>Apache 2.0 · NVIDIA CORPORATION</td></tr>
+</table>
+
+<h3>4 个 agent 一句话</h3>
+<div class="pipeline">
+  <div class="stage"><b>Material<span class="badge green">Beta</span></b><span class="sub">VLM 选材质→写 USD</span></div>
+  <div class="arrow">→</div>
+  <div class="stage"><b>Texture<span class="badge green">Preview</span></b><span class="sub">生成纹理→填材质</span></div>
+  <div class="arrow">→</div>
+  <div class="stage"><b>Physics<span class="badge green">Beta</span></b><span class="sub">分类物理属性</span></div>
+  <div class="arrow">→</div>
+  <div class="stage"><b>Validation<span class="badge orange">Preview</span></b><span class="sub">QA gate</span></div>
+</div>
+</section>
+
+<section id="architecture">
+<h2><span class="num">§</span>架构总览</h2>
+
+<h3>顶层目录速查</h3>
+<table>
+  <tr><th>目录</th><th>角色</th></tr>
+  <tr><td><code>world_understanding/</code></td><td><b>核心 SDK</b>：tools / agentic / functions / registry / utils — 所有 agent 共用</td></tr>
+  <tr><td><code>apps/material_agent/</code> + <code>material_agent_service/</code></td><td>Material Agent CLI + FastAPI REST 服务</td></tr>
+  <tr><td><code>apps/physics_agent/</code> + <code>physics_agent_service/</code></td><td>Physics Agent — 分类组件物理属性</td></tr>
+  <tr><td><code>apps/texture_agent/</code> + <code>texture_agent_service/</code></td><td>Texture Agent — 生成纹理 · CPU-only 服务</td></tr>
+  <tr><td><code>apps/validation_agent/</code></td><td>Validation Agent · v0.4 无 REST</td></tr>
+  <tr><td><code>apps/ovrtx_rendering_api/</code></td><td>共享渲染 GPU sidecar（被 compose 引用）</td></tr>
+  <tr><td><code>.agents/skills/</code></td><td><b>25 个 agent skill</b> — canonical tree + <code>.codex/</code> <code>.claude/</code> mirror</td></tr>
+  <tr><td><code>tests/</code></td><td>108 items — <code>test_public_quickstart_regression.py</code></td></tr>
+  <tr><td><code>deploy/collection/</code></td><td>全栈 collection 部署</td></tr>
+  <tr><td><code>scripts/</code></td><td>build resources fetch + sync + 探测</td></tr>
+</table>
+
+<h3>三层架构</h3>
+<pre><code>┌──────────────────────────────────────────────────────────────┐
+│ Layer 3: Agent Services (apps/)                               │
+│ material / physics / texture / validation                     │
+│ CLI (typer) + REST (FastAPI + Docker Compose)                 │
+│ Config-driven YAML pipeline DSL                              │
+├──────────────────────────────────────────────────────────────┤
+│ Layer 2: Agentic Framework (world_understanding/agentic/)     │
+│ workflows.py · tasks.py · agents/ · config/ · cli/            │
+│ base_pipeline_executor.py · usd_workflows.py                  │
+│ Orchestrates: VLM call → tool execute → USD write → validate  │
+├──────────────────────────────────────────────────────────────┤
+│ Layer 1: Tool Registry (world_understanding/tools/, registry/)│
+│ @register_tool · ToolSpec · _TOOLS_REGISTRY                  │
+│ functions/*.py → VLM function calling (LangChain)             │
+│ usd-core · usd-validation-nvidia · OVRTX rendering            │
+└──────────────────────────────────────────────────────────────┘
+
+横向：.agents/skills/ 25 skills → agent 的"使用说明书"（给 coding agent 读的）</code></pre>
+
+<h3>关键设计约定</h3>
+<ul>
+<li><b>Tool = func + ToolSpec</b>：装饰器注册，import 即生效</li>
+<li><b>VLM 通过 LangChain function-calling 调 tool</b>：人不能直接调 tool</li>
+<li><b>YAML DSL 描述 pipeline</b>：config 结构在 4 个 agent 间复用</li>
+<li><b>Render → Predict → Apply → Validate</b>：标准闭环</li>
+<li><b>Data URI by default</b>：渲染图 base64 inline（免 S3）</li>
+<li><b>OpenTelemetry 全链路</b>：每个 tool invocation 自动 span</li>
+</ul>
+</section>
+
+<section id="path">
+<h2><span class="num">§</span>推荐学习路径（10 步）</h2>
+<ol class="path-list">
+  <li><b>心智模型</b>："什么是 Content Agent"——VLM + USD 的闭环范式<br><span class="ref">→ 模块①</span></li>
+  <li><b>双模式架构</b>：CLI vs REST，同一 pipeline 的两种交付<br><span class="ref">→ 模块②</span></li>
+  <li><b>核心库 world_understanding</b>：6 个子包，所有 agent 的地基<br><span class="ref">→ 模块③</span></li>
+  <li><b>Tool Registry 与 VLM Function Calls</b>：装饰器注册 + LangChain function-calling<br><span class="ref">→ 模块④</span></li>
+  <li><b>Material Agent</b>：最成熟的 agent —— render→predict→apply→validate<br><span class="ref">→ 模块⑤</span></li>
+  <li><b>Physics Agent</b>：组件物理属性分类（asset-type-aware）<br><span class="ref">→ 模块⑥</span></li>
+  <li><b>Texture Agent</b>：纹理生成 + 两步式命令 · CPU-only<br><span class="ref">→ 模块⑦</span></li>
+  <li><b>Validation Agent</b>：QA gate · CLI-first · checked-in fixtures<br><span class="ref">→ 模块⑧</span></li>
+  <li><b>Agent Skills 系统</b>：.agents/skills/ → 教 coding agent 怎么用本仓库<br><span class="ref">→ 模块⑨</span></li>
+  <li><b>渲染管道</b>：OVRTX sidecar vs local subprocess<br><span class="ref">→ 模块⑩</span></li>
+</ol>
+</section>
+
+<section id="modules">
+<h2><span class="num">§</span>10 个模块详解</h2>
+
+<div class="modules-grid">
+
+<div class="module-card" id="m-concepts"><span class="step">STEP 1</span>
+<h3>① 心智模型</h3>
+<p class="resp">VLM 看图 → 推理 → 改 USD 的闭环。4 agent 的层级与输入输出。</p>
+<div class="keys"><b>关键：</b>README.md:1-18 GIFs + Agents 描述</div>
+<div class="start"><b>起点：</b>4 张 teaser GIF — 这是"Content Agent 做了什么"的最直观证据。</div>
+</div>
+
+<div class="module-card" id="m-modes"><span class="step">STEP 2</span>
+<h3>② 双模式架构</h3>
+<p class="resp">CLI vs Docker REST：同一 pipeline 两种交付方式；config YAML 互移植。</p>
+<div class="keys"><b>关键：</b>README.md:84-114 + System Requirements 表</div>
+<div class="start"><b>起点：</b>README "Two Ways to Use This" — 看 Pick this when 决策树。</div>
+</div>
+
+<div class="module-card" id="m-core"><span class="step">STEP 3</span>
+<h3>③ World Understanding 核心库</h3>
+<p class="resp">6 个子包：tools / agentic / functions / registry / config / utils。所有 agent 的 SDK。</p>
+<div class="keys"><b>关键：</b>world_understanding/__init__.py + tools/__init__.py + tools/base.py</div>
+<div class="start"><b>起点：</b>__init__.py 的 6 条 import — 这就是核心库的全部能力域。</div>
+</div>
+
+<div class="module-card" id="m-tool-registry"><span class="step">STEP 4</span>
+<h3>④ Tool Registry & VLM Function Calls</h3>
+<p class="resp">@register_tool 装饰器 + 4 registries + LangChain function-calling。Content Agent "智能"的核心机制。</p>
+<div class="keys"><b>关键：</b>tools/base.py + registry/tool_registry.py + functions/__init__.py</div>
+<div class="start"><b>起点：</b>tools/base.py:55-75 Tool.run() — 3 行看懂 tool 执行。</div>
+</div>
+
+<div class="module-card" id="m-material"><span class="step">STEP 5</span>
+<h3>⑤ Material Agent</h3>
+<p class="resp">最成熟的 agent。VLM 看 render → 选材质 from library → 写回 USD。YAML DSL。</p>
+<div class="keys"><b>关键：</b>apps/material_agent/configs/unified_example.yaml + README.md</div>
+<div class="start"><b>起点：</b>unified_example.yaml 的 8 步 steps 定义 — pipeline DSL。</div>
+</div>
+
+<div class="module-card" id="m-physics"><span class="step">STEP 6</span>
+<h3>⑥ Physics Agent</h3>
+<p class="resp">分类组件物理属性（material type / function / mass / friction），asset-type-aware。</p>
+<div class="keys"><b>关键：</b>apps/physics_agent/configs/lightbulb.yaml + README.md</div>
+<div class="start"><b>起点：</b>与 Material Agent 对比 — 无 material library，有 asset_type 参数。</div>
+</div>
+
+<div class="module-card" id="m-texture"><span class="step">STEP 7</span>
+<h3>⑦ Texture Agent</h3>
+<p class="resp">纹理生成 · 两步式命令（discover→generate→apply）· CPU-only · 多种 image-gen 后端。</p>
+<div class="keys"><b>关键：</b>apps/texture_agent/configs/texture_example.yaml + README.md</div>
+<div class="start"><b>起点：</b>两段命令设计 — 为什么拆成 discover/generate/apply。</div>
+</div>
+
+<div class="module-card" id="m-validation"><span class="step">STEP 8</span>
+<h3>⑧ Validation Agent</h3>
+<p class="resp">QA gate · v0.4 CLI-first · checked-in fixtures · validation_request→plan→result。</p>
+<div class="keys"><b>关键：</b>apps/validation_agent/examples/ + validation_agent/README.md</div>
+<div class="start"><b>起点：</b>checked-in fixtures — 不需其他 agent 就能跑 hello-world validation。</div>
+</div>
+
+<div class="module-card" id="m-skills"><span class="step">STEP 9</span>
+<h3>⑨ Agent Skills</h3>
+<p class="resp">25 个 SKILL.md · canonical + mirror · 教 coding agent 怎么操作用本仓库。</p>
+<div class="keys"><b>关键：</b>.agents/skills/material-agent-cli/SKILL.md + AGENTS.md:49-63</div>
+<div class="start"><b>起点：</b>material-agent-cli skill 的 frontmatter — 理解 skill 结构。</div>
+</div>
+
+<div class="module-card" id="m-render"><span class="step">STEP 10</span>
+<h3>⑩ Rendering Pipeline (OVRTX)</h3>
+<p class="resp">多视角渲染 → VLM 输入。Docker sidecar vs local subprocess。</p>
+<div class="keys"><b>关键：</b>apps/ovrtx_rendering_api/ + fetch_build_resources.sh + README 资源表</div>
+<div class="start"><b>起点：</b>README GPU 表 — 为什么 Material/Physics 需要 48GB VRAM。</div>
+</div>
+
+</div>
+</section>
+
+<section id="tutorial">
+<h2><span class="num">§</span>教程 · 跟读任务（Trace Tasks）</h2>
+
+<details open><summary>① 画出 4 agent 流程图</summary><div class="pad">
+<p>打开 README.md，找 4 段 GIF 对应文字描述（line 9-17）。不看代码，用一张纸画出"输入 USD → 4 agent 各自做了什么 → 最终输出"的流程图。对照 README Agents 描述检查。</p></div></details>
+
+<details><summary>② 对比 CLI vs REST 路径</summary><div class="pad">
+<p>读 README "Option A"（line 350）和 "Option B"（line 405）。画对照图：两条路径各几步走，标出"哪步需 GPU / Docker / API Key / fetch_build_resources"。</p></div></details>
+
+<details><summary>③ 追 register_tool 的注册链</summary><div class="pad">
+<p>在 tools/base.py 找到 register_tool，看：(1) 怎么接收 ToolSpec；(2) _TOOLS_REGISTRY 是什么数据结构；(3) return 的是 wrapper 还是函数。然后在 tools/__init__.py:18-21 看 import 触发注册。画出 import → decorator → dict insert 链路。</p></div></details>
+
+<details><summary>④ 追两个 registry 的联动</summary><div class="pad">
+<p>搜 tools/base.py 的 _TOOLS_REGISTRY 被读写位置。在 tools/__init__.py 的 register_all_tools() 看它如何同时操作 tool registry 和 display registry。在 tools/cv/__init__.py 看 @register_tool 用法。画完整 timeline。</p></div></details>
+
+<details><summary>⑤ 逐步理解 material pipeline</summary><div class="pad">
+<p>打开 unified_example.yaml，从 ladder.usd 开始到 validation，对每一步写一行"这一步做了什么"（只从 YAML 推断）。在 README 找对应描述验证。</p></div></details>
+
+<details><summary>⑥ 对比 Material vs Physics config</summary><div class="pad">
+<p>对比 unified_example.yaml vs lightbulb.yaml 的 steps 段，逐行标出相同/特有 step。看 functions/physics/ 目录推测 VLM 可调的 physics functions。</p></div></details>
+
+<details><summary>⑦ 画三 agent 数据流转图</summary><div class="pad">
+<p>画 Material → Texture → Validation 数据流转图。每箭头写一行"输入格式是什么"。验证：Texture 能否在 Material 前跑？写一句解释。</p></div></details>
+
+<details><summary>⑧ 理 validation 的 request→plan→result</summary><div class="pad">
+<p>打开 validation_agent/examples/configs/ 任一 YAML，找 validation_request/plan/policy 字段，理出 task→plan→criteria→judge 决策链。对照 examples/README.md 验证。</p></div></details>
+
+<details><summary>⑨ 读一个非 material 的 skill</summary><div class="pad">
+<p>找 .agents/skills/ 里第二重要的 skill，读 When to Use + Limitations。回答：这个 skill 判断该不该激活的逻辑是什么？diff 它的 .codex/ .claude/ mirror 与 canonical。</p></div></details>
+
+<details><summary>⑩ 理解 GPU 需求的 compose 关系</summary><div class="pad">
+<p>看 README:236 的 GPU 表："为什么 Texture 是 CPU-only"。打开 material_agent_service/docker-compose.yml，找 rendering-api service 的 GPU device reservation。</p></div></details>
+</section>
+
+<section id="exercises">
+<h2><span class="num">§</span>练习 · 实战检查点（Practice Tasks）</h2>
+
+<details><summary>练习 1 · 预判资产会被怎么处理</summary><div class="pad">
+<p><b>模块：</b>心智模型　<b>难度：</b>★☆☆　<b>预计：</b>30 min</p>
+<p>挑公开 USD（如 USDA Kitchen Set），预判：Material Agent 给哪些零件分什么材质？Physics Agent 分什么物理类型？Texture Agent 哪些面是纯色需纹理？Validation Agent 做什么校验？写一页预判表。后续实跑后回看预判 vs 实际。</p></div></details>
+
+<details><summary>练习 2 · install_all_cli.sh</summary><div class="pad">
+<p><b>模块：</b>双模式架构　<b>难度：</b>★★☆　<b>预计：</b>1h</p>
+<p>写 install_all_cli.sh：从零（无 repo）到 4 agent CLI 都能 --help。clone→uv venv→install core+4 agents→fetch build→验证。至少跑 material-agent --help。</p></div></details>
+
+<details><summary>练习 3 · 加一个自定义 tool</summary><div class="pad">
+<p><b>模块：</b>核心库　<b>难度：</b>★★☆　<b>预计：</b>1h</p>
+<p>在 tools/cv/ 下新建 fake_tool.py，写 DescribeColorTool：input_model ColorInput(color:str)→output_model ColorOutput(description:str)，@register_tool 注册。在 tools/__init__.py 和 tools/cv/__init__.py 加 import。验证 register_all_tools() 返回你的 tool。</p></div></details>
+
+<details><summary>练习 4 · inspect_tools.py + call_tool.py</summary><div class="pad">
+<p><b>模块：</b>Tool Registry　<b>难度：</b>★★☆　<b>预计：</b>1h</p>
+<p>写 inspect_tools.py（import register_all_tools，打印所有 tool 的 name/input/output/tag）。再写 call_tool.py 对 get_dominant_colors_tool 构造合法 input 调 Tool.run()，验证 output。</p></div></details>
+
+<details><summary>练习 5 · 修改 unified_example for your asset</summary><div class="pad">
+<p><b>模块：</b>Material Agent　<b>难度：</b>★★★　<b>预计：</b>1.5h + GPU</p>
+<p>复制 unified_example.yaml 为 my_asset.yaml，改 3 处：(1) usd_path 指向你的 USD；(2) backend 根据你的 API key 改；(3) 禁用 optimize/apply，只跑到 predict。看 VLM 给你的资产选了哪些材质。无环境至少用 yaml.safe_load 验证结构。</p></div></details>
+
+<details><summary>练习 6 · 手动 Physics Agent</summary><div class="pad">
+<p><b>模块：</b>Physics Agent　<b>难度：</b>★☆☆　<b>预计：</b>20 min</p>
+<p>对桌上任意物体拍 3 张照片，你替代 VLM 做 Physics prediction：material type / component function / mass/density/friction/deformability / asset type。写 structured 结果。</p></div></details>
+
+<details><summary>练习 7 · 扫描 empty texture slots</summary><div class="pad">
+<p><b>模块：</b>Texture Agent　<b>难度：</b>★★☆　<b>预计：</b>45 min</p>
+<p>对已有 material binding 的 USD，用 pxr.UsdShade 遍历 prim，统计"有 material binding 但无 texture file path"的数量。无 USD 就理解 discover 命令的作用。</p></div></details>
+
+<details><summary>练习 8 · Human validator</summary><div class="pad">
+<p><b>模块：</b>Validation Agent　<b>难度：</b>★☆☆　<b>预计：</b>20 min</p>
+<p>挑任意 3D 渲染图，做 look right judge：你看到什么？预期什么？verdict pass/fail？1 句理由。思考：VLM 能做这判断吗？什么情况 VLM 会误判？</p></div></details>
+
+<details><summary>练习 9 · 写一个最小 agent skill</summary><div class="pad">
+<p><b>模块：</b>Agent Skills　<b>难度：</b>★★☆　<b>预计：</b>1h</p>
+<p>仿 material-agent-cli SKILL.md 格式，写 my-first-skill SKILL.md（30-50 行）：frontmatter / When to Use / First Command。放 .agents/skills/ 下。分析：如果 Claude Code 加载这个 skill，什么用户请求会激活它？与 CLAUDE.md 按场景调度有何异同？</p></div></details>
+
+<details><summary>练习 10 · 修改渲染配置</summary><div class="pad">
+<p><b>模块：</b>Render　<b>难度：</b>★★☆　<b>预计：</b>45 min</p>
+<p>用 yaml.safe_load 读 unified_example.yaml 的 renderer，改 3 项：(1) backend remote→local；(2) resolution 512→1024；(3) 加 "+x-y+z" 视角。解释每项如何影响 VLM 预测质量。有 GPU 就跑一遍实测差异。</p></div></details>
+</section>
+
+<section id="glossary">
+<h2><span class="num">§</span>术语表</h2>
+<table>
+  <tr><th>术语</th><th>简释</th><th>相关模块</th></tr>
+  <tr><td>VLM</td><td>Vision-Language Model，能看图+读文字的多模态 LLM</td><td>①④⑤</td></tr>
+  <tr><td>USD</td><td>Universal Scene Description，Pixar 3D 场景格式</td><td>①</td></tr>
+  <tr><td>Material Agent</td><td>VLM 看图→挑材质→写 USD 的 agent</td><td>⑤</td></tr>
+  <tr><td>Physics Agent</td><td>分类组件物理属性的 agent</td><td>⑥</td></tr>
+  <tr><td>Texture Agent</td><td>生成纹理填材质空 slot 的 agent</td><td>⑦</td></tr>
+  <tr><td>Validation Agent</td><td>QA gate：校验生成产物</td><td>⑧</td></tr>
+  <tr><td>OVRTX</td><td>GPU accelerated rendering API（Omniverse RTX Renderer）</td><td>⑩</td></tr>
+  <tr><td>LangChain</td><td>LLM 调用框架，本仓库用它做 VLM function calling</td><td>④</td></tr>
+  <tr><td>Tool</td><td>func + ToolSpec，通过 @register_tool 注册</td><td>③④</td></tr>
+  <tr><td>ToolSpec</td><td>{name, version, description, tags, input_model, output_model, policy}</td><td>④</td></tr>
+  <tr><td>Registry</td><td>全局 name → Tool dict；4 种注册表（tool/chat/model/display）</td><td>④</td></tr>
+  <tr><td>Function</td><td>VLM 调用的函数（不同于 Tool——Tool 是 CLI 调用）</td><td>④</td></tr>
+  <tr><td>YAML DSL</td><td>Agent config 格式：project / input / output / steps</td><td>②⑤</td></tr>
+  <tr><td>Agent Skill</td><td>SKILL.md 教 coding agent 操作的文档</td><td>⑨</td></tr>
+  <tr><td>Large-scene</td><td>Material REST 的 partitioning 模式（单 USD stage → 多 workers）</td><td>⑤</td></tr>
+  <tr><td>Data URI</td><td>渲染图 base64 inline 发给 VLM（默认无 S3）</td><td>③⑩</td></tr>
+  <tr><td>NIM</td><td>NVIDIA Inference Microservice，容器化 AI model endpoint</td><td>②⑦</td></tr>
+  <tr><td>NVCF</td><td>NVIDIA Cloud Functions，远端 serverless 渲染/优化</td><td>⑩</td></tr>
+  <tr><td>Scene Optimizer Core</td><td>optimize_usd step 的本地后端（~332MB）</td><td>⑤</td></tr>
+  <tr><td>Checked-in fixtures</td><td>预先跑好的 evidence，不需 agent 就能 validation</td><td>⑧</td></tr>
+  <tr><td>OpenTelemetry</td><td>全链路 tracing（每个 tool invocation 自动 span）</td><td>③</td></tr>
+  <tr><td>Prim clustering</td><td>视觉聚类 → 只 predict representative → expand</td><td>⑤</td></tr>
+  <tr><td>Material Library</td><td>有限材质选项 YAML，防 VLM hallucination</td><td>⑤</td></tr>
+</table>
+</section>
+
+<section>
+<h2><span class="num">§</span>下一步</h2>
+<h3>产物</h3>
+<ul>
+  <li><code>.learning/repo-map.md</code> — 仓库总览</li>
+  <li><code>.learning/modules/*.md</code> × 10 — 模块笔记</li>
+  <li><code>.learning/out/index.html</code> — 本页</li>
+</ul>
+<h3>继续深入</h3>
+<ol>
+  <li>读 <code>world_understanding/cli.py</code>（~3000 行 typer app）—— 核心库的完整 CLI 入口</li>
+  <li>读 <code>world_understanding/agentic/workflows.py</code> —— workflow 编排机制</li>
+  <li>读 <code>apps/material_agent_service/docs/api.md</code> —— REST API 的全部 endpoint</li>
+  <li>读 <code>.agents/skills/deploy-collection/SKILL.md</code> —— 一键全栈部署</li>
+  <li>跑 <code>validation-agent run ...steel_scaffold...yaml</code> —— checked-in fixtures 不需 GPU/key</li>
+</ol>
+
+<div class="callout tip"><strong>记住 3 件事：</strong>
+<ol style="margin:6px 0 0 0">
+<li>本质：<b>VLM 看图 → 推理 → 改 USD</b>。Tool registry 是执行引擎，agentic framework 是编排器。</li>
+<li>双面：<b>CLI 跑 pipeline，REST 跑 service</b>。Config YAML 互移植。</li>
+<li>Meta：<b>.agents/skills/ 是给 coding agent 读的</b>。25 个 skill = 25 条"教 AI 用 AI"的 instruction。</li>
+</ol>
+</div>
+</section>
+
+</main>
+</div>
+
+<footer>Generated by <b>learning-experience-designer</b> · Source: <code>.learning/repo-map.md</code> + 10 modules · Built for <code>content-agents</code></footer>
+
+<script>
+const sections=document.querySelectorAll('section[id]');
+const links=document.querySelectorAll('.sidebar a[href^="#"]');
+const obs=new IntersectionObserver((e)=>{e.forEach(e=>{if(e.isIntersecting){links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+e.target.id))}})},{rootMargin:'-30% 0px -60% 0px'});
+sections.forEach(s=>obs.observe(s));
+document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',function(e){const t=document.querySelector(this.getAttribute('href'));if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth',block:'start'})}}));
+</script>
+
+</body>
+</html>

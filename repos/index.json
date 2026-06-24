@@ -1,5 +1,16 @@
 [
   {
+    "id": "content-agents",
+    "title": "Content Agents",
+    "desc": "NVIDIA Omniverse Content Agents — AI-driven USD content pipeline",
+    "has_en": true,
+    "has_zh": false,
+    "files": [
+      "index.html"
+    ],
+    "updated": "2026-06-24"
+  },
+  {
     "id": "omniverse-dsx-blueprint",
     "title": "DSX Blueprint",
     "desc": "NVIDIA Omniverse DSX Blueprint for AI Factory Digital Twins",
