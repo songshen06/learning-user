@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DSX Blueprint — Usage Guide</title>
+<style>
+:root {
+  --bg: #f8f9fa;
+  --sidebar-bg: #1a1a2e;
+  --sidebar-text: #c8c8d4;
+  --sidebar-active: #76b900;
+  --main-bg: #ffffff;
+  --text: #2d2d2d;
+  --text-secondary: #5a5a5a;
+  --code-bg: #1e1e2e;
+  --code-text: #cdd6f4;
+  --border: #e0e0e0;
+  --accent: #76b900;
+  --accent-hover: #8fd600;
+  --warning-bg: #fff8e1;
+  --warning-border: #ffc107;
+  --table-stripe: #f5f5f5;
+  --table-header: #e8e8e8;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background:var(--bg); color:var(--text); line-height:1.6; display:flex; min-height:100vh; }
+#sidebar { width:280px; background:var(--sidebar-bg); color:var(--sidebar-text); position:fixed; top:0; left:0; bottom:0; overflow-y:auto; padding:24px 20px; z-index:10; }
+#sidebar h2 { color:#fff; font-size:1.1rem; font-weight:600; margin-bottom:24px; letter-spacing:-0.01em; line-height:1.3; }
+#sidebar nav a { display:block; color:var(--sidebar-text); text-decoration:none; padding:6px 10px; border-radius:6px; font-size:0.875rem; margin-bottom:2px; transition:background 0.15s,color 0.15s; }
+#sidebar nav a:hover { background:rgba(255,255,255,0.08); color:#fff; }
+#sidebar nav a.active { background:rgba(118,185,0,0.15); color:var(--accent); }
+#sidebar .section-label { color:rgba(255,255,255,0.4); font-size:0.7rem; text-transform:uppercase; letter-spacing:0.08em; margin:18px 0 8px 10px; }
+#main { margin-left:280px; flex:1; max-width:920px; padding:40px 48px 80px; }
+h1 { font-size:2rem; font-weight:700; color:#111; margin-bottom:8px; letter-spacing:-0.02em; }
+h2 { font-size:1.4rem; font-weight:600; color:#1a1a1a; margin:40px 0 16px; padding-bottom:8px; border-bottom:2px solid var(--border); }
+h3 { font-size:1.05rem; font-weight:600; color:#333; margin:24px 0 10px; }
+h4 { font-size:0.95rem; font-weight:600; color:#444; margin:16px 0 8px; }
+p { margin-bottom:12px; color:var(--text-secondary); }
+a { color:var(--accent); text-decoration:none; }
+a:hover { text-decoration:underline; }
+code { font-family:'SF Mono', 'Menlo', 'Monaco', 'Cascadia Code', monospace; font-size:0.85rem; background:#eaeef2; padding:1px 5px; border-radius:3px; }
+pre { background:var(--code-bg); color:var(--code-text); padding:14px 18px; border-radius:8px; overflow-x:auto; font-size:0.82rem; line-height:1.5; margin:12px 0; }
+pre code { background:none; padding:0; font-size:inherit; }
+table { width:100%; border-collapse:collapse; margin:12px 0 20px; font-size:0.9rem; }
+th { background:var(--table-header); text-align:left; padding:8px 12px; font-weight:600; border:1px solid var(--border); }
+td { padding:7px 12px; border:1px solid var(--border); }
+tr:nth-child(even) td { background:var(--table-stripe); }
+ul, ol { padding-left:24px; margin-bottom:12px; color:var(--text-secondary); }
+li { margin-bottom:4px; }
+blockquote { border-left:3px solid var(--warning-border); background:var(--warning-bg); padding:10px 16px; margin:12px 0; border-radius:0 6px 6px 0; font-size:0.9rem; }
+blockquote p { margin:0; }
+details { margin:12px 0; border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+details summary { padding:12px 18px; background:#f5f5f5; cursor:pointer; font-weight:500; user-select:none; font-size:0.95rem; }
+details summary:hover { background:#eee; }
+details .details-content { padding:16px 18px; }
+.tabs { display:flex; gap:4px; margin-bottom:0; }
+.tab-btn { padding:6px 16px; border:1px solid var(--border); border-bottom:none; border-radius:6px 6px 0 0; background:#f0f0f0; cursor:pointer; font-size:0.85rem; font-weight:500; transition:background 0.15s; }
+.tab-btn.active { background:#fff; border-bottom:2px solid #fff; margin-bottom:-1px; color:var(--accent); }
+.tab-content { display:none; border:1px solid var(--border); border-radius:0 6px 6px 6px; padding:16px; background:#fff; }
+.tab-content.active { display:block; }
+.tag { display:inline-block; background:#e8f5e0; color:#2e7d32; font-size:0.75rem; padding:2px 8px; border-radius:4px; font-weight:500; margin-right:4px; }
+.tag-warn { background:var(--warning-bg); color:#b45309; }
+.badge { display:inline-block; padding:3px 10px; border-radius:12px; font-size:0.78rem; font-weight:600; }
+.badge-green { background:#e8f5e0; color:#2e7d32; }
+.badge-red { background:#fce4ec; color:#c62828; }
+.badge-yellow { background:#fff8e1; color:#b45309; }
+.checklist { list-style:none; padding-left:0; }
+.checklist li { padding:2px 0; }
+.checklist li::before { content:'☐ '; color:var(--text-secondary); }
+.highlight-box { background:#f0f7ff; border:1px solid #bbdefb; border-radius:8px; padding:14px 18px; margin:12px 0; }
+.cmd-label { font-size:0.75rem; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px; }
+.intro { font-size:1.05rem; color:var(--text-secondary); max-width:640px; margin-bottom:28px; }
+@media (max-width:900px) {
+  #sidebar { display:none; }
+  #main { margin-left:0; padding:24px 20px; }
+}
+</style>
+</head>
+<body>
+
+<aside id="sidebar">
+  <h2>NVIDIA Omniverse<br>DSX Blueprint<br>Usage Guide</h2>
+  <nav>
+    <a href="#is-this-for-me">Is this for me?</a>
+    <a href="#what-it-does">What it does</a>
+    <a href="#overview">5-minute overview</a>
+    <span class="section-label">Getting Started</span>
+    <a href="#install">Install</a>
+    <a href="#configure">Configure</a>
+    <a href="#daily-commands">Daily commands</a>
+    <span class="section-label">Workflows</span>
+    <a href="#workflow-launch">Launch full stack</a>
+    <a href="#workflow-config">Change GPU/rack config</a>
+    <a href="#workflow-cfd">CFD thermal simulation</a>
+    <a href="#workflow-electrical">Electrical simulation</a>
+    <a href="#workflow-ai">AI chat control</a>
+    <a href="#workflow-camera">Switch cameras</a>
+    <a href="#workflow-analytics">View analytics</a>
+    <span class="section-label">Reference</span>
+    <a href="#reference">Commands & flags</a>
+    <a href="#troubleshooting">Troubleshooting</a>
+    <a href="#cheat-sheet">Cheat sheet</a>
+    <a href="#glossary">Glossary</a>
+    <span class="section-label">Learn</span>
+    <a href="#tutorial">Tutorial</a>
+    <a href="#exercises">Exercises</a>
+  </nav>
+</aside>
+
+<main id="main">
+
+<h1>DSX Blueprint Usage Guide</h1>
+<p class="intro">How to use the NVIDIA Omniverse DSX Blueprint for AI Factory Digital Twins — from first install to daily operation. For end users, design engineers, and CFD engineers. <strong>No source code reading required.</strong></p>
+
+<!-- ============ IS THIS FOR ME ============ -->
+<section id="is-this-for-me">
+<h2>Is this for me?</h2>
+
+<h3>Who should use DSX Blueprint</h3>
+<table>
+<tr><th>Persona</th><th>Should use?</th><th>What you'll do</th></tr>
+<tr><td><strong>Design Engineer / End-User</strong></td><td><span class="badge badge-green">Yes</span></td><td>Use the web UI to explore, configure, and run simulations</td></tr>
+<tr><td><strong>CFD Engineer</strong></td><td><span class="badge badge-green">Yes</span></td><td>Visualize pre-baked CFD data; generate new CFD externally</td></tr>
+<tr><td><strong>Design Engineer / Artist</strong></td><td><span class="badge badge-green">Yes</span></td><td>Work with SimReady USD assets, modify 3D scenes</td></tr>
+<tr><td><strong>Application Developer</strong></td><td><span class="badge badge-green">Yes</span></td><td>Extend Kit app (C++/Python) or web frontend (React)</td></tr>
+<tr><td><strong>AI Engineer</strong></td><td><span class="badge badge-green">Yes</span></td><td>Configure/extend AI chat agent</td></tr>
+<tr><td><strong>Non-technical business user</strong></td><td><span class="badge badge-red">No</span></td><td>Not a turn-key product; requires technical setup</td></tr>
+<tr><td><strong>macOS user</strong></td><td><span class="badge badge-red">No</span></td><td>Windows 10/11 or Ubuntu 22.04/24.04 only</td></tr>
+</table>
+
+<h3>Hardware checklist</h3>
+<ul class="checklist">
+<li>NVIDIA RTX Pro 6000 Blackwell GPU</li>
+<li>Driver v570.169+</li>
+<li>64GB DDR5 RAM minimum</li>
+<li>1TB NVMe storage</li>
+<li>Windows 10/11 or Ubuntu 22.04/24.04</li>
+<li>Git + Git LFS</li>
+<li>Node.js v20+ and npm 9+</li>
+</ul>
+
+<blockquote><p><strong>Verify hardware:</strong> Run <code>nvidia-smi</code>. If you see an RTX Pro 6000 Blackwell with driver ≥570.169, you pass the first gate.</p></blockquote>
+
+<h3>What you can do</h3>
+<ul>
+<li>Explore a photorealistic 3D digital twin of a 50-acre AI factory in your browser</li>
+<li>Switch between GB200 and GB300 NVL72 GPU rack configurations</li>
+<li>Run and visualize pre-baked CFD thermal simulations (temperature, pressure, hot aisle)</li>
+<li>Run electrical loading simulations on different power configurations</li>
+<li>Use AI chat to control the scene with natural language</li>
+<li>Save and compare build configurations</li>
+<li>View power and thermal KPIs in an analytics dashboard</li>
+</ul>
+
+<h3>What you cannot do</h3>
+<ul>
+<li>Deploy as a production app without customization — this is a <em>developer blueprint</em></li>
+<li>Run on macOS</li>
+<li>Generate new CFD data (only visualize pre-baked data)</li>
+<li>Use without the exact GPU specified</li>
+<li>Use AI chat without an NVIDIA API key</li>
+<li>Run the full scene without the separate DSX Content Pack download</li>
+</ul>
+
+<blockquote><p><strong>If this isn't for you:</strong> For production deployment, customize this blueprint or use NVIDIA Cloud Functions (NVCF). For lower requirements, consider a lighter Omniverse Kit application.</p></blockquote>
+</section>
+
+<!-- ============ WHAT IT DOES ============ -->
+<section id="what-it-does">
+<h2>What it does</h2>
+<p>The DSX Blueprint is a digital twin platform combining GPU-accelerated 3D rendering with an AI agent. It streams a complete 50-acre AI factory scene to web browsers via WebRTC, letting you configure hardware layouts, run simulations, and interact with the scene through an AI chat interface.</p>
+
+<table>
+<tr><th>Component</th><th>What users see</th></tr>
+<tr><td><strong>3D Viewer</strong></td><td>Real-time path-traced viewport in browser — no GPU needed on the client</td></tr>
+<tr><td><strong>Configurator</strong></td><td>Switches GPU types (GB200/GB300), rack variants, site layouts</td></tr>
+<tr><td><strong>CFD Simulation</strong></td><td>Thermal heat maps (temperature, pressure) overlaid on the data hall</td></tr>
+<tr><td><strong>Electrical Simulation</strong></td><td>Power loading visualization with real-time metrics</td></tr>
+<tr><td><strong>AI Agent</strong></td><td>Natural-language chat controls the scene ("navigate to data hall 1")</td></tr>
+<tr><td><strong>Analytics</strong></td><td>KPI dashboard — power, thermal, GPU deployment stats</td></tr>
+<tr><td><strong>Camera Controls</strong></td><td>Preset interior/exterior/CFD camera views</td></tr>
+</table>
+</section>
+
+<!-- ============ 5-MINUTE OVERVIEW ============ -->
+<section id="overview">
+<h2>5-minute overview</h2>
+<p>The user journey from zero to exploring the digital twin:</p>
+<ol>
+<li><strong>Check hardware</strong> — RTX Pro 6000, 64GB RAM, 1TB NVMe</li>
+<li><strong>Install prerequisites</strong> — Git, Git LFS, Node.js, Docker (Linux), 7-Zip (Windows)</li>
+<li><strong>Clone repo</strong> — <code>git clone</code> the blueprint + download DSX Content Pack from NGC (~several GB)</li>
+<li><strong>Configure scene path</strong> — edit <code>source/apps/dsx.kit</code> to point <code>auto_load_usd</code> at extracted content</li>
+<li><strong>Set API key (optional)</strong> — <code>NVIDIA_API_KEY</code> from build.nvidia.com for AI chat</li>
+<li><strong>First run</strong> — Terminal 1: <code>./run_streaming.sh</code>, Terminal 2: <code>./run_web.sh</code>, open browser</li>
+<li><strong>Explore</strong> — use toolbar to change configs, run simulations, chat with AI</li>
+</ol>
+<blockquote><p>First launch takes 5–8 minutes for shader compilation. Subsequent launches are fast.</p></blockquote>
+</section>
+
+<!-- ============ INSTALL ============ -->
+<section id="install">
+<h2>Install</h2>
+<p>Set up DSX Blueprint from a fresh machine. Estimated time: 30–60 min (mostly content pack download).</p>
+
+<h3>Step 1: Hardware verification</h3>
+<pre><code>nvidia-smi          # RTX Pro 6000 Blackwell, driver ≥570.169
+free -h             # Linux — 64GB+
+df -h               # 1TB+ free on NVMe</code></pre>
+
+<h3>Step 2: Git + Git LFS</h3>
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab(event,'install-git-linux')">Linux</button>
+  <button class="tab-btn" onclick="switchTab(event,'install-git-windows')">Windows</button>
+</div>
+<div id="install-git-linux" class="tab-content active">
+<pre><code>sudo apt-get install git git-lfs
+git lfs install</code></pre>
+</div>
+<div id="install-git-windows" class="tab-content">
+<p>Download from <a href="https://git-scm.com/downloads">git-scm.com</a> and <a href="https://git-lfs.com">git-lfs.com</a>. Run installers.</p>
+</div>
+
+<h3>Step 3: Node.js v20+</h3>
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab(event,'install-node-linux')">Linux</button>
+  <button class="tab-btn" onclick="switchTab(event,'install-node-windows')">Windows</button>
+</div>
+<div id="install-node-linux" class="tab-content active">
+<pre><code>curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs
+node --version   # Should be v20.x+
+npm --version    # Should be 9.x+</code></pre>
+</div>
+<div id="install-node-windows" class="tab-content">
+<p>Download from <a href="https://nodejs.org">nodejs.org</a>, run installer, ensure "Add to PATH" is checked. Restart terminal. Verify:</p>
+<pre><code>node --version
+npm --version</code></pre>
+</div>
+
+<h3>Step 4: Docker (Linux only)</h3>
+<pre><code>sudo apt-get install docker-ce docker-ce-cli containerd.io
+sudo usermod -aG docker $USER
+# Install NVIDIA Container Toolkit:
+# https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html</code></pre>
+
+<h3>Step 5: 7-Zip (Windows only)</h3>
+<p>Windows native zip archiver fails on deeply nested paths. Download from <a href="https://7-zip.org">7-zip.org</a>.</p>
+
+<h3>Step 6: C++ toolchain + IDE</h3>
+<table>
+<tr><th>OS</th><th>Requirements</th></tr>
+<tr><td><strong>Windows</strong></td><td>Visual Studio 2019 with "Desktop development with C++" workload + Windows SDK</td></tr>
+<tr><td><strong>Linux</strong></td><td><code>sudo apt-get install build-essential</code></td></tr>
+<tr><td><strong>Both</strong></td><td>VSCode: <a href="https://code.visualstudio.com/download">code.visualstudio.com</a></td></tr>
+</table>
+
+<h3>Step 7: Clone + download content</h3>
+<pre><code>git clone https://github.com/NVIDIA-Omniverse-blueprints/omniverse-dsx-blueprint-for-ai-factories.git
+cd omniverse-dsx-blueprint-for-ai-factories</code></pre>
+<p>Download the <strong>DSX Content Pack</strong> from <a href="https://catalog.ngc.nvidia.com/orgs/nvidia/teams/omniverse/resources/dsx_dataset">NGC</a>. Extract to:</p>
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab(event,'extract-linux')">Linux</button>
+  <button class="tab-btn" onclick="switchTab(event,'extract-windows')">Windows</button>
+</div>
+<div id="extract-linux" class="tab-content active">
+<pre><code>/data/dsx/</code></pre>
+</div>
+<div id="extract-windows" class="tab-content">
+<pre><code>C:\data\dsx\</code></pre>
+</div>
+
+<h3>Step 8: Configure scene path</h3>
+<p>Edit <code>source/apps/dsx.kit</code>:</p>
+<pre><code>[settings.app]
+auto_load_usd = "C:\data\dsx\DSX_BP\Assembly\DSX_Main_BP.usda"   # Windows
+auto_load_usd = "/data/dsx/DSX_BP/Assembly/DSX_Main_BP.usda"      # Linux</code></pre>
+
+<h3>Step 9: NVIDIA API Key (optional — for AI chat)</h3>
+<p>Get a key from <a href="https://build.nvidia.com">build.nvidia.com</a>.</p>
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab(event,'apikey-linux')">Linux</button>
+  <button class="tab-btn" onclick="switchTab(event,'apikey-windows')">Windows</button>
+</div>
+<div id="apikey-linux" class="tab-content active">
+<pre><code>echo 'export NVIDIA_API_KEY="nvapi-..."' >> ~/.bashrc
+source ~/.bashrc</code></pre>
+</div>
+<div id="apikey-windows" class="tab-content">
+<pre><code>[System.Environment]::SetEnvironmentVariable("NVIDIA_API_KEY", "nvapi-...", "User")
+# Restart terminal</code></pre>
+</div>
+<blockquote><p>Skipping this step is fine — the 3D viewer, configurator, and simulations work without it.</p></blockquote>
+
+<h3>Success check</h3>
+<pre><code>node --version && npm --version && nvidia-smi</code></pre>
+<p>All three commands should succeed with correct versions.</p>
+</section>
+
+<!-- ============ CONFIGURE ============ -->
+<section id="configure">
+<h2>Configure</h2>
+<p>The critical one-time setup step: linking the Kit application to your USD scene data.</p>
+
+<p>Open <code>source/apps/dsx.kit</code> in any text editor. Find the <code>[settings.app]</code> section and set:</p>
+<pre><code>auto_load_usd = "&lt;your_extract_path&gt;/DSX_BP/Assembly/DSX_Main_BP.usda"</code></pre>
+
+<p>If you skip this, the application starts but no scene loads — you'll see a blank viewport.</p>
+
+<p><strong>Override at launch</strong> (no file editing needed):</p>
+<pre><code>./run_streaming.sh --/app/auto_load_usd=/custom/path/to/scene.usd</code></pre>
+
+<h3>Streaming connection settings</h3>
+<p>The streaming connection is configurable via URL query parameters or environment variables:</p>
+<table>
+<tr><th>Parameter</th><th>Env Variable</th><th>Default</th><th>Description</th></tr>
+<tr><td><code>server</code></td><td><code>VITE_OMNIVERSE_SERVER</code></td><td><code>localhost</code></td><td>Kit server address</td></tr>
+<tr><td><code>signalingPort</code></td><td><code>VITE_SIGNALING_PORT</code></td><td><code>49100</code></td><td>Signaling port</td></tr>
+<tr><td><code>width</code></td><td>—</td><td><code>1920</code></td><td>Stream width</td></tr>
+<tr><td><code>height</code></td><td>—</td><td><code>1080</code></td><td>Stream height</td></tr>
+<tr><td><code>fps</code></td><td>—</td><td><code>60</code></td><td>Target frame rate</td></tr>
+</table>
+<p>Example: <code>http://localhost:8080?server=192.168.1.100&width=1280&height=720</code></p>
+
+<blockquote><p>If <code>NVIDIA_API_KEY</code> is not set, the chat panel will display a message explaining how to enable the AI agent. Everything else still works.</p></blockquote>
+</section>
+
+<!-- ============ FIRST RUN (Daily commands) ============ -->
+<section id="first-run">
+<h2>First run &amp; daily commands</h2>
+
+<p>You need <strong>two terminal windows</strong> — one for the Kit streaming server, one for the web frontend.</p>
+
+<h3>Terminal 1: Kit streaming server</h3>
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab(event,'stream-linux')">Linux</button>
+  <button class="tab-btn" onclick="switchTab(event,'stream-windows')">Windows</button>
+</div>
+<div id="stream-linux" class="tab-content active">
+<pre><code>cd omniverse-dsx-blueprint-for-ai-factories
+./run_streaming.sh</code></pre>
+</div>
+<div id="stream-windows" class="tab-content">
+<pre><code>cd omniverse-dsx-blueprint-for-ai-factories
+.\run_streaming.bat</code></pre>
+</div>
+<p>First run: builds everything (10–20 min) + shader compilation (5–8 min). Subsequent runs are fast.</p>
+
+<h3>Terminal 2: Web frontend</h3>
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab(event,'web-linux')">Linux</button>
+  <button class="tab-btn" onclick="switchTab(event,'web-windows')">Windows</button>
+</div>
+<div id="web-linux" class="tab-content active">
+<pre><code>cd omniverse-dsx-blueprint-for-ai-factories
+./run_web.sh</code></pre>
+</div>
+<div id="web-windows" class="tab-content">
+<pre><code>cd omniverse-dsx-blueprint-for-ai-factories
+.\run_web.bat</code></pre>
+</div>
+<p>First run: <code>npm install</code> downloads dependencies. Then Vite dev server starts on port 8081.</p>
+
+<h3>Browser</h3>
+<p>Pick the <strong>third URL</strong> shown in Terminal 2 (the streaming-related one):</p>
+<pre><code>http://localhost:8081?server=localhost</code></pre>
+
+<h3>Docker alternative (Linux)</h3>
+<pre><code>docker compose up -d
+# Open: http://localhost:8080?server=localhost</code></pre>
+
+<h3>What success looks like</h3>
+<ul>
+<li>Terminal 1 shows WebRTC signaling active on port 49100</li>
+<li>Terminal 2 shows Vite dev server on port 8081</li>
+<li>Browser displays the 3D AI factory scene</li>
+<li>Left toolbar visible: Agent, Configurator, Analytics, Simulations, Camera</li>
+<li>You can rotate/zoom/pan the viewport</li>
+</ul>
+</section>
+
+<!-- ============ WORKFLOWS ============ -->
+<section id="workflows">
+<h2>Workflows</h2>
+
+<details id="workflow-launch">
+<summary><strong>1. Launch the full stack</strong></summary>
+<div class="details-content">
+<p>Every session starts here.</p>
+<pre><code># Terminal 1
+./run_streaming.sh
+
+# Terminal 2
+./run_web.sh
+
+# Browser: streaming URL from Vite output</code></pre>
+<p><strong>Docker (Linux):</strong></p>
+<pre><code>docker compose up -d
+# Open: http://localhost:8080?server=localhost</code></pre>
+</div>
+</details>
+
+<details id="workflow-config">
+<summary><strong>2. Change GPU / rack configuration</strong></summary>
+<div class="details-content">
+<ol>
+<li>Click <strong>Configurator</strong> icon in left toolbar</li>
+<li>Select GPU type: <strong>GB200</strong> or <strong>GB300 NVL72</strong></li>
+<li>Adjust site layout, power configuration</li>
+<li>Changes propagate instantly — viewport updates in real time</li>
+</ol>
+<p><strong>What changes:</strong> GPU deployment units (22 in hall_GPUs), DATAHALL layout, cooling infrastructure, power cabling.</p>
+</div>
+</details>
+
+<details id="workflow-cfd">
+<summary><strong>3. Run CFD thermal simulation</strong></summary>
+<div class="details-content">
+<ol>
+<li>Click <strong>Simulations</strong> icon in left toolbar</li>
+<li>Select <strong>Thermal</strong> simulation</li>
+<li>Choose CFD timestep: <strong>40, 60, 80, or 100</strong></li>
+<li>Toggle temperature and/or pressure visualization</li>
+</ol>
+<p>Pre-baked CGNS data overlays on the scene — hot aisle containment highlights heat patterns, temperature gradients color-map through the data hall.</p>
+<blockquote><p>CFD data is pre-baked. To generate new CFD for custom layouts, you need external CFD tools.</p></blockquote>
+</div>
+</details>
+
+<details id="workflow-electrical">
+<summary><strong>4. Run electrical loading simulation</strong></summary>
+<div class="details-content">
+<ol>
+<li>In <strong>SimulationPanel</strong>, select <strong>Electrical</strong></li>
+<li>Adjust loading parameters (power draw per rack, redundancy)</li>
+<li>View power metrics — cables, panels, trays respond visually</li>
+<li>KPI metrics update in real time</li>
+</ol>
+</div>
+</details>
+
+<details id="workflow-ai">
+<summary><strong>5. Use AI chat to control the scene</strong></summary>
+<div class="details-content">
+<ol>
+<li>Click <strong>Agent</strong> icon (robot icon) in left toolbar</li>
+<li>Type natural-language commands:</li>
+</ol>
+<pre><code>"Navigate to data hall 1"
+"Show me the hot aisle CFD"
+"Switch to GB300 rack variant"
+"Show the exterior camera view"
+"What GPU models are currently deployed?"</code></pre>
+<p>The LangChain agent (llama-4-maverick) parses your message, routes it to scene handlers, and executes USD modifications automatically.</p>
+<blockquote><p><strong>Requires <code>NVIDIA_API_KEY</code></strong> from build.nvidia.com. Without it, the chat panel shows setup instructions.</p></blockquote>
+
+<h4>Agent HTTP API (port 8012)</h4>
+<table>
+<tr><th>Endpoint</th><th>Method</th><th>Purpose</th></tr>
+<tr><td><code>/api/agent/chat</code></td><td>POST</td><td>Blocking chat</td></tr>
+<tr><td><code>/api/agent/chat/stream</code></td><td>POST</td><td>SSE streaming chat</td></tr>
+<tr><td><code>/api/agent/reset</code></td><td>POST</td><td>Clear conversation history</td></tr>
+<tr><td><code>/api/agent/health</code></td><td>GET</td><td>Health check + API key validation</td></tr>
+</table>
+</div>
+</details>
+
+<details id="workflow-camera">
+<summary><strong>6. Switch cameras and views</strong></summary>
+<div class="details-content">
+<ol>
+<li>Click <strong>Camera</strong> icon in left toolbar</li>
+<li>Available presets:</li>
+</ol>
+<table>
+<tr><th>Camera</th><th>View</th></tr>
+<tr><td><code>camera_int_datahall_01–04</code></td><td>Interior data hall views</td></tr>
+<tr><td><code>camera_ext_default_01–04</code></td><td>Exterior / bird's-eye site views</td></tr>
+<tr><td><code>cfd_camera</code></td><td>Optimized CFD visualization angle</td></tr>
+</table>
+<p>Also controllable via AI chat: <em>"Show me the exterior camera view"</em></p>
+</div>
+</details>
+
+<details id="workflow-analytics">
+<summary><strong>7. View analytics and KPIs</strong></summary>
+<div class="details-content">
+<ol>
+<li>Click <strong>Analytics</strong> icon (chart icon) in left toolbar</li>
+<li>Dashboard shows:</li>
+</ol>
+<ul>
+<li>Power consumption metrics across facility</li>
+<li>Thermal KPIs from CFD data</li>
+<li>GPU deployment statistics</li>
+<li>Site-level utilization summaries</li>
+</ul>
+<p>Charts update in real time as configurations and simulations change.</p>
+</div>
+</details>
+
+<h3>Common options across all workflows</h3>
+<table>
+<tr><th>Option</th><th>Description</th></tr>
+<tr><td><code>./repo.sh launch dsx.kit</code></td><td>Launch with window (non-streaming, local dev)</td></tr>
+<tr><td><code>./repo.sh build --rebuild-deps</code></td><td>Force rebuild submodules</td></tr>
+<tr><td><code>./repo.sh build -c</code></td><td>Clean build from scratch</td></tr>
+<tr><td><code>VITE_OMNIVERSE_SERVER=IP ./run_web.sh</code></td><td>Connect to remote Kit server</td></tr>
+<tr><td><code>VITE_SIGNALING_PORT=49200 ./run_web.sh</code></td><td>Custom signaling port</td></tr>
+<tr><td><code>DSX_AGENT_PORT=8020 ./run_streaming.sh</code></td><td>Custom agent HTTP port</td></tr>
+</table>
+</section>
+
+<!-- ============ REFERENCE ============ -->
+<section id="reference">
+<h2>Reference</h2>
+
+<h3>Key ports</h3>
+<table>
+<tr><th>Port</th><th>Service</th></tr>
+<tr><td>49100</td><td>WebRTC signaling</td></tr>
+<tr><td>47995–48012, 49000–49007</td><td>WebRTC media (TCP/UDP)</td></tr>
+<tr><td>8012</td><td>AI agent HTTP API</td></tr>
+<tr><td>8081</td><td>Vite dev server</td></tr>
+<tr><td>8080</td><td>Docker web (Nginx)</td></tr>
+</table>
+
+<h3>Environment variables</h3>
+<table>
+<tr><th>Variable</th><th>Default</th><th>Purpose</th></tr>
+<tr><td><code>NVIDIA_API_KEY</code></td><td>—</td><td>Required for AI chat agent</td></tr>
+<tr><td><code>DSX_AGENT_PORT</code></td><td><code>8012</code></td><td>Agent HTTP server port</td></tr>
+<tr><td><code>VITE_OMNIVERSE_SERVER</code></td><td><code>localhost</code></td><td>Kit server address</td></tr>
+<tr><td><code>VITE_SIGNALING_PORT</code></td><td><code>49100</code></td><td>WebRTC signaling port</td></tr>
+<tr><td><code>VITE_DSX_AGENT_PORT</code></td><td><code>8012</code></td><td>Frontend agent port</td></tr>
+<tr><td><code>USD_URL</code></td><td>—</td><td>Override USD scene path</td></tr>
+</table>
+
+<h3>Build commands</h3>
+<table>
+<tr><th>Command</th><th>Purpose</th></tr>
+<tr><td><code>./repo.sh build</code></td><td>Incremental build</td></tr>
+<tr><td><code>./repo.sh build -c</code></td><td>Clean build</td></tr>
+<tr><td><code>./repo.sh build --rebuild-deps</code></td><td>Force rebuild submodules</td></tr>
+<tr><td><code>./repo.sh launch dsx.kit</code></td><td>Launch with window</td></tr>
+<tr><td><code>./repo.sh launch dsx_streaming.kit</code></td><td>Launch streaming</td></tr>
+<tr><td><code>./repo.sh test</code></td><td>Run tests</td></tr>
+<tr><td><code>./repo.sh package_container</code></td><td>Package for cloud deployment</td></tr>
+</table>
+
+<h3>File locations that matter</h3>
+<table>
+<tr><th>File</th><th>Purpose</th></tr>
+<tr><td><code>source/apps/dsx.kit</code></td><td>Set <code>auto_load_usd</code> scene path</td></tr>
+<tr><td><code>source/apps/dsx_streaming.kit</code></td><td>Local streaming config</td></tr>
+<tr><td><code>source/apps/dsx_nvcf.kit</code></td><td>Cloud (NVCF) deployment config</td></tr>
+<tr><td><code>repo.toml</code></td><td>Top-level build configuration</td></tr>
+<tr><td><code>premake5.lua</code></td><td>Build system config</td></tr>
+<tr><td><code>compose.yml</code></td><td>Docker compose for containers</td></tr>
+</table>
+</section>
+
+<!-- ============ TROUBLESHOOTING ============ -->
+<section id="troubleshooting">
+<h2>Troubleshooting</h2>
+
+<h3>Launch &amp; streaming</h3>
+<table>
+<tr><th>Symptom</th><th>Fix</th></tr>
+<tr><td>Exits with code -11 (SIGSEGV)</td><td>Use <code>./repo.sh launch dsx.kit</code> instead. Or ensure RTX GPU + display available.</td></tr>
+<tr><td>"WebGL2 support is required"</td><td>Enable hardware acceleration in browser settings</td></tr>
+<tr><td>Blank / no 3D scene</td><td>Set <code>auto_load_usd</code> in <code>source/apps/dsx.kit</code> to correct content pack path</td></tr>
+<tr><td>Can't connect to streaming server</td><td>Use <code>?server=localhost&signalingPort=49100</code>. Check env vars.</td></tr>
+<tr><td>WebRTC connection fails</td><td>Ensure ports 49100, 47995–48012, 49000–49007 open in firewall</td></tr>
+<tr><td>Hangs during render init</td><td>Disable IOMMU at system level (BIOS/UEFI)</td></tr>
+</table>
+
+<h3>Build</h3>
+<table>
+<tr><th>Symptom</th><th>Fix</th></tr>
+<tr><td>Build fails on fresh checkout</td><td>Use <code>./repo.sh build</code> (handles everything automatically)</td></tr>
+<tr><td>Build fails after code changes</td><td>Verify same <code>.kit</code> files in <code>repo.toml</code>, <code>premake5.lua</code>, <code>source/apps/</code></td></tr>
+<tr><td>Stale dependencies</td><td>Clean build: <code>./repo.sh build -c</code> or clear cache: <code>./repo.sh launch -- --clear-cache --clear-data --reset-user</code></td></tr>
+<tr><td>Windows path too long</td><td>Move repo closer to drive root (e.g., <code>C:\dsx\</code>)</td></tr>
+<tr><td>exFAT drive errors</td><td>Move repo to NTFS-formatted drive</td></tr>
+<tr><td>Docker disk space exhausted</td><td><code>docker container prune</code> (safe) or <code>docker system prune</code> (⚠ aggressive)</td></tr>
+</table>
+
+<h3>Performance</h3>
+<table>
+<tr><th>Symptom</th><th>Fix</th></tr>
+<tr><td>First launch very slow (5–8 min)</td><td>Normal — RTX shader compilation. Wait. Subsequent launches fast.</td></tr>
+<tr><td>Low FPS / choppy</td><td>Reduce: <code>?width=1280&height=720&fps=30</code>. Check GPU with <code>nvidia-smi</code>.</td></tr>
+<tr><td>Scene incomplete</td><td>Run <code>git lfs pull</code> to download large binary assets</td></tr>
+</table>
+
+<h3>AI agent</h3>
+<table>
+<tr><th>Symptom</th><th>Fix</th></tr>
+<tr><td>"API key not configured"</td><td>Get key from <a href="https://build.nvidia.com">build.nvidia.com</a>, set <code>NVIDIA_API_KEY</code> env var</td></tr>
+<tr><td>Agent returns errors</td><td>Verify key at build.nvidia.com. Health check: <code>curl http://localhost:8012/api/agent/health</code></td></tr>
+<tr><td>Agent not responding</td><td>Check <code>DSX_AGENT_PORT</code> (default 8012) matches frontend <code>VITE_DSX_AGENT_PORT</code></td></tr>
+<tr><td>Wrong answers</td><td>Reset conversation: <code>curl -X POST http://localhost:8012/api/agent/reset</code></td></tr>
+</table>
+
+<h3>Cache clearing</h3>
+<div class="highlight-box">
+<p><strong>App-level (safe, per-launch):</strong></p>
+<pre><code>./repo.sh launch -- --clear-cache --clear-data --reset-user</code></pre>
+<p><strong>Global (⚠ requires full rebuild):</strong></p>
+<pre><code># Linux
+rm -rf ~/.local/share/ov ~/.cache/packman ~/.cache/uv
+# Windows — Delete:
+# %LOCALAPPDATA%\ov  %PM_PACKAGES_ROOT%  %LOCALAPPDATA%\uv\cache</code></pre>
+</div>
+</section>
+
+<!-- ============ CHEAT SHEET ============ -->
+<section id="cheat-sheet">
+<h2>Cheat sheet</h2>
+
+<div class="highlight-box">
+<h3>Quick launch</h3>
+<pre><code>./run_streaming.sh              # Terminal 1 — Kit
+./run_web.sh                    # Terminal 2 — Web
+# Browser: http://localhost:8081?server=localhost</code></pre>
+</div>
+
+<h3>Environment variables quick set</h3>
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab(event,'cs-linux')">Linux</button>
+  <button class="tab-btn" onclick="switchTab(event,'cs-windows')">Windows</button>
+</div>
+<div id="cs-linux" class="tab-content active">
+<pre><code>export NVIDIA_API_KEY="nvapi-..."
+export VITE_OMNIVERSE_SERVER="localhost"
+export VITE_SIGNALING_PORT="49100"</code></pre>
+</div>
+<div id="cs-windows" class="tab-content">
+<pre><code>[System.Environment]::SetEnvironmentVariable("NVIDIA_API_KEY", "nvapi-...", "User")</code></pre>
+</div>
+
+<h3>Web UI toolbar map</h3>
+<table>
+<tr><th>Icon</th><th>Panel</th><th>Function</th></tr>
+<tr><td>Agent (robot)</td><td>AgentPanel</td><td>AI chat for scene control</td></tr>
+<tr><td>Configurator (gear)</td><td>ConfiguratorPanel</td><td>GPU/rack/site/power config + map</td></tr>
+<tr><td>Analytics (chart)</td><td>AnalyticsPanel</td><td>Power, thermal, GPU KPIs</td></tr>
+<tr><td>Simulations (play)</td><td>SimulationPanel</td><td>Thermal CFD + electrical simulations</td></tr>
+<tr><td>Camera (camera)</td><td>Camera</td><td>Switch preset camera views</td></tr>
+</table>
+
+<h3>AI agent quick commands</h3>
+<table>
+<tr><th>Chat input</th><th>Effect</th></tr>
+<tr><td><code>"Navigate to data hall 1"</code></td><td>Move camera to interior data hall</td></tr>
+<tr><td><code>"Show me the hot aisle CFD"</code></td><td>Enable CFD temperature visualization</td></tr>
+<tr><td><code>"Switch to GB300 rack variant"</code></td><td>Change rack configuration</td></tr>
+</table>
+
+<h3>Agent API quick curls</h3>
+<pre><code>curl http://localhost:8012/api/agent/health
+curl -X POST http://localhost:8012/api/agent/reset</code></pre>
+
+<h3>Troubleshooting quick fixes</h3>
+<table>
+<tr><th>Problem</th><th>Quick fix</th></tr>
+<tr><td>Blank scene</td><td>Set <code>auto_load_usd</code> in <code>source/apps/dsx.kit</code></td></tr>
+<tr><td>SIGSEGV (-11)</td><td>Use <code>./repo.sh launch dsx.kit</code></td></tr>
+<tr><td>No WebGL2</td><td>Enable browser hardware acceleration</td></tr>
+<tr><td>Agent not working</td><td>Set <code>NVIDIA_API_KEY</code></td></tr>
+<tr><td>Build out of sync</td><td>Check <code>.kit</code> files in repo.toml, premake5.lua, source/apps</td></tr>
+<tr><td>Slow first launch</td><td>Normal — wait 5–8 min for shader compilation</td></tr>
+<tr><td>Clear cache</td><td><code>./repo.sh launch -- --clear-cache --clear-data --reset-user</code></td></tr>
+</table>
+</section>
+
+<!-- ============ GLOSSARY ============ -->
+<section id="glossary">
+<h2>Glossary</h2>
+
+<table>
+<tr><th>Term</th><th>Definition</th></tr>
+<tr><td><strong>Kit</strong></td><td>NVIDIA Omniverse Kit SDK — the GPU-accelerated application framework for building 3D tools</td></tr>
+<tr><td><strong>USD / OpenUSD</strong></td><td>Universal Scene Description — Pixar's open standard for 3D scene composition and interchange</td></tr>
+<tr><td><strong>WebRTC</strong></td><td>Web Real-Time Communication — browser-based protocol for streaming video, audio, and data between peers</td></tr>
+<tr><td><strong>NVCF</strong></td><td>NVIDIA Cloud Functions — serverless GPU container hosting for Kit applications</td></tr>
+<tr><td><strong>NVL72</strong></td><td>NVIDIA's rack-scale GPU design — 72 GPUs interconnected in a single rack</td></tr>
+<tr><td><strong>GB200 / GB300</strong></td><td>GPU product generations used in DSX rack configurations</td></tr>
+<tr><td><strong>CFD</strong></td><td>Computational Fluid Dynamics — simulation of fluid/air flow and heat transfer</td></tr>
+<tr><td><strong>CGNS</strong></td><td>CFD General Notation System — file format for CFD simulation data</td></tr>
+<tr><td><strong>SimReady</strong></td><td>NVIDIA's standard for USD assets that include both geometry and metadata for simulation</td></tr>
+<tr><td><strong>Content Pack</strong></td><td>The multi-GB USD scene dataset downloaded separately from NGC — contains the AI factory 3D model</td></tr>
+<tr><td><strong>NGC</strong></td><td>NVIDIA GPU Cloud — catalog for datasets, containers, and models</td></tr>
+<tr><td><strong>Signaling</strong></td><td>The WebRTC process of negotiating a peer-to-peer connection between browser and streaming server</td></tr>
+<tr><td><strong>Kit Extension</strong></td><td>A modular component in the Kit SDK — every feature (rendering, streaming, CAE) is an extension</td></tr>
+<tr><td><strong>CAE</strong></td><td>Computer-Aided Engineering — simulation extensions for CFD, thermal, and structural analysis</td></tr>
+<tr><td><strong>SSE</strong></td><td>Server-Sent Events — HTTP streaming protocol used by the AI agent for real-time chat responses</td></tr>
+<tr><td><strong>LangChain</strong></td><td>LLM orchestration framework used by the AI agent to route chat messages to scene handlers</td></tr>
+</table>
+</section>
+
+<!-- ============ TUTORIAL ============ -->
+<section id="tutorial">
+<h2>Tutorial</h2>
+<p>Step-by-step walkthrough built from each task's <strong>Trace task</strong>, in journey order.</p>
+
+<ol>
+<li>
+  <strong>Hardware check:</strong> Run <code>nvidia-smi</code>. Confirm RTX Pro 6000 Blackwell and driver ≥570.169.
+</li>
+<li>
+  <strong>Prerequisites check:</strong> Run <code>node --version && npm --version && nvidia-smi</code>. All three should succeed.
+</li>
+<li>
+  <strong>First launch:</strong> Open two terminals. Run <code>./run_streaming.sh</code> in one, <code>./run_web.sh</code> in the other. Open the third URL from Vite output. Verify the 3D scene renders and camera responds to interaction.
+</li>
+<li>
+  <strong>GPU configuration:</strong> Click the Configurator icon. Switch from GB200 to GB300. Verify rack units change in the viewport.
+</li>
+<li>
+  <strong>AI chat control:</strong> Open the Agent panel. Type <em>"navigate to data hall 1."</em> Confirm camera moves to an interior data hall view.
+</li>
+<li>
+  <strong>Troubleshooting practice:</strong> Deliberately launch with wrong <code>auto_load_usd</code>. Observe blank scene. Correct the path and relaunch.
+</li>
+</ol>
+</section>
+
+<!-- ============ EXERCISES ============ -->
+<section id="exercises">
+<h2>Exercises</h2>
+<p>Self-checks framed from each task's <strong>Practice task</strong>.</p>
+
+<ol>
+<li>
+  <strong>Suitability:</strong> List your project requirements. Map them against "What you can do." Identify at least 3 gaps where you'll need to extend the blueprint.
+</li>
+<li>
+  <strong>Setup speed:</strong> Time a full setup from scratch on a clean VM. Target: under 1 hour. Identify the slowest step and document how to parallelize it.
+</li>
+<li>
+  <strong>Remote streaming:</strong> Start the streaming server. Connect from a different machine on the same network using <code>?server=IP</code>. Verify remote streaming works.
+</li>
+<li>
+  <strong>Full workflow demo:</strong> Start GB200 → run thermal CFD at timestep 60 → switch to GB300 → run electrical loading → use AI chat to query "what is the current GPU configuration?" → screenshot the analytics dashboard. Time the full sequence.
+</li>
+<li>
+  <strong>Build failure recovery:</strong> Rename a <code>.kit</code> file in <code>source/apps/</code> without updating <code>repo.toml</code> or <code>premake5.lua</code>. Try to build. Observe the error. Fix all three locations and rebuild.
+</li>
+</ol>
+</section>
+
+<p style="margin-top:60px;padding-top:24px;border-top:1px solid var(--border);font-size:0.85rem;color:#999;">
+  NVIDIA Omniverse DSX Blueprint Usage Guide. Generated from repo docs and user-facing materials. For the developer-oriented guide (code architecture), see the companion learning guide.
+</p>
+
+</main>
+
+<script>
+function switchTab(event, tabId) {
+  const btn = event.target;
+  const container = btn.parentElement;
+  const contentContainer = container.nextElementSibling;
+  // Deactivate all tabs in this group
+  container.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  // For OS tabs, the next sibling is the tab content; for single tab groups it's the next content div
+  let parent = container.parentElement;
+  let allContents = parent.querySelectorAll('.tab-content');
+  // Find the target content
+  allContents.forEach(c => c.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,14 @@
+[
+  {
+    "id": "omniverse-dsx-blueprint",
+    "title": "DSX Blueprint",
+    "desc": "NVIDIA Omniverse DSX Blueprint for AI Factory Digital Twins",
+    "has_en": true,
+    "has_zh": true,
+    "files": [
+      "index.html",
+      "index_zh.html"
+    ],
+    "updated": "2026-06-24"
+  }
+]

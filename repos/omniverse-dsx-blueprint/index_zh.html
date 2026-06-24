@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DSX Blueprint — 使用指南</title>
+<style>
+:root {
+  --bg: #f8f9fa;
+  --sidebar-bg: #1a1a2e;
+  --sidebar-text: #c8c8d4;
+  --sidebar-active: #76b900;
+  --main-bg: #ffffff;
+  --text: #2d2d2d;
+  --text-secondary: #5a5a5a;
+  --code-bg: #1e1e2e;
+  --code-text: #cdd6f4;
+  --border: #e0e0e0;
+  --accent: #76b900;
+  --accent-hover: #8fd600;
+  --warning-bg: #fff8e1;
+  --warning-border: #ffc107;
+  --table-stripe: #f5f5f5;
+  --table-header: #e8e8e8;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif; background:var(--bg); color:var(--text); line-height:1.7; display:flex; min-height:100vh; }
+#sidebar { width:280px; background:var(--sidebar-bg); color:var(--sidebar-text); position:fixed; top:0; left:0; bottom:0; overflow-y:auto; padding:24px 20px; z-index:10; }
+#sidebar h2 { color:#fff; font-size:1.1rem; font-weight:600; margin-bottom:24px; letter-spacing:-0.01em; line-height:1.3; }
+#sidebar nav a { display:block; color:var(--sidebar-text); text-decoration:none; padding:6px 10px; border-radius:6px; font-size:0.875rem; margin-bottom:2px; transition:background 0.15s,color 0.15s; }
+#sidebar nav a:hover { background:rgba(255,255,255,0.08); color:#fff; }
+#sidebar nav a.active { background:rgba(118,185,0,0.15); color:var(--accent); }
+#sidebar .section-label { color:rgba(255,255,255,0.4); font-size:0.7rem; text-transform:uppercase; letter-spacing:0.08em; margin:18px 0 8px 10px; }
+#main { margin-left:280px; flex:1; max-width:960px; padding:40px 48px 80px; }
+h1 { font-size:2rem; font-weight:700; color:#111; margin-bottom:8px; letter-spacing:-0.02em; }
+h2 { font-size:1.4rem; font-weight:600; color:#1a1a1a; margin:40px 0 16px; padding-bottom:8px; border-bottom:2px solid var(--border); }
+h3 { font-size:1.05rem; font-weight:600; color:#333; margin:24px 0 10px; }
+h4 { font-size:0.95rem; font-weight:600; color:#444; margin:16px 0 8px; }
+p { margin-bottom:12px; color:var(--text-secondary); }
+a { color:var(--accent); text-decoration:none; }
+a:hover { text-decoration:underline; }
+code { font-family:'SF Mono', 'Menlo', 'Monaco', 'Cascadia Code', monospace; font-size:0.85rem; background:#eaeef2; padding:1px 5px; border-radius:3px; }
+pre { background:var(--code-bg); color:var(--code-text); padding:14px 18px; border-radius:8px; overflow-x:auto; font-size:0.82rem; line-height:1.5; margin:12px 0; }
+pre code { background:none; padding:0; font-size:inherit; }
+table { width:100%; border-collapse:collapse; margin:12px 0 20px; font-size:0.9rem; }
+th { background:var(--table-header); text-align:left; padding:8px 12px; font-weight:600; border:1px solid var(--border); }
+td { padding:7px 12px; border:1px solid var(--border); }
+tr:nth-child(even) td { background:var(--table-stripe); }
+ul, ol { padding-left:24px; margin-bottom:12px; color:var(--text-secondary); }
+li { margin-bottom:4px; }
+blockquote { border-left:3px solid var(--warning-border); background:var(--warning-bg); padding:10px 16px; margin:12px 0; border-radius:0 6px 6px 0; font-size:0.9rem; }
+blockquote p { margin:0; }
+details { margin:12px 0; border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+details summary { padding:12px 18px; background:#f5f5f5; cursor:pointer; font-weight:500; user-select:none; font-size:0.95rem; }
+details summary:hover { background:#eee; }
+details .details-content { padding:16px 18px; }
+.tabs { display:flex; gap:4px; margin-bottom:0; }
+.tab-btn { padding:6px 16px; border:1px solid var(--border); border-bottom:none; border-radius:6px 6px 0 0; background:#f0f0f0; cursor:pointer; font-size:0.85rem; font-weight:500; transition:background 0.15s; }
+.tab-btn.active { background:#fff; border-bottom:2px solid #fff; margin-bottom:-1px; color:var(--accent); }
+.tab-content { display:none; border:1px solid var(--border); border-radius:0 6px 6px 6px; padding:16px; background:#fff; }
+.tab-content.active { display:block; }
+.tag { display:inline-block; background:#e8f5e0; color:#2e7d32; font-size:0.75rem; padding:2px 8px; border-radius:4px; font-weight:500; margin-right:4px; }
+.tag-warn { background:var(--warning-bg); color:#b45309; }
+.badge { display:inline-block; padding:3px 10px; border-radius:12px; font-size:0.78rem; font-weight:600; }
+.badge-green { background:#e8f5e0; color:#2e7d32; }
+.badge-red { background:#fce4ec; color:#c62828; }
+.badge-yellow { background:#fff8e1; color:#b45309; }
+.checklist { list-style:none; padding-left:0; }
+.checklist li { padding:2px 0; }
+.checklist li::before { content:'☐ '; color:var(--text-secondary); }
+.highlight-box { background:#f0f7ff; border:1px solid #bbdefb; border-radius:8px; padding:14px 18px; margin:12px 0; }
+.cmd-label { font-size:0.75rem; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px; }
+.intro { font-size:1.05rem; color:var(--text-secondary); max-width:680px; margin-bottom:28px; }
+@media (max-width:900px) {
+  #sidebar { display:none; }
+  #main { margin-left:0; padding:24px 20px; }
+}
+</style>
+</head>
+<body>
+
+<aside id="sidebar">
+  <h2>NVIDIA Omniverse<br>DSX Blueprint<br>使用指南</h2>
+  <nav>
+    <a href="#is-this-for-me">适合我吗？</a>
+    <a href="#what-it-does">功能概览</a>
+    <a href="#overview">5 分钟速览</a>
+    <span class="section-label">入门</span>
+    <a href="#install">安装</a>
+    <a href="#configure">配置</a>
+    <a href="#daily-commands">日常命令</a>
+    <span class="section-label">工作流</span>
+    <a href="#workflow-launch">启动完整套件</a>
+    <a href="#workflow-config">切换 GPU/机架配置</a>
+    <a href="#workflow-cfd">CFD 热力仿真</a>
+    <a href="#workflow-electrical">电力负载仿真</a>
+    <a href="#workflow-ai">AI 对话控制</a>
+    <a href="#workflow-camera">切换摄像机视角</a>
+    <a href="#workflow-analytics">查看分析面板</a>
+    <span class="section-label">参考</span>
+    <a href="#reference">命令与参数</a>
+    <a href="#troubleshooting">故障排除</a>
+    <a href="#cheat-sheet">速查卡</a>
+    <a href="#glossary">术语表</a>
+    <span class="section-label">学习</span>
+    <a href="#tutorial">教程</a>
+    <a href="#exercises">练习</a>
+  </nav>
+</aside>
+
+<main id="main">
+
+<h1>DSX Blueprint 使用指南</h1>
+<p class="intro">如何使用 NVIDIA Omniverse DSX Blueprint 构建 AI 工厂数字孪生 —— 从首次安装到日常操作。面向最终用户、设计工程师和 CFD 工程师。<strong>无需阅读源代码。</strong></p>
+
+<!-- ============ 适合我吗 ============ -->
+<section id="is-this-for-me">
+<h2>适合我吗？</h2>
+
+<h3>谁应该使用 DSX Blueprint</h3>
+<table>
+<tr><th>角色</th><th>是否适合</th><th>你能做什么</th></tr>
+<tr><td><strong>设计工程师 / 最终用户</strong></td><td><span class="badge badge-green">是</span></td><td>通过 Web UI 浏览、配置和运行仿真</td></tr>
+<tr><td><strong>CFD 工程师</strong></td><td><span class="badge badge-green">是</span></td><td>可视化预生成的 CFD 数据；新 CFD 需外部工具生成</td></tr>
+<tr><td><strong>设计工程师 / 美术师</strong></td><td><span class="badge badge-green">是</span></td><td>使用 SimReady USD 资产，修改 3D 场景</td></tr>
+<tr><td><strong>应用开发者</strong></td><td><span class="badge badge-green">是</span></td><td>扩展 Kit 应用（C++/Python）或 Web 前端（React）</td></tr>
+<tr><td><strong>AI 工程师</strong></td><td><span class="badge badge-green">是</span></td><td>配置/扩展 AI 对话代理</td></tr>
+<tr><td><strong>非技术业务用户</strong></td><td><span class="badge badge-red">否</span></td><td>非开箱即用产品；需要技术配置</td></tr>
+<tr><td><strong>macOS 用户</strong></td><td><span class="badge badge-red">否</span></td><td>仅支持 Windows 10/11 或 Ubuntu 22.04/24.04</td></tr>
+</table>
+
+<h3>硬件检查清单</h3>
+<ul class="checklist">
+<li>NVIDIA RTX Pro 6000 Blackwell GPU</li>
+<li>驱动程序 ≥ v570.169</li>
+<li>最小 64GB DDR5 内存</li>
+<li>1TB NVMe 存储</li>
+<li>Windows 10/11 或 Ubuntu 22.04/24.04</li>
+<li>Git + Git LFS</li>
+<li>Node.js v20+ 和 npm 9+</li>
+</ul>
+
+<blockquote><p><strong>验证硬件：</strong>运行 <code>nvidia-smi</code>。如果看到 RTX Pro 6000 Blackwell 且驱动 ≥570.169，则通过第一关。</p></blockquote>
+
+<h3>你能做什么</h3>
+<ul>
+<li>在浏览器中浏览完整的 50 英亩 AI 工厂照片级 3D 数字孪生</li>
+<li>在 GB200 和 GB300 NVL72 GPU 机架配置之间切换</li>
+<li>运行并可视化预生成的 CFD 热力仿真（温度、压力、热通道）</li>
+<li>在不同电力配置上运行电力负载仿真</li>
+<li>通过 AI 对话用自然语言控制场景</li>
+<li>保存和对比多种构建配置方案</li>
+<li>在分析仪表盘中查看电力和热力 KPI</li>
+</ul>
+
+<h3>你不能做什么</h3>
+<ul>
+<li>未经定制直接部署为生产应用 — 这是一个<em>开发者蓝图</em></li>
+<li>在 macOS 上运行</li>
+<li>生成新的 CFD 数据（仅能可视化预生成数据）</li>
+<li>在非指定 GPU 上运行</li>
+<li>在没有 NVIDIA API 密钥的情况下使用 AI 对话</li>
+<li>不下载独立的 DSX Content Pack 就运行完整场景</li>
+</ul>
+
+<blockquote><p><strong>如果这不适合你：</strong>用于生产部署请定制此蓝图或使用 NVIDIA Cloud Functions (NVCF)。如需更低硬件要求，请考虑更轻量的 Omniverse Kit 应用。</p></blockquote>
+</section>
+
+<!-- ============ 功能概览 ============ -->
+<section id="what-it-does">
+<h2>功能概览</h2>
+<p>DSX Blueprint 是一个将 GPU 加速 3D 渲染与 AI 代理相结合的数字孪生平台。它通过 WebRTC 将完整的 50 英亩 AI 工厂场景实时流式传输到 Web 浏览器，让你可以配置硬件布局、运行仿真，并通过 AI 对话界面与场景交互。</p>
+
+<table>
+<tr><th>组件</th><th>用户所见</th></tr>
+<tr><td><strong>3D 查看器</strong></td><td>浏览器中实时光线追踪视口 — 客户端无需 GPU</td></tr>
+<tr><td><strong>配置器</strong></td><td>切换 GPU 类型（GB200/GB300）、机架变体、场地布局</td></tr>
+<tr><td><strong>CFD 仿真</strong></td><td>数据大厅上的热力图叠加（温度、压力）</td></tr>
+<tr><td><strong>电力仿真</strong></td><td>带实时指标的电力和负载可视化</td></tr>
+<tr><td><strong>AI 代理</strong></td><td>自然语言对话控制场景（"导航到数据大厅 1"）</td></tr>
+<tr><td><strong>分析面板</strong></td><td>KPI 仪表盘 — 电力、热力、GPU 部署统计</td></tr>
+<tr><td><strong>摄像机控制</strong></td><td>预设的室内/室外/CFD 摄像机视角</td></tr>
+</table>
+</section>
+
+<!-- ============ 5 分钟速览 ============ -->
+<section id="overview">
+<h2>5 分钟速览</h2>
+<p>从零到探索数字孪生的用户旅程：</p>
+<ol>
+<li><strong>检查硬件</strong> — RTX Pro 6000、64GB 内存、1TB NVMe</li>
+<li><strong>安装前提软件</strong> — Git、Git LFS、Node.js、Docker（Linux）、7-Zip（Windows）</li>
+<li><strong>克隆仓库</strong> — <code>git clone</code> 蓝图 + 从 NGC 下载 DSX Content Pack（数 GB）</li>
+<li><strong>配置场景路径</strong> — 编辑 <code>source/apps/dsx.kit</code>，将 <code>auto_load_usd</code> 指向解压后的内容</li>
+<li><strong>设置 API 密钥（可选）</strong> — 从 build.nvidia.com 获取 <code>NVIDIA_API_KEY</code> 启用 AI 对话</li>
+<li><strong>首次运行</strong> — 终端1：<code>./run_streaming.sh</code>，终端2：<code>./run_web.sh</code>，打开浏览器</li>
+<li><strong>探索</strong> — 使用工具栏切换配置、运行仿真、与 AI 对话</li>
+</ol>
+<blockquote><p>首次启动需要 5–8 分钟进行着色器编译。后续启动很快。</p></blockquote>
+</section>
+
+<!-- ============ 安装 ============ -->
+<section id="install">
+<h2>安装</h2>
+<p>从全新机器安装 DSX Blueprint。预计耗时：30–60 分钟（主要是内容包下载）。</p>
+
+<h3>步骤 1：硬件验证</h3>
+<pre><code>nvidia-smi          # RTX Pro 6000 Blackwell，驱动 ≥570.169
+free -h             # Linux — 64GB+
+df -h               # NVMe 上 1TB+ 可用空间</code></pre>
+
+<h3>步骤 2：Git + Git LFS</h3>
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab(event,'install-git-linux')">Linux</button>
+  <button class="tab-btn" onclick="switchTab(event,'install-git-windows')">Windows</button>
+</div>
+<div id="install-git-linux" class="tab-content active">
+<pre><code>sudo apt-get install git git-lfs
+git lfs install</code></pre>
+</div>
+<div id="install-git-windows" class="tab-content">
+<p>从 <a href="https://git-scm.com/downloads">git-scm.com</a> 和 <a href="https://git-lfs.com">git-lfs.com</a> 下载安装程序运行。</p>
+</div>
+
+<h3>步骤 3：Node.js v20+</h3>
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab(event,'install-node-linux')">Linux</button>
+  <button class="tab-btn" onclick="switchTab(event,'install-node-windows')">Windows</button>
+</div>
+<div id="install-node-linux" class="tab-content active">
+<pre><code>curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs
+node --version   # 应为 v20.x+
+npm --version    # 应为 9.x+</code></pre>
+</div>
+<div id="install-node-windows" class="tab-content">
+<p>从 <a href="https://nodejs.org">nodejs.org</a> 下载安装程序，确保勾选"Add to PATH"。重启终端后验证：</p>
+<pre><code>node --version
+npm --version</code></pre>
+</div>
+
+<h3>步骤 4：Docker（仅 Linux）</h3>
+<pre><code>sudo apt-get install docker-ce docker-ce-cli containerd.io
+sudo usermod -aG docker $USER
+# 安装 NVIDIA Container Toolkit：
+# https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html</code></pre>
+
+<h3>步骤 5：7-Zip（仅 Windows）</h3>
+<p>Windows 自带 zip 压缩工具在处理深层嵌套路径时会失败。从 <a href="https://7-zip.org">7-zip.org</a> 下载。</p>
+
+<h3>步骤 6：C++ 工具链 + IDE</h3>
+<table>
+<tr><th>操作系统</th><th>要求</th></tr>
+<tr><td><strong>Windows</strong></td><td>Visual Studio 2019，需选择"桌面 C++ 开发"工作负载 + Windows SDK</td></tr>
+<tr><td><strong>Linux</strong></td><td><code>sudo apt-get install build-essential</code></td></tr>
+<tr><td><strong>通用</strong></td><td>VSCode：<a href="https://code.visualstudio.com/download">code.visualstudio.com</a></td></tr>
+</table>
+
+<h3>步骤 7：克隆仓库 + 下载内容</h3>
+<pre><code>git clone https://github.com/NVIDIA-Omniverse-blueprints/omniverse-dsx-blueprint-for-ai-factories.git
+cd omniverse-dsx-blueprint-for-ai-factories</code></pre>
+<p>从 <a href="https://catalog.ngc.nvidia.com/orgs/nvidia/teams/omniverse/resources/dsx_dataset">NGC</a> 下载 <strong>DSX Content Pack</strong>。解压到：</p>
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab(event,'extract-linux')">Linux</button>
+  <button class="tab-btn" onclick="switchTab(event,'extract-windows')">Windows</button>
+</div>
+<div id="extract-linux" class="tab-content active">
+<pre><code>/data/dsx/</code></pre>
+</div>
+<div id="extract-windows" class="tab-content">
+<pre><code>C:\data\dsx\</code></pre>
+</div>
+
+<h3>步骤 8：配置场景路径</h3>
+<p>编辑 <code>source/apps/dsx.kit</code>：</p>
+<pre><code>[settings.app]
+auto_load_usd = "C:\data\dsx\DSX_BP\Assembly\DSX_Main_BP.usda"   # Windows
+auto_load_usd = "/data/dsx/DSX_BP/Assembly/DSX_Main_BP.usda"      # Linux</code></pre>
+
+<h3>步骤 9：NVIDIA API 密钥（可选 — 用于 AI 对话）</h3>
+<p>从 <a href="https://build.nvidia.com">build.nvidia.com</a> 获取密钥。</p>
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab(event,'apikey-linux')">Linux</button>
+  <button class="tab-btn" onclick="switchTab(event,'apikey-windows')">Windows</button>
+</div>
+<div id="apikey-linux" class="tab-content active">
+<pre><code>echo 'export NVIDIA_API_KEY="nvapi-..."' >> ~/.bashrc
+source ~/.bashrc</code></pre>
+</div>
+<div id="apikey-windows" class="tab-content">
+<pre><code>[System.Environment]::SetEnvironmentVariable("NVIDIA_API_KEY", "nvapi-...", "User")
+# 重启终端</code></pre>
+</div>
+<blockquote><p>跳过此步骤也没问题 — 3D 查看器、配置器和仿真功能无需密钥即可正常使用。</p></blockquote>
+
+<h3>安装成功验证</h3>
+<pre><code>node --version && npm --version && nvidia-smi</code></pre>
+<p>三条命令均应成功并显示正确的版本。</p>
+</section>
+
+<!-- ============ 配置 ============ -->
+<section id="configure">
+<h2>配置</h2>
+<p>关键的一次性设置步骤：将 Kit 应用关联到你的 USD 场景数据。</p>
+
+<p>用任意文本编辑器打开 <code>source/apps/dsx.kit</code>。找到 <code>[settings.app]</code> 部分并设置：</p>
+<pre><code>auto_load_usd = "&lt;你的解压路径&gt;/DSX_BP/Assembly/DSX_Main_BP.usda"</code></pre>
+
+<p>如果跳过此步骤，应用会启动但不会加载场景 — 你将看到空白视口。</p>
+
+<p><strong>启动时覆盖</strong>（无需编辑文件）：</p>
+<pre><code>./run_streaming.sh --/app/auto_load_usd=/自定义/路径/场景.usd</code></pre>
+
+<h3>流式连接设置</h3>
+<p>流式连接可通过 URL 查询参数或环境变量配置：</p>
+<table>
+<tr><th>参数</th><th>环境变量</th><th>默认值</th><th>说明</th></tr>
+<tr><td><code>server</code></td><td><code>VITE_OMNIVERSE_SERVER</code></td><td><code>localhost</code></td><td>Kit 服务器地址</td></tr>
+<tr><td><code>signalingPort</code></td><td><code>VITE_SIGNALING_PORT</code></td><td><code>49100</code></td><td>信令端口</td></tr>
+<tr><td><code>width</code></td><td>—</td><td><code>1920</code></td><td>流宽度</td></tr>
+<tr><td><code>height</code></td><td>—</td><td><code>1080</code></td><td>流高度</td></tr>
+<tr><td><code>fps</code></td><td>—</td><td><code>60</code></td><td>目标帧率</td></tr>
+</table>
+<p>示例：<code>http://localhost:8080?server=192.168.1.100&width=1280&height=720</code></p>
+
+<blockquote><p>如果未设置 <code>NVIDIA_API_KEY</code>，对话面板会显示启用 AI 代理的说明。其他功能不受影响。</p></blockquote>
+</section>
+
+<!-- ============ 首次运行 / 日常命令 ============ -->
+<section id="daily-commands">
+<h2>首次运行与日常命令</h2>
+
+<p>需要<strong>两个终端窗口</strong> — 一个用于 Kit 流式服务器，一个用于 Web 前端。</p>
+
+<h3>终端 1：Kit 流式服务器</h3>
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab(event,'stream-linux')">Linux</button>
+  <button class="tab-btn" onclick="switchTab(event,'stream-windows')">Windows</button>
+</div>
+<div id="stream-linux" class="tab-content active">
+<pre><code>cd omniverse-dsx-blueprint-for-ai-factories
+./run_streaming.sh</code></pre>
+</div>
+<div id="stream-windows" class="tab-content">
+<pre><code>cd omniverse-dsx-blueprint-for-ai-factories
+.\run_streaming.bat</code></pre>
+</div>
+<p>首次运行：构建所有内容（10–20 分钟）+ 着色器编译（5–8 分钟）。后续运行很快。</p>
+
+<h3>终端 2：Web 前端</h3>
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab(event,'web-linux')">Linux</button>
+  <button class="tab-btn" onclick="switchTab(event,'web-windows')">Windows</button>
+</div>
+<div id="web-linux" class="tab-content active">
+<pre><code>cd omniverse-dsx-blueprint-for-ai-factories
+./run_web.sh</code></pre>
+</div>
+<div id="web-windows" class="tab-content">
+<pre><code>cd omniverse-dsx-blueprint-for-ai-factories
+.\run_web.bat</code></pre>
+</div>
+<p>首次运行：<code>npm install</code> 下载依赖。然后 Vite 开发服务器在端口 8081 启动。</p>
+
+<h3>浏览器</h3>
+<p>选择终端 2 中显示的<strong>第三个 URL</strong>（流式相关的那个）：</p>
+<pre><code>http://localhost:8081?server=localhost</code></pre>
+
+<h3>Docker 替代方案（Linux）</h3>
+<pre><code>docker compose up -d
+# 打开：http://localhost:8080?server=localhost</code></pre>
+
+<h3>成功的标志</h3>
+<ul>
+<li>终端 1 显示 WebRTC 信令在端口 49100 活跃</li>
+<li>终端 2 显示 Vite 开发服务器在端口 8081 运行</li>
+<li>浏览器显示 3D AI 工厂场景</li>
+<li>左侧工具栏可见：Agent、Configurator、Analytics、Simulations、Camera</li>
+<li>可以旋转/缩放/平移视口</li>
+</ul>
+</section>
+
+<!-- ============ 工作流 ============ -->
+<section id="workflows">
+<h2>工作流</h2>
+
+<details id="workflow-launch">
+<summary><strong>1. 启动完整套件</strong></summary>
+<div class="details-content">
+<p>每次会话的起点。</p>
+<pre><code># 终端 1
+./run_streaming.sh
+
+# 终端 2
+./run_web.sh
+
+# 浏览器：Vite 输出的流式 URL</code></pre>
+<p><strong>Docker（Linux）：</strong></p>
+<pre><code>docker compose up -d
+# 打开：http://localhost:8080?server=localhost</code></pre>
+</div>
+</details>
+
+<details id="workflow-config">
+<summary><strong>2. 切换 GPU / 机架配置</strong></summary>
+<div class="details-content">
+<ol>
+<li>点击左侧工具栏 <strong>Configurator</strong> 图标</li>
+<li>选择 GPU 类型：<strong>GB200</strong> 或 <strong>GB300 NVL72</strong></li>
+<li>调整场地布局、电力配置</li>
+<li>更改即时生效 — 视口实时更新</li>
+</ol>
+<p><strong>场景变化：</strong>GPU 部署单元（hall_GPUs 中 22 个）、DATAHALL 布局、冷却基础设施、电力布线。</p>
+</div>
+</details>
+
+<details id="workflow-cfd">
+<summary><strong>3. 运行 CFD 热力仿真</strong></summary>
+<div class="details-content">
+<ol>
+<li>点击左侧工具栏 <strong>Simulations</strong> 图标</li>
+<li>选择 <strong>Thermal</strong>（热力）仿真</li>
+<li>选择 CFD 时间步：<strong>40、60、80 或 100</strong></li>
+<li>切换温度和/或压力可视化</li>
+</ol>
+<p>预生成的 CGNS 数据叠加在场景上 — 热通道封存高亮显示热力模式，温度梯度通过数据大厅进行颜色映射。</p>
+<blockquote><p>CFD 数据是预生成的。如需为自定义布局生成新的 CFD 数据，需要使用外部 CFD 工具。</p></blockquote>
+</div>
+</details>
+
+<details id="workflow-electrical">
+<summary><strong>4. 运行电力负载仿真</strong></summary>
+<div class="details-content">
+<ol>
+<li>在 <strong>SimulationPanel</strong> 中，选择 <strong>Electrical</strong>（电力）</li>
+<li>调整负载参数（单机架功耗、冗余设置）</li>
+<li>查看电力指标 — 电缆、面板、走线架视觉上同步响应</li>
+<li>KPI 指标实时更新</li>
+</ol>
+</div>
+</details>
+
+<details id="workflow-ai">
+<summary><strong>5. 使用 AI 对话控制场景</strong></summary>
+<div class="details-content">
+<ol>
+<li>点击左侧工具栏 <strong>Agent</strong> 图标（机器人图标）</li>
+<li>输入自然语言命令：</li>
+</ol>
+<pre><code>"导航到数据大厅 1"
+"显示热通道 CFD"
+"切换到 GB300 机架变体"
+"显示外部摄像机视角"
+"当前部署了哪些 GPU 型号？"</code></pre>
+<p>LangChain 代理（llama-4-maverick）解析你的消息，路由到场景处理器，并自动执行 USD 修改。</p>
+<blockquote><p><strong>需要从 build.nvidia.com 获取 <code>NVIDIA_API_KEY</code></strong>。没有密钥时，对话面板会显示设置说明。</p></blockquote>
+
+<h4>Agent HTTP API（端口 8012）</h4>
+<table>
+<tr><th>端点</th><th>方法</th><th>用途</th></tr>
+<tr><td><code>/api/agent/chat</code></td><td>POST</td><td>阻塞式对话</td></tr>
+<tr><td><code>/api/agent/chat/stream</code></td><td>POST</td><td>SSE 流式对话</td></tr>
+<tr><td><code>/api/agent/reset</code></td><td>POST</td><td>清除对话历史</td></tr>
+<tr><td><code>/api/agent/health</code></td><td>GET</td><td>健康检查 + API 密钥验证</td></tr>
+</table>
+</div>
+</details>
+
+<details id="workflow-camera">
+<summary><strong>6. 切换摄像机视角</strong></summary>
+<div class="details-content">
+<ol>
+<li>点击左侧工具栏 <strong>Camera</strong> 图标</li>
+<li>可用预设视角：</li>
+</ol>
+<table>
+<tr><th>摄像机</th><th>视角</th></tr>
+<tr><td><code>camera_int_datahall_01–04</code></td><td>数据大厅内部视图</td></tr>
+<tr><td><code>camera_ext_default_01–04</code></td><td>外部 / 鸟瞰视图</td></tr>
+<tr><td><code>cfd_camera</code></td><td>优化的 CFD 可视化角度</td></tr>
+</table>
+<p>也可通过 AI 对话控制：<em>"显示外部摄像机视角"</em></p>
+</div>
+</details>
+
+<details id="workflow-analytics">
+<summary><strong>7. 查看分析面板与 KPI</strong></summary>
+<div class="details-content">
+<ol>
+<li>点击左侧工具栏 <strong>Analytics</strong> 图标（图表图标）</li>
+<li>仪表盘显示：</li>
+</ol>
+<ul>
+<li>全设施电力消耗指标</li>
+<li>来自 CFD 数据的热力 KPI</li>
+<li>GPU 部署统计</li>
+<li>场地级利用率汇总</li>
+</ul>
+<p>图表随配置和仿真变化实时更新。</p>
+</div>
+</details>
+
+<h3>所有工作流通用选项</h3>
+<table>
+<tr><th>选项</th><th>说明</th></tr>
+<tr><td><code>./repo.sh launch dsx.kit</code></td><td>以窗口模式启动（非流式，本地开发）</td></tr>
+<tr><td><code>./repo.sh build --rebuild-deps</code></td><td>强制重建子模块</td></tr>
+<tr><td><code>./repo.sh build -c</code></td><td>从头清洁构建</td></tr>
+<tr><td><code>VITE_OMNIVERSE_SERVER=IP ./run_web.sh</code></td><td>连接到远程 Kit 服务器</td></tr>
+<tr><td><code>VITE_SIGNALING_PORT=49200 ./run_web.sh</code></td><td>自定义信令端口</td></tr>
+<tr><td><code>DSX_AGENT_PORT=8020 ./run_streaming.sh</code></td><td>自定义 Agent HTTP 端口</td></tr>
+</table>
+</section>
+
+<!-- ============ 参考 ============ -->
+<section id="reference">
+<h2>参考</h2>
+
+<h3>关键端口</h3>
+<table>
+<tr><th>端口</th><th>服务</th></tr>
+<tr><td>49100</td><td>WebRTC 信令</td></tr>
+<tr><td>47995–48012, 49000–49007</td><td>WebRTC 媒体流（TCP/UDP）</td></tr>
+<tr><td>8012</td><td>AI Agent HTTP API</td></tr>
+<tr><td>8081</td><td>Vite 开发服务器</td></tr>
+<tr><td>8080</td><td>Docker Web（Nginx）</td></tr>
+</table>
+
+<h3>环境变量</h3>
+<table>
+<tr><th>变量</th><th>默认值</th><th>用途</th></tr>
+<tr><td><code>NVIDIA_API_KEY</code></td><td>—</td><td>AI 对话代理必需</td></tr>
+<tr><td><code>DSX_AGENT_PORT</code></td><td><code>8012</code></td><td>Agent HTTP 服务器端口</td></tr>
+<tr><td><code>VITE_OMNIVERSE_SERVER</code></td><td><code>localhost</code></td><td>Kit 服务器地址</td></tr>
+<tr><td><code>VITE_SIGNALING_PORT</code></td><td><code>49100</code></td><td>WebRTC 信令端口</td></tr>
+<tr><td><code>VITE_DSX_AGENT_PORT</code></td><td><code>8012</code></td><td>前端 Agent 端口</td></tr>
+<tr><td><code>USD_URL</code></td><td>—</td><td>覆盖 USD 场景路径</td></tr>
+</table>
+
+<h3>构建命令</h3>
+<table>
+<tr><th>命令</th><th>用途</th></tr>
+<tr><td><code>./repo.sh build</code></td><td>增量构建</td></tr>
+<tr><td><code>./repo.sh build -c</code></td><td>清洁构建</td></tr>
+<tr><td><code>./repo.sh build --rebuild-deps</code></td><td>强制重建子模块</td></tr>
+<tr><td><code>./repo.sh launch dsx.kit</code></td><td>以窗口模式启动</td></tr>
+<tr><td><code>./repo.sh launch dsx_streaming.kit</code></td><td>启动流式模式</td></tr>
+<tr><td><code>./repo.sh test</code></td><td>运行测试</td></tr>
+<tr><td><code>./repo.sh package_container</code></td><td>打包用于云部署</td></tr>
+</table>
+
+<h3>重要文件位置</h3>
+<table>
+<tr><th>文件</th><th>用途</th></tr>
+<tr><td><code>source/apps/dsx.kit</code></td><td>设置 <code>auto_load_usd</code> 场景路径</td></tr>
+<tr><td><code>source/apps/dsx_streaming.kit</code></td><td>本地流式配置</td></tr>
+<tr><td><code>source/apps/dsx_nvcf.kit</code></td><td>云端（NVCF）部署配置</td></tr>
+<tr><td><code>repo.toml</code></td><td>顶层构建配置</td></tr>
+<tr><td><code>premake5.lua</code></td><td>构建系统配置</td></tr>
+<tr><td><code>compose.yml</code></td><td>容器化 Docker compose</td></tr>
+</table>
+</section>
+
+<!-- ============ 故障排除 ============ -->
+<section id="troubleshooting">
+<h2>故障排除</h2>
+
+<h3>启动与流式传输</h3>
+<table>
+<tr><th>症状</th><th>解决方法</th></tr>
+<tr><td>以代码 -11（SIGSEGV）退出</td><td>改用 <code>./repo.sh launch dsx.kit</code>。或确保 RTX GPU + 显示器可用。</td></tr>
+<tr><td>"需要 WebGL2 支持"</td><td>在浏览器设置中启用硬件加速</td></tr>
+<tr><td>空白 / 无 3D 场景</td><td>在 <code>source/apps/dsx.kit</code> 中将 <code>auto_load_usd</code> 设置为正确的内容包路径</td></tr>
+<tr><td>无法连接到流式服务器</td><td>使用 <code>?server=localhost&signalingPort=49100</code>。检查环境变量。</td></tr>
+<tr><td>WebRTC 连接失败</td><td>确保防火墙开放端口 49100、47995–48012、49000–49007</td></tr>
+<tr><td>渲染初始化时卡住</td><td>在系统层面禁用 IOMMU（BIOS/UEFI）</td></tr>
+</table>
+
+<h3>构建</h3>
+<table>
+<tr><th>症状</th><th>解决方法</th></tr>
+<tr><td>全新克隆后构建失败</td><td>使用 <code>./repo.sh build</code>（自动处理所有步骤）</td></tr>
+<tr><td>代码改动后构建失败</td><td>验证 <code>repo.toml</code>、<code>premake5.lua</code>、<code>source/apps/</code> 中列出的 <code>.kit</code> 文件一致</td></tr>
+<tr><td>过期依赖</td><td>清洁构建：<code>./repo.sh build -c</code> 或清缓存：<code>./repo.sh launch -- --clear-cache --clear-data --reset-user</code></td></tr>
+<tr><td>Windows 路径过长</td><td>将仓库移至靠近驱动器根目录的位置（如 <code>C:\dsx\</code>）</td></tr>
+<tr><td>exFAT 驱动器错误</td><td>将仓库移至 NTFS 格式的驱动器</td></tr>
+<tr><td>Docker 磁盘空间耗尽</td><td><code>docker container prune</code>（安全）或 <code>docker system prune</code>（⚠ 激进清理）</td></tr>
+</table>
+
+<h3>性能</h3>
+<table>
+<tr><th>症状</th><th>解决方法</th></tr>
+<tr><td>首次启动非常慢（5–8 分钟）</td><td>正常现象 — RTX 着色器编译。等待。后续启动快速。</td></tr>
+<tr><td>帧率低/卡顿</td><td>降低：<code>?width=1280&height=720&fps=30</code>。用 <code>nvidia-smi</code> 检查 GPU。</td></tr>
+<tr><td>场景不完整</td><td>运行 <code>git lfs pull</code> 下载大型二进制资产</td></tr>
+</table>
+
+<h3>AI 代理</h3>
+<table>
+<tr><th>症状</th><th>解决方法</th></tr>
+<tr><td>"API 密钥未配置"</td><td>从 <a href="https://build.nvidia.com">build.nvidia.com</a> 获取密钥，设置 <code>NVIDIA_API_KEY</code> 环境变量</td></tr>
+<tr><td>代理返回错误</td><td>在 build.nvidia.com 验证密钥。健康检查：<code>curl http://localhost:8012/api/agent/health</code></td></tr>
+<tr><td>代理无响应</td><td>检查 <code>DSX_AGENT_PORT</code>（默认 8012）是否与前端 <code>VITE_DSX_AGENT_PORT</code> 匹配</td></tr>
+<tr><td>回答不正确</td><td>重置对话：<code>curl -X POST http://localhost:8012/api/agent/reset</code></td></tr>
+</table>
+
+<h3>缓存清理</h3>
+<div class="highlight-box">
+<p><strong>应用级（安全，每次启动时）：</strong></p>
+<pre><code>./repo.sh launch -- --clear-cache --clear-data --reset-user</code></pre>
+<p><strong>全局级（⚠ 需要完全重建）：</strong></p>
+<pre><code># Linux
+rm -rf ~/.local/share/ov ~/.cache/packman ~/.cache/uv
+# Windows — 删除：
+# %LOCALAPPDATA%\ov  %PM_PACKAGES_ROOT%  %LOCALAPPDATA%\uv\cache</code></pre>
+</div>
+</section>
+
+<!-- ============ 速查卡 ============ -->
+<section id="cheat-sheet">
+<h2>速查卡</h2>
+
+<div class="highlight-box">
+<h3>快速启动</h3>
+<pre><code>./run_streaming.sh              # 终端 1 — Kit
+./run_web.sh                    # 终端 2 — Web
+# 浏览器：http://localhost:8081?server=localhost</code></pre>
+</div>
+
+<h3>环境变量快速设置</h3>
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab(event,'cs-linux')">Linux</button>
+  <button class="tab-btn" onclick="switchTab(event,'cs-windows')">Windows</button>
+</div>
+<div id="cs-linux" class="tab-content active">
+<pre><code>export NVIDIA_API_KEY="nvapi-..."
+export VITE_OMNIVERSE_SERVER="localhost"
+export VITE_SIGNALING_PORT="49100"</code></pre>
+</div>
+<div id="cs-windows" class="tab-content">
+<pre><code>[System.Environment]::SetEnvironmentVariable("NVIDIA_API_KEY", "nvapi-...", "User")</code></pre>
+</div>
+
+<h3>Web UI 工具栏速查</h3>
+<table>
+<tr><th>图标</th><th>面板</th><th>功能</th></tr>
+<tr><td>Agent（机器人）</td><td>AgentPanel</td><td>AI 对话控制场景</td></tr>
+<tr><td>Configurator（齿轮）</td><td>ConfiguratorPanel</td><td>GPU/机架/场地/电源配置 + 地图</td></tr>
+<tr><td>Analytics（图表）</td><td>AnalyticsPanel</td><td>电力、热力、GPU KPI</td></tr>
+<tr><td>Simulations（播放）</td><td>SimulationPanel</td><td>热力 CFD + 电力仿真</td></tr>
+<tr><td>Camera（相机）</td><td>Camera</td><td>切换预设摄像机视角</td></tr>
+</table>
+
+<h3>AI 代理常用命令</h3>
+<table>
+<tr><th>对话输入</th><th>效果</th></tr>
+<tr><td><code>"导航到数据大厅 1"</code></td><td>将摄像机移至数据大厅内部</td></tr>
+<tr><td><code>"显示热通道 CFD"</code></td><td>启用 CFD 温度可视化</td></tr>
+<tr><td><code>"切换到 GB300 机架变体"</code></td><td>切换机架配置</td></tr>
+</table>
+
+<h3>Agent API 快速 curl</h3>
+<pre><code>curl http://localhost:8012/api/agent/health
+curl -X POST http://localhost:8012/api/agent/reset</code></pre>
+
+<h3>故障排除快速修复</h3>
+<table>
+<tr><th>问题</th><th>快速修复</th></tr>
+<tr><td>空白场景</td><td>在 <code>source/apps/dsx.kit</code> 中设置 <code>auto_load_usd</code></td></tr>
+<tr><td>SIGSEGV (-11)</td><td>使用 <code>./repo.sh launch dsx.kit</code></td></tr>
+<tr><td>无 WebGL2</td><td>在浏览器设置中启用硬件加速</td></tr>
+<tr><td>Agent 不工作</td><td>设置 <code>NVIDIA_API_KEY</code></td></tr>
+<tr><td>构建配置不同步</td><td>检查 repo.toml、premake5.lua、source/apps 中的 <code>.kit</code> 文件</td></tr>
+<tr><td>首次启动慢</td><td>正常 — 等待 5–8 分钟着色器编译</td></tr>
+<tr><td>清除缓存</td><td><code>./repo.sh launch -- --clear-cache --clear-data --reset-user</code></td></tr>
+</table>
+</section>
+
+<!-- ============ 术语表 ============ -->
+<section id="glossary">
+<h2>术语表</h2>
+
+<table>
+<tr><th>术语</th><th>定义</th></tr>
+<tr><td><strong>Kit</strong></td><td>NVIDIA Omniverse Kit SDK — GPU 加速的应用框架，用于构建 3D 工具</td></tr>
+<tr><td><strong>USD / OpenUSD</strong></td><td>通用场景描述（Universal Scene Description）— Pixar 的开放标准，用于 3D 场景组合与交换</td></tr>
+<tr><td><strong>WebRTC</strong></td><td>Web 实时通信 — 基于浏览器的点对点视频、音频和数据流传输协议</td></tr>
+<tr><td><strong>NVCF</strong></td><td>NVIDIA Cloud Functions — 无服务器 GPU 容器托管，用于 Kit 应用</td></tr>
+<tr><td><strong>NVL72</strong></td><td>NVIDIA 机架级 GPU 设计 — 单个机架内 72 个 GPU 互联</td></tr>
+<tr><td><strong>GB200 / GB300</strong></td><td>DSX 机架配置中使用的 GPU 产品代际</td></tr>
+<tr><td><strong>CFD</strong></td><td>计算流体力学（Computational Fluid Dynamics）— 流体/气流和热传递仿真</td></tr>
+<tr><td><strong>CGNS</strong></td><td>CFD 通用符号系统 — CFD 仿真数据的文件格式</td></tr>
+<tr><td><strong>SimReady</strong></td><td>NVIDIA USD 资产标准，同时包含几何体数据和仿真元数据</td></tr>
+<tr><td><strong>Content Pack</strong></td><td>从 NGC 单独下载的多 GB USD 场景数据集 — 包含 AI 工厂 3D 模型</td></tr>
+<tr><td><strong>NGC</strong></td><td>NVIDIA GPU Cloud — 数据集、容器和模型目录</td></tr>
+<tr><td><strong>信令（Signaling）</strong></td><td>WebRTC 中协商浏览器与流式服务器间点对点连接的过程</td></tr>
+<tr><td><strong>Kit 扩展</strong></td><td>Kit SDK 中的模块化组件 — 每个功能（渲染、流式传输、CAE）都是一个扩展</td></tr>
+<tr><td><strong>CAE</strong></td><td>计算机辅助工程 — 用于 CFD、热力和结构分析的仿真扩展</td></tr>
+<tr><td><strong>SSE</strong></td><td>服务器推送事件 — AI 代理用于实时对话响应的 HTTP 流式协议</td></tr>
+<tr><td><strong>LangChain</strong></td><td>LLM 编排框架，AI 代理用它将会话消息路由到场景处理器</td></tr>
+</table>
+</section>
+
+<!-- ============ 教程 ============ -->
+<section id="tutorial">
+<h2>教程</h2>
+<p>按旅程顺序、基于每个任务<strong>跟踪练习</strong>构建的分步演练。</p>
+
+<ol>
+<li>
+  <strong>硬件检查：</strong>运行 <code>nvidia-smi</code>。确认 RTX Pro 6000 Blackwell 和驱动 ≥570.169。
+</li>
+<li>
+  <strong>前提检查：</strong>运行 <code>node --version && npm --version && nvidia-smi</code>。三条命令均应成功。
+</li>
+<li>
+  <strong>首次启动：</strong>打开两个终端。一个运行 <code>./run_streaming.sh</code>，另一个运行 <code>./run_web.sh</code>。在浏览器中打开 Vite 输出的第三个 URL。确认 3D 场景渲染正常且摄像机响应交互。
+</li>
+<li>
+  <strong>GPU 配置：</strong>点击 Configurator 图标。从 GB200 切换到 GB300。确认视口中机架单元发生变化。
+</li>
+<li>
+  <strong>AI 对话控制：</strong>打开 Agent 面板。输入 <em>"导航到数据大厅 1"</em>。确认摄像机移动到数据大厅内部视图。
+</li>
+<li>
+  <strong>故障排除练习：</strong>故意使用错误的 <code>auto_load_usd</code> 启动。观察空白场景。修正路径后重新启动。
+</li>
+</ol>
+</section>
+
+<!-- ============ 练习 ============ -->
+<section id="exercises">
+<h2>练习</h2>
+<p>基于每个任务<strong>实践练习</strong>的自检题目。</p>
+
+<ol>
+<li>
+  <strong>适用性评估：</strong>列出你的项目需求。对照"你能做什么"进行匹配。找出至少 3 处你需要扩展蓝图的地方。
+</li>
+<li>
+  <strong>安装速度：</strong>在干净的虚拟机上计时完整安装。目标：1 小时内完成。找出最慢的步骤并记录如何并行化。
+</li>
+<li>
+  <strong>远程流式传输：</strong>启动流式服务器。从同一网络的另一台机器使用 <code>?server=IP</code> 连接。验证远程流式传输正常工作。
+</li>
+<li>
+  <strong>完整工作流演示：</strong>从 GB200 开始 → 在时间步 60 运行热力 CFD → 切换到 GB300 → 运行电力负载仿真 → 用 AI 对话查询"当前 GPU 配置是什么？" → 截屏分析仪表盘。计时整个流程。
+</li>
+<li>
+  <strong>构建故障恢复：</strong>重命名 <code>source/apps/</code> 中的一个 <code>.kit</code> 文件但不更新 <code>repo.toml</code> 或 <code>premake5.lua</code>。尝试构建。观察错误。修正三处后重新构建。
+</li>
+</ol>
+</section>
+
+<p style="margin-top:60px;padding-top:24px;border-top:1px solid var(--border);font-size:0.85rem;color:#999;">
+  NVIDIA Omniverse DSX Blueprint 使用指南。基于仓库文档和面向用户的材料生成。如需面向开发者的代码架构指南，请参阅配套学习指南。
+</p>
+
+</main>
+
+<script>
+function switchTab(event, tabId) {
+  const btn = event.target;
+  const container = btn.parentElement;
+  const contentContainer = container.nextElementSibling;
+  container.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  let parent = container.parentElement;
+  let allContents = parent.querySelectorAll('.tab-content');
+  allContents.forEach(c => c.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+
+</body>
+</html>
