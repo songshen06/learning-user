@@ -2,11 +2,12 @@
   {
     "id": "content-agents",
     "title": "Content Agents",
-    "desc": "NVIDIA Omniverse Content Agents — AI-driven USD content pipeline",
+    "desc": "NVIDIA AI-driven 3D content automation framework — VLM-based USD asset analysis",
     "has_en": true,
-    "has_zh": false,
+    "has_zh": true,
     "files": [
-      "index.html"
+      "index.html",
+      "index_zh.html"
     ],
     "updated": "2026-06-24"
   },

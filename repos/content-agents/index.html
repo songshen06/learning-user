@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -84,356 +84,356 @@
 <body>
 
 <div class="topbar">
-  <span class="brand">🤖 content-agents</span>
+  <span class="brand">content-agents</span>
   <span class="tag">Deep-Dive Learning Web App</span>
   <span class="grow"></span>
   <nav>
-    <a href="#overview">概览</a>
-    <a href="#architecture">架构</a>
-    <a href="#path">学习路径</a>
-    <a href="#modules">模块</a>
-    <a href="#tutorial">教程</a>
-    <a href="#glossary">术语</a>
-    <a href="#exercises">练习</a>
+    <a href="#overview">Overview</a>
+    <a href="#architecture">Architecture</a>
+    <a href="#path">Learning Path</a>
+    <a href="#modules">Modules</a>
+    <a href="#tutorial">Tutorial</a>
+    <a href="#glossary">Glossary</a>
+    <a href="#exercises">Exercises</a>
   </nav>
 </div>
 
 <div class="layout">
 
 <aside class="sidebar">
-  <h3>导航</h3>
-  <a href="#overview">概览</a>
-  <a href="#architecture">架构</a>
-  <a href="#path">学习路径</a>
-  <a href="#modules">10 个模块</a>
-  <h3>模块</h3>
-  <a href="#m-concepts" class="sub">① 心智模型</a>
-  <a href="#m-modes" class="sub">② 双模式架构</a>
-  <a href="#m-core" class="sub">③ 核心库</a>
-  <a href="#m-tool-registry" class="sub">④ Tool Registry</a>
-  <a href="#m-material" class="sub">⑤ Material Agent</a>
-  <a href="#m-physics" class="sub">⑥ Physics Agent</a>
-  <a href="#m-texture" class="sub">⑦ Texture Agent</a>
-  <a href="#m-validation" class="sub">⑧ Validation Agent</a>
-  <a href="#m-skills" class="sub">⑨ Agent Skills</a>
-  <a href="#m-render" class="sub">⑩ Rendering</a>
-  <h3>实操</h3>
-  <a href="#tutorial" class="sub">教程 · Trace tasks</a>
-  <a href="#exercises" class="sub">练习 · Practice tasks</a>
-  <a href="#glossary" class="sub">术语表</a>
+  <h3>Navigation</h3>
+  <a href="#overview">Overview</a>
+  <a href="#architecture">Architecture</a>
+  <a href="#path">Learning Path</a>
+  <a href="#modules">10 Modules</a>
+  <h3>Modules</h3>
+  <a href="#m-concepts" class="sub">Mental Model</a>
+  <a href="#m-modes" class="sub">Dual-Mode Architecture</a>
+  <a href="#m-core" class="sub">Core Library</a>
+  <a href="#m-tool-registry" class="sub">Tool Registry</a>
+  <a href="#m-material" class="sub">Material Agent</a>
+  <a href="#m-physics" class="sub">Physics Agent</a>
+  <a href="#m-texture" class="sub">Texture Agent</a>
+  <a href="#m-validation" class="sub">Validation Agent</a>
+  <a href="#m-skills" class="sub">Agent Skills</a>
+  <a href="#m-render" class="sub">Rendering</a>
+  <h3>Hands-On</h3>
+  <a href="#tutorial" class="sub">Tutorial · Trace Tasks</a>
+  <a href="#exercises" class="sub">Exercises · Practice Tasks</a>
+  <a href="#glossary" class="sub">Glossary</a>
 </aside>
 
 <main>
 
 <section id="overview">
 <h1>content-agents</h1>
-<p>NVIDIA 的 AI 驱动 3D 内容自动化框架 · VLM 看图分析 USD 资产 · v0.4.3</p>
+<p>NVIDIA AI-driven 3D content automation framework · VLM-based USD asset analysis · v0.4.3</p>
 
-<h3>这个仓库做什么</h3>
-<p>用 <b>VLM</b>（Vision-Language Model）分析 USD 资产的多视角渲染图，<b>自动分配材质、分类物理属性、生成纹理、校验生成内容</b>。4 个 agent（Material / Physics / Texture / Validation）各有 CLI + REST 服务两种形态。本质上是 <code>"3D 渲染 → VLM 看 → 推理 → 改 USD"</code> 的 agentic pipeline。</p>
+<h3>What this repo does</h3>
+<p>Uses <b>VLM</b> (Vision-Language Model) to analyze multi-view renders of USD assets, <b>automatically assign materials, classify physics properties, generate textures, and validate generated content</b>. 4 agents (Material / Physics / Texture / Validation) each available as CLI + REST service. At its core: the <code>"3D Render &rarr; VLM Sees &rarr; Reasons &rarr; Modifies USD"</code> agentic pipeline.</p>
 
-<p>所有 agent 标 <b>Beta</b> 或 Research Preview。仅支持 Linux/WSL2 —— 无原生 Windows/macOS。</p>
+<p>All agents marked <b>Beta</b> or Research Preview. Linux/WSL2 only — no native Windows/macOS.</p>
 
-<h3>技术栈</h3>
+<h3>Tech Stack</h3>
 <table>
-  <tr><th>维度</th><th>选型</th></tr>
-  <tr><td>语言</td><td>Python 3.12+</td></tr>
-  <tr><td>包管理</td><td><code>uv</code>（editable install <code>-e .</code> + <code>-e apps/&lt;agent&gt;</code>）</td></tr>
-  <tr><td>CLI 框架</td><td>typer==0.16.1 + rich（不是 click）</td></tr>
-  <tr><td>核心库</td><td><code>world-understanding</code>（<code>world_understanding/</code>）</td></tr>
-  <tr><td>VLM 后端</td><td>langchain-{openai,anthropic,google-genai,nvidia-ai-endpoints}</td></tr>
+  <tr><th>Dimension</th><th>Choice</th></tr>
+  <tr><td>Language</td><td>Python 3.12+</td></tr>
+  <tr><td>Package Manager</td><td><code>uv</code> (editable install <code>-e .</code> + <code>-e apps/&lt;agent&gt;</code>)</td></tr>
+  <tr><td>CLI Framework</td><td>typer==0.16.1 + rich (not click)</td></tr>
+  <tr><td>Core Library</td><td><code>world-understanding</code> (<code>world_understanding/</code>)</td></tr>
+  <tr><td>VLM Backend</td><td>langchain-{openai,anthropic,google-genai,nvidia-ai-endpoints}</td></tr>
   <tr><td>USD</td><td>usd-core>=24.11 + usd-validation-nvidia>=1.19.3</td></tr>
-  <tr><td>Rendering</td><td>OVRTX（GPU accelerated），Docker Compose sidecar 或 local subprocess</td></tr>
-  <tr><td>REST 服务</td><td>FastAPI（<code>apps/&lt;agent&gt;_service/</code>）</td></tr>
-  <tr><td>Agent skills</td><td>25 个 checked-in SKILL.md（.agents/ canonical + .codex/.claude mirror）</td></tr>
+  <tr><td>Rendering</td><td>OVRTX (GPU accelerated), Docker Compose sidecar or local subprocess</td></tr>
+  <tr><td>REST Services</td><td>FastAPI (<code>apps/&lt;agent&gt;_service/</code>)</td></tr>
+  <tr><td>Agent Skills</td><td>25 checked-in SKILL.md (.agents/ canonical + .codex/.claude mirror)</td></tr>
   <tr><td>License</td><td>Apache 2.0 · NVIDIA CORPORATION</td></tr>
 </table>
 
-<h3>4 个 agent 一句话</h3>
+<h3>The 4 Agents in One Sentence</h3>
 <div class="pipeline">
-  <div class="stage"><b>Material<span class="badge green">Beta</span></b><span class="sub">VLM 选材质→写 USD</span></div>
-  <div class="arrow">→</div>
-  <div class="stage"><b>Texture<span class="badge green">Preview</span></b><span class="sub">生成纹理→填材质</span></div>
-  <div class="arrow">→</div>
-  <div class="stage"><b>Physics<span class="badge green">Beta</span></b><span class="sub">分类物理属性</span></div>
-  <div class="arrow">→</div>
+  <div class="stage"><b>Material<span class="badge green">Beta</span></b><span class="sub">VLM picks material &rarr; writes USD</span></div>
+  <div class="arrow">&rarr;</div>
+  <div class="stage"><b>Texture<span class="badge green">Preview</span></b><span class="sub">Generates textures &rarr; fills slots</span></div>
+  <div class="arrow">&rarr;</div>
+  <div class="stage"><b>Physics<span class="badge green">Beta</span></b><span class="sub">Classifies physics attributes</span></div>
+  <div class="arrow">&rarr;</div>
   <div class="stage"><b>Validation<span class="badge orange">Preview</span></b><span class="sub">QA gate</span></div>
 </div>
 </section>
 
 <section id="architecture">
-<h2><span class="num">§</span>架构总览</h2>
+<h2><span class="num">&sect;</span>Architecture Overview</h2>
 
-<h3>顶层目录速查</h3>
+<h3>Top-Level Directory Quick Reference</h3>
 <table>
-  <tr><th>目录</th><th>角色</th></tr>
-  <tr><td><code>world_understanding/</code></td><td><b>核心 SDK</b>：tools / agentic / functions / registry / utils — 所有 agent 共用</td></tr>
-  <tr><td><code>apps/material_agent/</code> + <code>material_agent_service/</code></td><td>Material Agent CLI + FastAPI REST 服务</td></tr>
-  <tr><td><code>apps/physics_agent/</code> + <code>physics_agent_service/</code></td><td>Physics Agent — 分类组件物理属性</td></tr>
-  <tr><td><code>apps/texture_agent/</code> + <code>texture_agent_service/</code></td><td>Texture Agent — 生成纹理 · CPU-only 服务</td></tr>
-  <tr><td><code>apps/validation_agent/</code></td><td>Validation Agent · v0.4 无 REST</td></tr>
-  <tr><td><code>apps/ovrtx_rendering_api/</code></td><td>共享渲染 GPU sidecar（被 compose 引用）</td></tr>
-  <tr><td><code>.agents/skills/</code></td><td><b>25 个 agent skill</b> — canonical tree + <code>.codex/</code> <code>.claude/</code> mirror</td></tr>
+  <tr><th>Directory</th><th>Role</th></tr>
+  <tr><td><code>world_understanding/</code></td><td><b>Core SDK</b>: tools / agentic / functions / registry / utils — shared by all agents</td></tr>
+  <tr><td><code>apps/material_agent/</code> + <code>material_agent_service/</code></td><td>Material Agent CLI + FastAPI REST service</td></tr>
+  <tr><td><code>apps/physics_agent/</code> + <code>physics_agent_service/</code></td><td>Physics Agent — classifies component physics attributes</td></tr>
+  <tr><td><code>apps/texture_agent/</code> + <code>texture_agent_service/</code></td><td>Texture Agent — generates textures · CPU-only service</td></tr>
+  <tr><td><code>apps/validation_agent/</code></td><td>Validation Agent · v0.4 CLI-only (no REST)</td></tr>
+  <tr><td><code>apps/ovrtx_rendering_api/</code></td><td>Shared rendering GPU sidecar (referenced by compose)</td></tr>
+  <tr><td><code>.agents/skills/</code></td><td><b>25 agent skills</b> — canonical tree + <code>.codex/</code> <code>.claude/</code> mirror</td></tr>
   <tr><td><code>tests/</code></td><td>108 items — <code>test_public_quickstart_regression.py</code></td></tr>
-  <tr><td><code>deploy/collection/</code></td><td>全栈 collection 部署</td></tr>
-  <tr><td><code>scripts/</code></td><td>build resources fetch + sync + 探测</td></tr>
+  <tr><td><code>deploy/collection/</code></td><td>Full-stack collection deployment</td></tr>
+  <tr><td><code>scripts/</code></td><td>Build resources fetch + sync + probe</td></tr>
 </table>
 
-<h3>三层架构</h3>
-<pre><code>┌──────────────────────────────────────────────────────────────┐
-│ Layer 3: Agent Services (apps/)                               │
-│ material / physics / texture / validation                     │
-│ CLI (typer) + REST (FastAPI + Docker Compose)                 │
-│ Config-driven YAML pipeline DSL                              │
-├──────────────────────────────────────────────────────────────┤
-│ Layer 2: Agentic Framework (world_understanding/agentic/)     │
-│ workflows.py · tasks.py · agents/ · config/ · cli/            │
-│ base_pipeline_executor.py · usd_workflows.py                  │
-│ Orchestrates: VLM call → tool execute → USD write → validate  │
-├──────────────────────────────────────────────────────────────┤
-│ Layer 1: Tool Registry (world_understanding/tools/, registry/)│
-│ @register_tool · ToolSpec · _TOOLS_REGISTRY                  │
-│ functions/*.py → VLM function calling (LangChain)             │
-│ usd-core · usd-validation-nvidia · OVRTX rendering            │
-└──────────────────────────────────────────────────────────────┘
+<h3>Three-Layer Architecture</h3>
+<pre><code>&#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+&#9474; Layer 3: Agent Services (apps/)                               &#9474;
+&#9474; material / physics / texture / validation                     &#9474;
+&#9474; CLI (typer) + REST (FastAPI + Docker Compose)                 &#9474;
+&#9474; Config-driven YAML pipeline DSL                              &#9474;
+&#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+&#9474; Layer 2: Agentic Framework (world_understanding/agentic/)     &#9474;
+&#9474; workflows.py · tasks.py · agents/ · config/ · cli/            &#9474;
+&#9474; base_pipeline_executor.py · usd_workflows.py                  &#9474;
+&#9474; Orchestrates: VLM call &rarr; tool execute &rarr; USD write &rarr; validate &#9474;
+&#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
+&#9474; Layer 1: Tool Registry (world_understanding/tools/, registry/)&#9474;
+&#9474; @register_tool · ToolSpec · _TOOLS_REGISTRY                  &#9474;
+&#9474; functions/*.py &rarr; VLM function calling (LangChain)        &#9474;
+&#9474; usd-core · usd-validation-nvidia · OVRTX rendering            &#9474;
+&#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;
 
-横向：.agents/skills/ 25 skills → agent 的"使用说明书"（给 coding agent 读的）</code></pre>
+Horizontal: .agents/skills/ 25 skills &rarr; agent "instruction manuals" (for coding agents to read)</code></pre>
 
-<h3>关键设计约定</h3>
+<h3>Key Design Conventions</h3>
 <ul>
-<li><b>Tool = func + ToolSpec</b>：装饰器注册，import 即生效</li>
-<li><b>VLM 通过 LangChain function-calling 调 tool</b>：人不能直接调 tool</li>
-<li><b>YAML DSL 描述 pipeline</b>：config 结构在 4 个 agent 间复用</li>
-<li><b>Render → Predict → Apply → Validate</b>：标准闭环</li>
-<li><b>Data URI by default</b>：渲染图 base64 inline（免 S3）</li>
-<li><b>OpenTelemetry 全链路</b>：每个 tool invocation 自动 span</li>
+<li><b>Tool = func + ToolSpec</b>: decorator registration, import-triggered</li>
+<li><b>VLM calls tools via LangChain function-calling</b>: humans don't call tools directly</li>
+<li><b>YAML DSL describes pipelines</b>: config structure reused across 4 agents</li>
+<li><b>Render &rarr; Predict &rarr; Apply &rarr; Validate</b>: standard closed loop</li>
+<li><b>Data URI by default</b>: rendered images base64 inline (no S3 needed)</li>
+<li><b>OpenTelemetry full tracing</b>: every tool invocation auto-spans</li>
 </ul>
 </section>
 
 <section id="path">
-<h2><span class="num">§</span>推荐学习路径（10 步）</h2>
+<h2><span class="num">&sect;</span>Recommended Learning Path (10 Steps)</h2>
 <ol class="path-list">
-  <li><b>心智模型</b>："什么是 Content Agent"——VLM + USD 的闭环范式<br><span class="ref">→ 模块①</span></li>
-  <li><b>双模式架构</b>：CLI vs REST，同一 pipeline 的两种交付<br><span class="ref">→ 模块②</span></li>
-  <li><b>核心库 world_understanding</b>：6 个子包，所有 agent 的地基<br><span class="ref">→ 模块③</span></li>
-  <li><b>Tool Registry 与 VLM Function Calls</b>：装饰器注册 + LangChain function-calling<br><span class="ref">→ 模块④</span></li>
-  <li><b>Material Agent</b>：最成熟的 agent —— render→predict→apply→validate<br><span class="ref">→ 模块⑤</span></li>
-  <li><b>Physics Agent</b>：组件物理属性分类（asset-type-aware）<br><span class="ref">→ 模块⑥</span></li>
-  <li><b>Texture Agent</b>：纹理生成 + 两步式命令 · CPU-only<br><span class="ref">→ 模块⑦</span></li>
-  <li><b>Validation Agent</b>：QA gate · CLI-first · checked-in fixtures<br><span class="ref">→ 模块⑧</span></li>
-  <li><b>Agent Skills 系统</b>：.agents/skills/ → 教 coding agent 怎么用本仓库<br><span class="ref">→ 模块⑨</span></li>
-  <li><b>渲染管道</b>：OVRTX sidecar vs local subprocess<br><span class="ref">→ 模块⑩</span></li>
+  <li><b>Mental Model</b>: "What is a Content Agent" — the VLM + USD closed-loop paradigm<br><span class="ref">&rarr; Module 1</span></li>
+  <li><b>Dual-Mode Architecture</b>: CLI vs REST — two delivery modes for the same pipeline<br><span class="ref">&rarr; Module 2</span></li>
+  <li><b>Core Library world_understanding</b>: 6 sub-packages, the foundation of all agents<br><span class="ref">&rarr; Module 3</span></li>
+  <li><b>Tool Registry &amp; VLM Function Calls</b>: decorator registration + LangChain function-calling<br><span class="ref">&rarr; Module 4</span></li>
+  <li><b>Material Agent</b>: the most mature agent — render &rarr; predict &rarr; apply &rarr; validate<br><span class="ref">&rarr; Module 5</span></li>
+  <li><b>Physics Agent</b>: component physics attribute classification (asset-type-aware)<br><span class="ref">&rarr; Module 6</span></li>
+  <li><b>Texture Agent</b>: texture generation + two-step commands · CPU-only<br><span class="ref">&rarr; Module 7</span></li>
+  <li><b>Validation Agent</b>: QA gate · CLI-first · checked-in fixtures<br><span class="ref">&rarr; Module 8</span></li>
+  <li><b>Agent Skills System</b>: .agents/skills/ &rarr; teaches coding agents how to use this repo<br><span class="ref">&rarr; Module 9</span></li>
+  <li><b>Rendering Pipeline</b>: OVRTX sidecar vs local subprocess<br><span class="ref">&rarr; Module 10</span></li>
 </ol>
 </section>
 
 <section id="modules">
-<h2><span class="num">§</span>10 个模块详解</h2>
+<h2><span class="num">&sect;</span>10 Modules in Detail</h2>
 
 <div class="modules-grid">
 
 <div class="module-card" id="m-concepts"><span class="step">STEP 1</span>
-<h3>① 心智模型</h3>
-<p class="resp">VLM 看图 → 推理 → 改 USD 的闭环。4 agent 的层级与输入输出。</p>
-<div class="keys"><b>关键：</b>README.md:1-18 GIFs + Agents 描述</div>
-<div class="start"><b>起点：</b>4 张 teaser GIF — 这是"Content Agent 做了什么"的最直观证据。</div>
+<h3>Mental Model</h3>
+<p class="resp">VLM sees render &rarr; reasons &rarr; modifies USD. The closed loop. 4 agents' hierarchy and I/O.</p>
+<div class="keys"><b>Key:</b> README.md:1-18 GIFs + Agents description</div>
+<div class="start"><b>Start:</b> 4 teaser GIFs — the most intuitive evidence of "what Content Agents do."</div>
 </div>
 
 <div class="module-card" id="m-modes"><span class="step">STEP 2</span>
-<h3>② 双模式架构</h3>
-<p class="resp">CLI vs Docker REST：同一 pipeline 两种交付方式；config YAML 互移植。</p>
-<div class="keys"><b>关键：</b>README.md:84-114 + System Requirements 表</div>
-<div class="start"><b>起点：</b>README "Two Ways to Use This" — 看 Pick this when 决策树。</div>
+<h3>Dual-Mode Architecture</h3>
+<p class="resp">CLI vs Docker REST: same pipeline, two delivery modes; config YAML is portable between them.</p>
+<div class="keys"><b>Key:</b> README.md:84-114 + System Requirements table</div>
+<div class="start"><b>Start:</b> README "Two Ways to Use This" — examine the Pick-this-when decision tree.</div>
 </div>
 
 <div class="module-card" id="m-core"><span class="step">STEP 3</span>
-<h3>③ World Understanding 核心库</h3>
-<p class="resp">6 个子包：tools / agentic / functions / registry / config / utils。所有 agent 的 SDK。</p>
-<div class="keys"><b>关键：</b>world_understanding/__init__.py + tools/__init__.py + tools/base.py</div>
-<div class="start"><b>起点：</b>__init__.py 的 6 条 import — 这就是核心库的全部能力域。</div>
+<h3>World Understanding Core Library</h3>
+<p class="resp">6 sub-packages: tools / agentic / functions / registry / config / utils. The SDK for all agents.</p>
+<div class="keys"><b>Key:</b> world_understanding/__init__.py + tools/__init__.py + tools/base.py</div>
+<div class="start"><b>Start:</b> __init__.py's 6 imports — that's the entire capability domain of the core library.</div>
 </div>
 
 <div class="module-card" id="m-tool-registry"><span class="step">STEP 4</span>
-<h3>④ Tool Registry & VLM Function Calls</h3>
-<p class="resp">@register_tool 装饰器 + 4 registries + LangChain function-calling。Content Agent "智能"的核心机制。</p>
-<div class="keys"><b>关键：</b>tools/base.py + registry/tool_registry.py + functions/__init__.py</div>
-<div class="start"><b>起点：</b>tools/base.py:55-75 Tool.run() — 3 行看懂 tool 执行。</div>
+<h3>Tool Registry &amp; VLM Function Calls</h3>
+<p class="resp">@register_tool decorator + 4 registries + LangChain function-calling. The core mechanism that makes Content Agents "intelligent."</p>
+<div class="keys"><b>Key:</b> tools/base.py + registry/tool_registry.py + functions/__init__.py</div>
+<div class="start"><b>Start:</b> tools/base.py:55-75 Tool.run() — understand tool execution in 3 lines.</div>
 </div>
 
 <div class="module-card" id="m-material"><span class="step">STEP 5</span>
-<h3>⑤ Material Agent</h3>
-<p class="resp">最成熟的 agent。VLM 看 render → 选材质 from library → 写回 USD。YAML DSL。</p>
-<div class="keys"><b>关键：</b>apps/material_agent/configs/unified_example.yaml + README.md</div>
-<div class="start"><b>起点：</b>unified_example.yaml 的 8 步 steps 定义 — pipeline DSL。</div>
+<h3>Material Agent</h3>
+<p class="resp">The most mature agent. VLM views render &rarr; selects materials from library &rarr; writes back to USD. YAML DSL.</p>
+<div class="keys"><b>Key:</b> apps/material_agent/configs/unified_example.yaml + README.md</div>
+<div class="start"><b>Start:</b> unified_example.yaml's 8 step definitions — the pipeline DSL.</div>
 </div>
 
 <div class="module-card" id="m-physics"><span class="step">STEP 6</span>
-<h3>⑥ Physics Agent</h3>
-<p class="resp">分类组件物理属性（material type / function / mass / friction），asset-type-aware。</p>
-<div class="keys"><b>关键：</b>apps/physics_agent/configs/lightbulb.yaml + README.md</div>
-<div class="start"><b>起点：</b>与 Material Agent 对比 — 无 material library，有 asset_type 参数。</div>
+<h3>Physics Agent</h3>
+<p class="resp">Classifies component physics attributes (material type / function / mass / friction), asset-type-aware.</p>
+<div class="keys"><b>Key:</b> apps/physics_agent/configs/lightbulb.yaml + README.md</div>
+<div class="start"><b>Start:</b> Compare with Material Agent — no material library, has asset_type parameter.</div>
 </div>
 
 <div class="module-card" id="m-texture"><span class="step">STEP 7</span>
-<h3>⑦ Texture Agent</h3>
-<p class="resp">纹理生成 · 两步式命令（discover→generate→apply）· CPU-only · 多种 image-gen 后端。</p>
-<div class="keys"><b>关键：</b>apps/texture_agent/configs/texture_example.yaml + README.md</div>
-<div class="start"><b>起点：</b>两段命令设计 — 为什么拆成 discover/generate/apply。</div>
+<h3>Texture Agent</h3>
+<p class="resp">Texture generation · two-step commands (discover &rarr; generate &rarr; apply) · CPU-only · multiple image-gen backends.</p>
+<div class="keys"><b>Key:</b> apps/texture_agent/configs/texture_example.yaml + README.md</div>
+<div class="start"><b>Start:</b> Two-segment command design — why split into discover/generate/apply.</div>
 </div>
 
 <div class="module-card" id="m-validation"><span class="step">STEP 8</span>
-<h3>⑧ Validation Agent</h3>
-<p class="resp">QA gate · v0.4 CLI-first · checked-in fixtures · validation_request→plan→result。</p>
-<div class="keys"><b>关键：</b>apps/validation_agent/examples/ + validation_agent/README.md</div>
-<div class="start"><b>起点：</b>checked-in fixtures — 不需其他 agent 就能跑 hello-world validation。</div>
+<h3>Validation Agent</h3>
+<p class="resp">QA gate · v0.4 CLI-first · checked-in fixtures · validation_request &rarr; plan &rarr; result.</p>
+<div class="keys"><b>Key:</b> apps/validation_agent/examples/ + validation_agent/README.md</div>
+<div class="start"><b>Start:</b> Checked-in fixtures — run hello-world validation without needing other agents.</div>
 </div>
 
 <div class="module-card" id="m-skills"><span class="step">STEP 9</span>
-<h3>⑨ Agent Skills</h3>
-<p class="resp">25 个 SKILL.md · canonical + mirror · 教 coding agent 怎么操作用本仓库。</p>
-<div class="keys"><b>关键：</b>.agents/skills/material-agent-cli/SKILL.md + AGENTS.md:49-63</div>
-<div class="start"><b>起点：</b>material-agent-cli skill 的 frontmatter — 理解 skill 结构。</div>
+<h3>Agent Skills</h3>
+<p class="resp">25 SKILL.md · canonical + mirror · teaches coding agents how to operate this repo.</p>
+<div class="keys"><b>Key:</b> .agents/skills/material-agent-cli/SKILL.md + AGENTS.md:49-63</div>
+<div class="start"><b>Start:</b> material-agent-cli skill frontmatter — understand the skill structure.</div>
 </div>
 
 <div class="module-card" id="m-render"><span class="step">STEP 10</span>
-<h3>⑩ Rendering Pipeline (OVRTX)</h3>
-<p class="resp">多视角渲染 → VLM 输入。Docker sidecar vs local subprocess。</p>
-<div class="keys"><b>关键：</b>apps/ovrtx_rendering_api/ + fetch_build_resources.sh + README 资源表</div>
-<div class="start"><b>起点：</b>README GPU 表 — 为什么 Material/Physics 需要 48GB VRAM。</div>
+<h3>Rendering Pipeline (OVRTX)</h3>
+<p class="resp">Multi-view rendering &rarr; VLM input. Docker sidecar vs local subprocess.</p>
+<div class="keys"><b>Key:</b> apps/ovrtx_rendering_api/ + fetch_build_resources.sh + README resource table</div>
+<div class="start"><b>Start:</b> README GPU table — why Material/Physics needs 48GB VRAM.</div>
 </div>
 
 </div>
 </section>
 
 <section id="tutorial">
-<h2><span class="num">§</span>教程 · 跟读任务（Trace Tasks）</h2>
+<h2><span class="num">&sect;</span>Tutorial · Trace Tasks</h2>
 
-<details open><summary>① 画出 4 agent 流程图</summary><div class="pad">
-<p>打开 README.md，找 4 段 GIF 对应文字描述（line 9-17）。不看代码，用一张纸画出"输入 USD → 4 agent 各自做了什么 → 最终输出"的流程图。对照 README Agents 描述检查。</p></div></details>
+<details open><summary>1. Draw the 4-agent flowchart</summary><div class="pad">
+<p>Open README.md, find the 4 GIF descriptions (line 9-17). Without reading code, draw a flowchart on paper: "Input USD &rarr; what each of 4 agents does &rarr; final output." Cross-check against README Agents descriptions.</p></div></details>
 
-<details><summary>② 对比 CLI vs REST 路径</summary><div class="pad">
-<p>读 README "Option A"（line 350）和 "Option B"（line 405）。画对照图：两条路径各几步走，标出"哪步需 GPU / Docker / API Key / fetch_build_resources"。</p></div></details>
+<details><summary>2. Compare CLI vs REST paths</summary><div class="pad">
+<p>Read README "Option A" (line 350) and "Option B" (line 405). Draw a comparison diagram: how many steps per path, label "which step needs GPU / Docker / API Key / fetch_build_resources."</p></div></details>
 
-<details><summary>③ 追 register_tool 的注册链</summary><div class="pad">
-<p>在 tools/base.py 找到 register_tool，看：(1) 怎么接收 ToolSpec；(2) _TOOLS_REGISTRY 是什么数据结构；(3) return 的是 wrapper 还是函数。然后在 tools/__init__.py:18-21 看 import 触发注册。画出 import → decorator → dict insert 链路。</p></div></details>
+<details><summary>3. Trace register_tool's registration chain</summary><div class="pad">
+<p>In tools/base.py, find register_tool. Observe: (1) how it receives ToolSpec; (2) what data structure _TOOLS_REGISTRY is; (3) whether it returns wrapper or function. Then in tools/__init__.py:18-21 watch import trigger registration. Draw: import &rarr; decorator &rarr; dict insert chain.</p></div></details>
 
-<details><summary>④ 追两个 registry 的联动</summary><div class="pad">
-<p>搜 tools/base.py 的 _TOOLS_REGISTRY 被读写位置。在 tools/__init__.py 的 register_all_tools() 看它如何同时操作 tool registry 和 display registry。在 tools/cv/__init__.py 看 @register_tool 用法。画完整 timeline。</p></div></details>
+<details><summary>4. Trace two registries' interaction</summary><div class="pad">
+<p>Search tools/base.py for read/write locations of _TOOLS_REGISTRY. In tools/__init__.py's register_all_tools(), see how it simultaneously operates tool registry and display registry. In tools/cv/__init__.py see @register_tool usage. Draw complete timeline.</p></div></details>
 
-<details><summary>⑤ 逐步理解 material pipeline</summary><div class="pad">
-<p>打开 unified_example.yaml，从 ladder.usd 开始到 validation，对每一步写一行"这一步做了什么"（只从 YAML 推断）。在 README 找对应描述验证。</p></div></details>
+<details><summary>5. Step through material pipeline</summary><div class="pad">
+<p>Open unified_example.yaml. From ladder.usd to validation, write one line per step: "what this step does" (inferring from YAML only). Cross-reference README descriptions to verify.</p></div></details>
 
-<details><summary>⑥ 对比 Material vs Physics config</summary><div class="pad">
-<p>对比 unified_example.yaml vs lightbulb.yaml 的 steps 段，逐行标出相同/特有 step。看 functions/physics/ 目录推测 VLM 可调的 physics functions。</p></div></details>
+<details><summary>6. Compare Material vs Physics config</summary><div class="pad">
+<p>Compare unified_example.yaml vs lightbulb.yaml steps sections, mark identical/unique steps line by line. Browse functions/physics/ directory to infer what physics functions VLM can call.</p></div></details>
 
-<details><summary>⑦ 画三 agent 数据流转图</summary><div class="pad">
-<p>画 Material → Texture → Validation 数据流转图。每箭头写一行"输入格式是什么"。验证：Texture 能否在 Material 前跑？写一句解释。</p></div></details>
+<details><summary>7. Draw 3-agent data flow</summary><div class="pad">
+<p>Draw Material &rarr; Texture &rarr; Validation data flow. For each arrow write one line: "input format." Verify: can Texture run before Material? Write one sentence explaining why.</p></div></details>
 
-<details><summary>⑧ 理 validation 的 request→plan→result</summary><div class="pad">
-<p>打开 validation_agent/examples/configs/ 任一 YAML，找 validation_request/plan/policy 字段，理出 task→plan→criteria→judge 决策链。对照 examples/README.md 验证。</p></div></details>
+<details><summary>8. Unpack validation's request &rarr; plan &rarr; result</summary><div class="pad">
+<p>Open any YAML under validation_agent/examples/configs/. Find validation_request/plan/policy fields, derive: task &rarr; plan &rarr; criteria &rarr; judge decision chain. Cross-check with examples/README.md.</p></div></details>
 
-<details><summary>⑨ 读一个非 material 的 skill</summary><div class="pad">
-<p>找 .agents/skills/ 里第二重要的 skill，读 When to Use + Limitations。回答：这个 skill 判断该不该激活的逻辑是什么？diff 它的 .codex/ .claude/ mirror 与 canonical。</p></div></details>
+<details><summary>9. Read a non-material skill</summary><div class="pad">
+<p>Find the second most important SKILL.md under .agents/skills/. Read When to Use + Limitations. Answer: what logic activates this skill? Diff its .codex/ .claude/ mirror against canonical.</p></div></details>
 
-<details><summary>⑩ 理解 GPU 需求的 compose 关系</summary><div class="pad">
-<p>看 README:236 的 GPU 表："为什么 Texture 是 CPU-only"。打开 material_agent_service/docker-compose.yml，找 rendering-api service 的 GPU device reservation。</p></div></details>
+<details><summary>10. Understand GPU requirements via compose</summary><div class="pad">
+<p>Read README:236 GPU table: "Why Texture is CPU-only." Open material_agent_service/docker-compose.yml, find rendering-api service's GPU device reservation.</p></div></details>
 </section>
 
 <section id="exercises">
-<h2><span class="num">§</span>练习 · 实战检查点（Practice Tasks）</h2>
+<h2><span class="num">&sect;</span>Exercises · Practice Tasks</h2>
 
-<details><summary>练习 1 · 预判资产会被怎么处理</summary><div class="pad">
-<p><b>模块：</b>心智模型　<b>难度：</b>★☆☆　<b>预计：</b>30 min</p>
-<p>挑公开 USD（如 USDA Kitchen Set），预判：Material Agent 给哪些零件分什么材质？Physics Agent 分什么物理类型？Texture Agent 哪些面是纯色需纹理？Validation Agent 做什么校验？写一页预判表。后续实跑后回看预判 vs 实际。</p></div></details>
+<details><summary>Exercise 1 · Predict how an asset will be processed</summary><div class="pad">
+<p><b>Module:</b> Mental Model &nbsp;<b>Difficulty:</b> &starf;&star;&star;&star; &nbsp;<b>Estimate:</b> 30 min</p>
+<p>Pick a public USD (e.g., USDA Kitchen Set). Predict: which parts does Material Agent assign which materials to? What physics types does Physics Agent classify? Which faces does Texture Agent flag as solid-color and need textures? What validations does Validation Agent perform? Write a one-page prediction table. Later re-run and compare predictions vs actuals.</p></div></details>
 
-<details><summary>练习 2 · install_all_cli.sh</summary><div class="pad">
-<p><b>模块：</b>双模式架构　<b>难度：</b>★★☆　<b>预计：</b>1h</p>
-<p>写 install_all_cli.sh：从零（无 repo）到 4 agent CLI 都能 --help。clone→uv venv→install core+4 agents→fetch build→验证。至少跑 material-agent --help。</p></div></details>
+<details><summary>Exercise 2 · install_all_cli.sh</summary><div class="pad">
+<p><b>Module:</b> Dual-Mode Arch &nbsp;<b>Difficulty:</b> &starf;&starf;&star; &nbsp;<b>Estimate:</b> 1h</p>
+<p>Write install_all_cli.sh: from scratch (no repo) to all 4 agent CLIs showing --help. clone &rarr; uv venv &rarr; install core+4 agents &rarr; fetch build &rarr; verify. Must at least run material-agent --help.</p></div></details>
 
-<details><summary>练习 3 · 加一个自定义 tool</summary><div class="pad">
-<p><b>模块：</b>核心库　<b>难度：</b>★★☆　<b>预计：</b>1h</p>
-<p>在 tools/cv/ 下新建 fake_tool.py，写 DescribeColorTool：input_model ColorInput(color:str)→output_model ColorOutput(description:str)，@register_tool 注册。在 tools/__init__.py 和 tools/cv/__init__.py 加 import。验证 register_all_tools() 返回你的 tool。</p></div></details>
+<details><summary>Exercise 3 · Add a custom tool</summary><div class="pad">
+<p><b>Module:</b> Core Library &nbsp;<b>Difficulty:</b> &starf;&starf;&star; &nbsp;<b>Estimate:</b> 1h</p>
+<p>Under tools/cv/, create fake_tool.py. Write DescribeColorTool: input_model ColorInput(color:str) &rarr; output_model ColorOutput(description:str), @register_tool registered. Add import in tools/__init__.py and tools/cv/__init__.py. Verify register_all_tools() returns your tool.</p></div></details>
 
-<details><summary>练习 4 · inspect_tools.py + call_tool.py</summary><div class="pad">
-<p><b>模块：</b>Tool Registry　<b>难度：</b>★★☆　<b>预计：</b>1h</p>
-<p>写 inspect_tools.py（import register_all_tools，打印所有 tool 的 name/input/output/tag）。再写 call_tool.py 对 get_dominant_colors_tool 构造合法 input 调 Tool.run()，验证 output。</p></div></details>
+<details><summary>Exercise 4 · inspect_tools.py + call_tool.py</summary><div class="pad">
+<p><b>Module:</b> Tool Registry &nbsp;<b>Difficulty:</b> &starf;&starf;&star; &nbsp;<b>Estimate:</b> 1h</p>
+<p>Write inspect_tools.py (import register_all_tools, print all tools' name/input/output/tag). Then write call_tool.py — for get_dominant_colors_tool, construct valid input, call Tool.run(), verify output.</p></div></details>
 
-<details><summary>练习 5 · 修改 unified_example for your asset</summary><div class="pad">
-<p><b>模块：</b>Material Agent　<b>难度：</b>★★★　<b>预计：</b>1.5h + GPU</p>
-<p>复制 unified_example.yaml 为 my_asset.yaml，改 3 处：(1) usd_path 指向你的 USD；(2) backend 根据你的 API key 改；(3) 禁用 optimize/apply，只跑到 predict。看 VLM 给你的资产选了哪些材质。无环境至少用 yaml.safe_load 验证结构。</p></div></details>
+<details><summary>Exercise 5 · Modify unified_example for your asset</summary><div class="pad">
+<p><b>Module:</b> Material Agent &nbsp;<b>Difficulty:</b> &starf;&starf;&starf; &nbsp;<b>Estimate:</b> 1.5h + GPU</p>
+<p>Copy unified_example.yaml as my_asset.yaml, change 3 things: (1) usd_path to your USD; (2) backend per your API key; (3) disable optimize/apply, run to predict only. See what materials VLM selects for your asset. Without GPU, at least use yaml.safe_load to validate structure.</p></div></details>
 
-<details><summary>练习 6 · 手动 Physics Agent</summary><div class="pad">
-<p><b>模块：</b>Physics Agent　<b>难度：</b>★☆☆　<b>预计：</b>20 min</p>
-<p>对桌上任意物体拍 3 张照片，你替代 VLM 做 Physics prediction：material type / component function / mass/density/friction/deformability / asset type。写 structured 结果。</p></div></details>
+<details><summary>Exercise 6 · Manual Physics Agent</summary><div class="pad">
+<p><b>Module:</b> Physics Agent &nbsp;<b>Difficulty:</b> &starf;&star;&star; &nbsp;<b>Estimate:</b> 20 min</p>
+<p>Take 3 photos of any desktop object. You act as VLM for Physics prediction: material type / component function / mass/density/friction/deformability / asset type. Write structured results.</p></div></details>
 
-<details><summary>练习 7 · 扫描 empty texture slots</summary><div class="pad">
-<p><b>模块：</b>Texture Agent　<b>难度：</b>★★☆　<b>预计：</b>45 min</p>
-<p>对已有 material binding 的 USD，用 pxr.UsdShade 遍历 prim，统计"有 material binding 但无 texture file path"的数量。无 USD 就理解 discover 命令的作用。</p></div></details>
+<details><summary>Exercise 7 · Scan empty texture slots</summary><div class="pad">
+<p><b>Module:</b> Texture Agent &nbsp;<b>Difficulty:</b> &starf;&starf;&star; &nbsp;<b>Estimate:</b> 45 min</p>
+<p>For a USD with existing material bindings, use pxr.UsdShade to walk prims, count "has material binding but no texture file path." Without USD, understand discover command's role.</p></div></details>
 
-<details><summary>练习 8 · Human validator</summary><div class="pad">
-<p><b>模块：</b>Validation Agent　<b>难度：</b>★☆☆　<b>预计：</b>20 min</p>
-<p>挑任意 3D 渲染图，做 look right judge：你看到什么？预期什么？verdict pass/fail？1 句理由。思考：VLM 能做这判断吗？什么情况 VLM 会误判？</p></div></details>
+<details><summary>Exercise 8 · Human validator</summary><div class="pad">
+<p><b>Module:</b> Validation Agent &nbsp;<b>Difficulty:</b> &starf;&star;&star; &nbsp;<b>Estimate:</b> 20 min</p>
+<p>Pick any 3D render. Do a look-right judge: What do you see? What do you expect? Verdict pass/fail? One sentence reason. Think: can a VLM make this judgment? When would a VLM misjudge?</p></div></details>
 
-<details><summary>练习 9 · 写一个最小 agent skill</summary><div class="pad">
-<p><b>模块：</b>Agent Skills　<b>难度：</b>★★☆　<b>预计：</b>1h</p>
-<p>仿 material-agent-cli SKILL.md 格式，写 my-first-skill SKILL.md（30-50 行）：frontmatter / When to Use / First Command。放 .agents/skills/ 下。分析：如果 Claude Code 加载这个 skill，什么用户请求会激活它？与 CLAUDE.md 按场景调度有何异同？</p></div></details>
+<details><summary>Exercise 9 · Write a minimal agent skill</summary><div class="pad">
+<p><b>Module:</b> Agent Skills &nbsp;<b>Difficulty:</b> &starf;&starf;&star; &nbsp;<b>Estimate:</b> 1h</p>
+<p>Following material-agent-cli SKILL.md format, write my-first-skill SKILL.md (30-50 lines): frontmatter / When to Use / First Command. Place under .agents/skills/. Analyze: if Claude Code loads this skill, what user request triggers it? How does it differ from CLAUDE.md per-scenario dispatch?</p></div></details>
 
-<details><summary>练习 10 · 修改渲染配置</summary><div class="pad">
-<p><b>模块：</b>Render　<b>难度：</b>★★☆　<b>预计：</b>45 min</p>
-<p>用 yaml.safe_load 读 unified_example.yaml 的 renderer，改 3 项：(1) backend remote→local；(2) resolution 512→1024；(3) 加 "+x-y+z" 视角。解释每项如何影响 VLM 预测质量。有 GPU 就跑一遍实测差异。</p></div></details>
+<details><summary>Exercise 10 · Modify render config</summary><div class="pad">
+<p><b>Module:</b> Render &nbsp;<b>Difficulty:</b> &starf;&starf;&star; &nbsp;<b>Estimate:</b> 45 min</p>
+<p>Use yaml.safe_load to read unified_example.yaml's renderer, change 3 items: (1) backend remote &rarr; local; (2) resolution 512 &rarr; 1024; (3) add "+x-y+z" view. Explain how each affects VLM prediction quality. With GPU, run once and measure actual differences.</p></div></details>
 </section>
 
 <section id="glossary">
-<h2><span class="num">§</span>术语表</h2>
+<h2><span class="num">&sect;</span>Glossary</h2>
 <table>
-  <tr><th>术语</th><th>简释</th><th>相关模块</th></tr>
-  <tr><td>VLM</td><td>Vision-Language Model，能看图+读文字的多模态 LLM</td><td>①④⑤</td></tr>
-  <tr><td>USD</td><td>Universal Scene Description，Pixar 3D 场景格式</td><td>①</td></tr>
-  <tr><td>Material Agent</td><td>VLM 看图→挑材质→写 USD 的 agent</td><td>⑤</td></tr>
-  <tr><td>Physics Agent</td><td>分类组件物理属性的 agent</td><td>⑥</td></tr>
-  <tr><td>Texture Agent</td><td>生成纹理填材质空 slot 的 agent</td><td>⑦</td></tr>
-  <tr><td>Validation Agent</td><td>QA gate：校验生成产物</td><td>⑧</td></tr>
-  <tr><td>OVRTX</td><td>GPU accelerated rendering API（Omniverse RTX Renderer）</td><td>⑩</td></tr>
-  <tr><td>LangChain</td><td>LLM 调用框架，本仓库用它做 VLM function calling</td><td>④</td></tr>
-  <tr><td>Tool</td><td>func + ToolSpec，通过 @register_tool 注册</td><td>③④</td></tr>
-  <tr><td>ToolSpec</td><td>{name, version, description, tags, input_model, output_model, policy}</td><td>④</td></tr>
-  <tr><td>Registry</td><td>全局 name → Tool dict；4 种注册表（tool/chat/model/display）</td><td>④</td></tr>
-  <tr><td>Function</td><td>VLM 调用的函数（不同于 Tool——Tool 是 CLI 调用）</td><td>④</td></tr>
-  <tr><td>YAML DSL</td><td>Agent config 格式：project / input / output / steps</td><td>②⑤</td></tr>
-  <tr><td>Agent Skill</td><td>SKILL.md 教 coding agent 操作的文档</td><td>⑨</td></tr>
-  <tr><td>Large-scene</td><td>Material REST 的 partitioning 模式（单 USD stage → 多 workers）</td><td>⑤</td></tr>
-  <tr><td>Data URI</td><td>渲染图 base64 inline 发给 VLM（默认无 S3）</td><td>③⑩</td></tr>
-  <tr><td>NIM</td><td>NVIDIA Inference Microservice，容器化 AI model endpoint</td><td>②⑦</td></tr>
-  <tr><td>NVCF</td><td>NVIDIA Cloud Functions，远端 serverless 渲染/优化</td><td>⑩</td></tr>
-  <tr><td>Scene Optimizer Core</td><td>optimize_usd step 的本地后端（~332MB）</td><td>⑤</td></tr>
-  <tr><td>Checked-in fixtures</td><td>预先跑好的 evidence，不需 agent 就能 validation</td><td>⑧</td></tr>
-  <tr><td>OpenTelemetry</td><td>全链路 tracing（每个 tool invocation 自动 span）</td><td>③</td></tr>
-  <tr><td>Prim clustering</td><td>视觉聚类 → 只 predict representative → expand</td><td>⑤</td></tr>
-  <tr><td>Material Library</td><td>有限材质选项 YAML，防 VLM hallucination</td><td>⑤</td></tr>
+  <tr><th>Term</th><th>Definition</th><th>Relevant Module</th></tr>
+  <tr><td>VLM</td><td>Vision-Language Model — multimodal LLM that can see images and read text</td><td>1,4,5</td></tr>
+  <tr><td>USD</td><td>Universal Scene Description — Pixar's 3D scene format</td><td>1</td></tr>
+  <tr><td>Material Agent</td><td>Agent that uses VLM to view renders &rarr; select materials &rarr; write USD</td><td>5</td></tr>
+  <tr><td>Physics Agent</td><td>Agent that classifies component physics attributes</td><td>6</td></tr>
+  <tr><td>Texture Agent</td><td>Agent that generates textures to fill empty material slots</td><td>7</td></tr>
+  <tr><td>Validation Agent</td><td>QA gate: validates generated outputs</td><td>8</td></tr>
+  <tr><td>OVRTX</td><td>GPU accelerated rendering API (Omniverse RTX Renderer)</td><td>10</td></tr>
+  <tr><td>LangChain</td><td>LLM calling framework; this repo uses it for VLM function calling</td><td>4</td></tr>
+  <tr><td>Tool</td><td>func + ToolSpec, registered via @register_tool</td><td>3,4</td></tr>
+  <tr><td>ToolSpec</td><td>{name, version, description, tags, input_model, output_model, policy}</td><td>4</td></tr>
+  <tr><td>Registry</td><td>Global name &rarr; Tool dict; 4 types (tool/chat/model/display)</td><td>4</td></tr>
+  <tr><td>Function</td><td>VLM-callable function (distinct from Tool — Tool is CLI-invoked)</td><td>4</td></tr>
+  <tr><td>YAML DSL</td><td>Agent config format: project / input / output / steps</td><td>2,5</td></tr>
+  <tr><td>Agent Skill</td><td>SKILL.md document that teaches coding agents how to operate</td><td>9</td></tr>
+  <tr><td>Large-scene</td><td>Material REST partitioning mode (single USD stage &rarr; multiple workers)</td><td>5</td></tr>
+  <tr><td>Data URI</td><td>Rendered images base64 inline sent to VLM (no S3 by default)</td><td>3,10</td></tr>
+  <tr><td>NIM</td><td>NVIDIA Inference Microservice — containerized AI model endpoint</td><td>2,7</td></tr>
+  <tr><td>NVCF</td><td>NVIDIA Cloud Functions — remote serverless rendering/optimization</td><td>10</td></tr>
+  <tr><td>Scene Optimizer Core</td><td>optimize_usd step's local backend (~332MB)</td><td>5</td></tr>
+  <tr><td>Checked-in fixtures</td><td>Pre-run evidence; validation works without running agents</td><td>8</td></tr>
+  <tr><td>OpenTelemetry</td><td>Full tracing (every tool invocation auto-spans)</td><td>3</td></tr>
+  <tr><td>Prim clustering</td><td>Visual clustering &rarr; predict only representative &rarr; expand</td><td>5</td></tr>
+  <tr><td>Material Library</td><td>Finite material options YAML, prevents VLM hallucination</td><td>5</td></tr>
 </table>
 </section>
 
 <section>
-<h2><span class="num">§</span>下一步</h2>
-<h3>产物</h3>
+<h2><span class="num">&sect;</span>Next Steps</h2>
+<h3>Generated Artifacts</h3>
 <ul>
-  <li><code>.learning/repo-map.md</code> — 仓库总览</li>
-  <li><code>.learning/modules/*.md</code> × 10 — 模块笔记</li>
-  <li><code>.learning/out/index.html</code> — 本页</li>
+  <li><code>.learning/repo-map.md</code> — Repo overview</li>
+  <li><code>.learning/modules/*.md</code> &times; 10 — Module notes</li>
+  <li><code>.learning/out/index.html</code> — This page</li>
 </ul>
-<h3>继续深入</h3>
+<h3>Go Deeper</h3>
 <ol>
-  <li>读 <code>world_understanding/cli.py</code>（~3000 行 typer app）—— 核心库的完整 CLI 入口</li>
-  <li>读 <code>world_understanding/agentic/workflows.py</code> —— workflow 编排机制</li>
-  <li>读 <code>apps/material_agent_service/docs/api.md</code> —— REST API 的全部 endpoint</li>
-  <li>读 <code>.agents/skills/deploy-collection/SKILL.md</code> —— 一键全栈部署</li>
-  <li>跑 <code>validation-agent run ...steel_scaffold...yaml</code> —— checked-in fixtures 不需 GPU/key</li>
+  <li>Read <code>world_understanding/cli.py</code> (~3000-line typer app) — the core library's full CLI entry</li>
+  <li>Read <code>world_understanding/agentic/workflows.py</code> — workflow orchestration</li>
+  <li>Read <code>apps/material_agent_service/docs/api.md</code> — all REST API endpoints</li>
+  <li>Read <code>.agents/skills/deploy-collection/SKILL.md</code> — one-click full-stack deployment</li>
+  <li>Run <code>validation-agent run ...steel_scaffold...yaml</code> — checked-in fixtures need no GPU/key</li>
 </ol>
 
-<div class="callout tip"><strong>记住 3 件事：</strong>
+<div class="callout tip"><strong>Remember 3 things:</strong>
 <ol style="margin:6px 0 0 0">
-<li>本质：<b>VLM 看图 → 推理 → 改 USD</b>。Tool registry 是执行引擎，agentic framework 是编排器。</li>
-<li>双面：<b>CLI 跑 pipeline，REST 跑 service</b>。Config YAML 互移植。</li>
-<li>Meta：<b>.agents/skills/ 是给 coding agent 读的</b>。25 个 skill = 25 条"教 AI 用 AI"的 instruction。</li>
+<li>The essence: <b>VLM sees render &rarr; reasons &rarr; modifies USD</b>. Tool registry is the execution engine, agentic framework is the orchestrator.</li>
+<li>Dual-faced: <b>CLI runs pipelines, REST runs services</b>. Config YAML is portable between them.</li>
+<li>Meta: <b>.agents/skills/ is read by coding agents</b>. 25 skills = 25 "teach AI to use AI" instructions.</li>
 </ol>
 </div>
 </section>
