@@ -71,13 +71,28 @@ footer a { color:var(--accent); }
     entries.forEach(e => {
       const card = document.createElement('div');
       card.className = 'card';
-      let langLinks = '';
-      if (e.has_en) langLinks += `<a class="lang-en" href="repos/${e.id}/index.html">EN</a>`;
-      if (e.has_zh) langLinks += `<a class="lang-zh" href="repos/${e.id}/index_zh.html">中文</a>`;
+      const files = e.files || [];
+      // Build file links from files array
+      let fileLinks = '';
+      const info = {}; // name → label map
+      files.forEach(f => {
+        const name = f.replace('.html','');
+        if (name === 'index') { info.en = true; fileLinks += `<a class="lang-en" href="repos/${e.id}/index.html">EN</a>`; }
+        else if (name === 'index_zh') { info.zh = true; fileLinks += `<a class="lang-zh" href="repos/${e.id}/index_zh.html">中文</a>`; }
+        else { fileLinks += `<a class="badge blue" href="repos/${e.id}/${f}">${name}</a>`; }
+      });
+      // Fallback if no files info
+      if (!fileLinks) {
+        if (e.has_en) fileLinks += `<a class="lang-en" href="repos/${e.id}/index.html">EN</a>`;
+        if (e.has_zh) fileLinks += `<a class="lang-zh" href="repos/${e.id}/index_zh.html">中文</a>`;
+      }
+      // Title link: prefer index.html, else first file
+      const hasIndex = files.includes('index.html');
+      const titleHref = hasIndex ? `repos/${e.id}/index.html` : (files.length ? `repos/${e.id}/${files[0]}` : '#');
       card.innerHTML = `
-        <h3><a href="repos/${e.id}/index.html">${e.title}</a></h3>
+        <h3><a href="${titleHref}">${e.title}</a></h3>
         <div class="desc">${e.desc || 'Usage guide for ' + e.id}</div>
-        <div class="langs">${langLinks}</div>
+        <div class="langs">${fileLinks}</div>
         <div class="meta">${e.updated || ''}</div>
       `;
       grid.appendChild(card);
