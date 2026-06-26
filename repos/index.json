@@ -1,5 +1,20 @@
 [
   {
+    "id": "nemoclaw",
+    "title": "NemoClaw",
+    "desc": "NVIDIA NemoClaw — sandboxed AI agent platform · User Guide + Developer Guide",
+    "has_en": false,
+    "has_zh": true,
+    "files": [
+      "dev-guide.html",
+      "dev-guide_zh.html",
+      "user-guide.html",
+      "user-guide_zh.html"
+    ],
+    "updated": "2026-06-26",
+    "repo_url": "https://github.com/NVIDIA/NemoClaw"
+  },
+  {
     "id": "aif",
     "title": "AIF",
     "desc": "AI Factory — Developer Guide & Usage Guide",

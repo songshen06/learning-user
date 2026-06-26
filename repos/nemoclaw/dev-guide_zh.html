@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NemoClaw · 开发者指南</title>
+<style>
+:root{--bg:#0d1117;--bg-soft:#161b22;--bg-card:#1c2128;--border:#30363d;--text:#c9d1d9;--text-dim:#8b949e;--accent:#58a6ff;--accent-2:#79c0ff;--green:#7ee787;--yellow:#f2cc60;--orange:#ffa657;--red:#ff7b72;--purple:#d2a8ff;--max:1400px}
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",Helvetica,Arial,sans-serif;line-height:1.75;font-size:15px}
+code,pre,.mono{font-family:"SF Mono","JetBrains Mono","Fira Code",Menlo,Consolas,monospace;font-size:.88em}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(13,17,23,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding:10px 24px;display:flex;align-items:center;gap:16px}
+.topbar .brand{font-weight:700;font-size:16px;color:var(--text)}
+.topbar .tag{background:var(--bg-card);border:1px solid var(--border);padding:2px 8px;border-radius:4px;font-size:12px;color:var(--text-dim)}
+.topbar .grow{flex:1}
+.topbar nav a{color:var(--text-dim);margin-left:14px;font-size:13px}
+.topbar nav a:hover{color:var(--accent)}
+.layout{max-width:var(--max);margin:0 auto;display:grid;grid-template-columns:260px 1fr;gap:32px;padding:24px}
+@media(max-width:980px){.layout{grid-template-columns:1fr;padding:16px}.sidebar{position:static!important}}
+.sidebar{position:sticky;top:72px;align-self:start;max-height:calc(100vh - 96px);overflow-y:auto;padding:8px 0;font-size:13.5px}
+.sidebar h3{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);margin:18px 0 6px 0;padding-left:10px}
+.sidebar a{display:block;color:var(--text-dim);padding:5px 10px;border-radius:5px;border-left:2px solid transparent}
+.sidebar a:hover{background:var(--bg-soft);color:var(--text);text-decoration:none}
+.sidebar a.active{color:var(--accent);border-left-color:var(--accent);background:var(--bg-soft)}
+.sidebar a.sub{padding-left:22px;font-size:13px}
+main{min-width:0}
+section{padding:28px 0 8px 0;border-bottom:1px solid var(--border);scroll-margin-top:70px}
+section:last-child{border-bottom:none}
+h1{font-size:30px;margin:0 0 4px 0;background:linear-gradient(120deg,var(--accent),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+h1+p{color:var(--text-dim);margin-top:0}
+h2{font-size:22px;margin:0 0 14px 0;padding-bottom:6px;border-bottom:1px solid var(--border)}
+h2 .num{display:inline-block;min-width:32px;color:var(--accent);font-variant-numeric:tabular-nums}
+h3{font-size:17px;margin:18px 0 8px 0;color:var(--accent-2)}
+h4{font-size:14px;margin:12px 0 6px 0;color:var(--text)}
+p{margin:8px 0}ul,ol{padding-left:22px;margin:8px 0}li{margin:4px 0}
+code{background:var(--bg-soft);border:1px solid var(--border);padding:1px 6px;border-radius:4px;color:var(--orange)}
+pre{background:var(--bg-soft);border:1px solid var(--border);padding:14px 16px;border-radius:8px;overflow-x:auto;line-height:1.55}pre code{background:none;border:none;padding:0;color:var(--text)}
+.callout{border-left:3px solid var(--accent);background:var(--bg-soft);padding:10px 14px;margin:12px 0;border-radius:0 6px 6px 0}
+.callout.warn{border-left-color:var(--yellow)}.callout.tip{border-left-color:var(--green)}.callout.danger{border-left-color:var(--red)}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+th{background:var(--bg-soft);color:var(--accent-2);font-weight:600;font-size:13px}td code{white-space:nowrap}
+.modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;margin-top:14px}
+.module-card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:16px 18px;transition:border-color .15s,transform .15s}
+.module-card:hover{border-color:var(--accent);transform:translateY(-1px)}
+.module-card .step{display:inline-block;background:var(--bg-soft);color:var(--accent);border:1px solid var(--border);padding:1px 8px;border-radius:10px;font-size:11px;font-weight:600;margin-bottom:6px}
+.module-card h3{margin:4px 0 6px 0;font-size:16px;color:var(--text)}
+.module-card .resp{color:var(--text-dim);font-size:13.5px;margin:0}
+.module-card .keys{margin-top:10px;font-size:13px;color:var(--text-dim)}
+.module-card .keys b{color:var(--accent-2);font-weight:500}
+.module-card .start{margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);font-size:13px;color:var(--text-dim)}
+.module-card .start b{color:var(--green);font-weight:500}
+details{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:0;margin:10px 0}
+details>summary{cursor:pointer;padding:10px 14px;font-weight:500;color:var(--text);user-select:none;list-style:none}
+details>summary::-webkit-details-marker{display:none}
+details>summary::before{content:"▸";color:var(--accent);margin-right:8px;display:inline-block;transition:transform .15s}
+details[open]>summary::before{transform:rotate(90deg)}
+details>div.pad{padding:0 14px 12px 14px}
+.path-list{list-style:none;padding:0;counter-reset:step;margin:16px 0}
+.path-list li{counter-increment:step;position:relative;padding:10px 14px 10px 50px;margin:6px 0;background:var(--bg-soft);border:1px solid var(--border);border-radius:8px;transition:border-color .15s}
+.path-list li:hover{border-color:var(--accent)}
+.path-list li::before{content:counter(step);position:absolute;left:14px;top:50%;transform:translateY(-50%);width:26px;height:26px;background:var(--bg);color:var(--accent);border:1px solid var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px}
+.path-list li b{color:var(--text)}.path-list li .ref{color:var(--text-dim);font-size:13px}
+footer{text-align:center;color:var(--text-dim);padding:30px 24px;font-size:13px;border-top:1px solid var(--border);margin-top:24px}
+footer a{color:var(--accent)}
+@media print{.topbar,.sidebar{display:none}.layout{display:block}body{background:white;color:black}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="brand">🐾 NemoClaw</span>
+  <span class="tag">开发者指南</span>
+  <span class="grow"></span>
+  <nav>
+    <a href="#overview">概览</a>
+    <a href="#architecture">架构</a>
+    <a href="#path">学习路径</a>
+    <a href="#modules">模块</a>
+    <a href="#tutorial">教程</a>
+    <a href="#glossary">术语</a>
+    <a href="#exercises">练习</a>
+  </nav>
+</div>
+
+<div class="layout">
+
+<aside class="sidebar">
+  <h3>导航</h3>
+  <a href="#overview">概览</a>
+  <a href="#architecture">架构</a>
+  <a href="#path">学习路径</a>
+  <a href="#modules">10 个模块</a>
+  <h3>模块</h3>
+  <a href="#m-mental" class="sub">心智模型</a>
+  <a href="#m-cli" class="sub">CLI 架构</a>
+  <a href="#m-blueprint" class="sub">蓝图系统</a>
+  <a href="#m-onboard" class="sub">入门流程</a>
+  <a href="#m-state" class="sub">状态与恢复</a>
+  <a href="#m-sandbox" class="sub">沙箱生命周期</a>
+  <a href="#m-inference" class="sub">推理路由</a>
+  <a href="#m-policy" class="sub">网络策略</a>
+  <a href="#m-security" class="sub">安全与 Shields</a>
+  <a href="#m-integration" class="sub">集成点</a>
+  <a href="#m-skills" class="sub">Agent Skills</a>
+  <h3>实操</h3>
+  <a href="#tutorial" class="sub">教程 · 跟读任务</a>
+  <a href="#exercises" class="sub">练习 · 实战检查</a>
+  <a href="#glossary" class="sub">术语表</a>
+</aside>
+
+<main>
+
+<section id="overview">
+<h1>NemoClaw</h1>
+<p>AI 代理的 OpenShell 沙箱管理器 · TypeScript / oclif / Node.js ≥22.16 · v0.1.0 (Alpha)</p>
+
+<h3>这个仓库做什么</h3>
+<p>NemoClaw 在 <code>openshell</code> CLI 之上封装了一层高级编排：引导式入门向导、沙箱生命周期（创建/连接/执行/恢复/重建/销毁）、推理提供商路由、网络策略管理、配置锁定（shields）和消息平台集成。通过单一 CLI 提供引导式入门、加固蓝图、路由推理、网络策略和生命周期管理。</p>
+
+<h3>技术栈</h3>
+<table>
+  <tr><th>维度</th><th>选型</th></tr>
+  <tr><td>语言</td><td>TypeScript 6.0.2</td></tr>
+  <tr><td>运行时</td><td>Node.js ≥ 22.16</td></tr>
+  <tr><td>CLI 框架</td><td>oclif ^4.10.5（pattern strategy, flexibleTaxonomy）</td></tr>
+  <tr><td>构建</td><td><code>tsc</code> → <code>dist/</code></td></tr>
+  <tr><td>Lint/格式化</td><td>Biome 2.4.14</td></tr>
+  <tr><td>测试</td><td>Vitest 4.1.0（276 个测试文件）</td></tr>
+  <tr><td>文档</td><td>Fern（MDX → docs.nvidia.com）</td></tr>
+  <tr><td>容器</td><td>Docker（engine/desktop/colima）</td></tr>
+  <tr><td>沙箱引擎</td><td>OpenShell（npm 包）</td></tr>
+  <tr><td>许可证</td><td>Apache 2.0 · NVIDIA CORPORATION</td></tr>
+</table>
+
+<h3>支持的代理</h3>
+<div class="callout tip">
+<p><b>OpenClaw</b>（默认）— 带消息机器人的 TUI 聊天代理 · <b>Hermes</b> — OpenAI 兼容 API 服务 · <b>LangChain Deep Agents Code</b>（<code>dcode</code>）— 无头终端编码代理</p>
+<p>关键区别：OpenClaw 有仪表盘 + <code>/nemoclaw</code> 斜杠命令。Hermex 暴露端口 8642 API。<code>dcode</code> 无仪表盘，运行时禁用 MCP，通过 <code>dcode</code> / <code>dcode -n "任务"</code> 运行。配置路径：<code>/sandbox/.openclaw</code> · <code>/sandbox/.hermes</code> · <code>/sandbox/.deepagents</code>。</p>
+</div>
+</section>
+
+<section id="architecture">
+<h2><span class="num">§</span>架构总览</h2>
+
+<h3>顶层目录速查</h3>
+<table>
+  <tr><th>目录</th><th>角色</th></tr>
+  <tr><td><code>src/lib/</code>（88 文件）</td><td><b>核心库</b>：CLI、入门、沙箱、推理、策略、shields、安全、消息、诊断、状态、领域类型 — 每个 CLI 命令都委托到这里</td></tr>
+  <tr><td><code>src/commands/</code></td><td>oclif 命令树 — 每个 <code>.ts</code> 导出一个命令类，通过 pattern strategy 自动发现</td></tr>
+  <tr><td><code>nemoclaw/</code></td><td>打包的代理包：OpenClaw 插件，独立 npm workspace</td></tr>
+  <tr><td><code>nemoclaw-blueprint/</code></td><td>蓝图定义：生命周期阶段、推理 profile、策略预设、路由配置</td></tr>
+  <tr><td><code>scripts/</code></td><td>安装器、卸载器、构建资源、发布、验证脚本</td></tr>
+  <tr><td><code>docs/</code></td><td>Fern 文档（MDX）→ docs.nvidia.com/nemoclaw</td></tr>
+  <tr><td><code>.agents/skills/</code></td><td>25 个 agent skill（SKILL.md）— canonical + <code>.claude/</code> 镜像</td></tr>
+  <tr><td><code>test/</code></td><td>276 个测试文件（Vitest）— 高覆盖率，与源码同目录</td></tr>
+  <tr><td><code>ci/</code></td><td>CI 平台矩阵 — <code>platform-matrix.json</code> 是已测试平台的唯一真实来源</td></tr>
+  <tr><td><code>schemas/</code></td><td>JSON/YAML 配置 schema — 蓝图、策略和配置文件的验证 schema</td></tr>
+  <tr><td><code>tools/</code></td><td>辅助工具 — 不属于核心 CLI 的开发支持工具</td></tr>
+  <tr><td><code>fern/</code></td><td>Fern 文档配置 — 从 <code>docs/</code> MDX 源生成 docs.nvidia.com/nemoclaw</td></tr>
+</table>
+
+<h3>开发工作流命令</h3>
+<table>
+  <tr><th>命令</th><th>用途</th></tr>
+  <tr><td><code>npm run build:cli</code></td><td>编译 TypeScript → dist/ + 生成 oclif 元数据</td></tr>
+  <tr><td><code>npm run test</code></td><td>运行 Vitest 测试套件</td></tr>
+  <tr><td><code>npm run check</code></td><td>运行 pre-commit 检查（Biome + 自定义检查）</td></tr>
+  <tr><td><code>npm run lint</code> / <code>lint:fix</code></td><td>Biome lint + 自定义检查 / 自动修复</td></tr>
+  <tr><td><code>npm run format</code></td><td>Biome 格式化</td></tr>
+  <tr><td><code>npm run typecheck</code></td><td>TypeScript 类型检查（不输出文件）</td></tr>
+  <tr><td><code>npm run validate:configs</code></td><td>验证配置文件与 schema 一致</td></tr>
+  <tr><td><code>npm run docs:live</code></td><td>本地实时预览 Fern 文档</td></tr>
+</table>
+
+<h3>三层架构</h3>
+<pre><code>┌──────────────────────────────────────────────────────────────┐
+│ Layer 3: CLI 命令 (src/commands/)                              │
+│ oclif pattern strategy + flexible taxonomy                    │
+│ onboard / list / resources / sandbox/{connect,exec,...}       │
+│ 薄命令类 → 委托到 Layer 2                                      │
+├──────────────────────────────────────────────────────────────┤
+│ Layer 2: 核心库 (src/lib/)                                     │
+│ 88 文件: onboard.ts, sandbox/, inference/, policy/,          │
+│ shields/, security/, messaging/, state/, diagnostics/, ...    │
+│ 所有业务逻辑在这里。命令只是薄封装。                           │
+├──────────────────────────────────────────────────────────────┤
+│ Layer 1: 基础层 (src/lib/core/ + adapters/)                    │
+│ OpenShell 客户端, Docker 交互, 平台探测                        │
+│ GPU 探测, SSH 隧道, 凭证存储                                   │
+└──────────────────────────────────────────────────────────────┘
+
+声明式: nemoclaw-blueprint/blueprint.yaml → 镜像 pin, 版本范围, profiles
+横向: .agents/skills/ 25 个 skill → agent 的"使用说明书"</code></pre>
+
+<h3>关键设计约定</h3>
+<ul>
+<li><b>薄命令，厚库</b>：<code>src/commands/</code> 类只解析参数和验证；所有逻辑在 <code>src/lib/</code></li>
+<li><b>Flexible taxonomy</b>：oclif 接受 <code>nemoclaw &lt;name&gt; &lt;command&gt;</code> 格式，无需 <code>:</code> 分隔符</li>
+<li><b>Agent-aware</b>：OpenClaw vs Hermes 差异在运行时通过变体检查处理</li>
+<li><b>声明式蓝图</b>：镜像 digest、版本范围和推理 profile 固定在 YAML 中</li>
+<li><b>同目录测试</b>：<code>.test.ts</code> 文件与源码同目录放在 <code>src/lib/</code></li>
+<li><b>凭证不落盘</b>：API key 注册到 OpenShell 网关，仅内存存储</li>
+</ul>
+
+<h3>平台专属指南</h3>
+<table>
+  <tr><th>指南</th><th>路径</th><th>受众</th></tr>
+  <tr><td>DGX Spark 安装</td><td><code>spark-install.md</code></td><td>DGX Spark 用户</td></tr>
+  <tr><td>Windows WSL2 准备</td><td><code>docs/get-started/windows-preparation.mdx</code></td><td>Windows 用户</td></tr>
+  <tr><td>LangChain Deep Agents</td><td><code>docs/get-started/quickstart-langchain-deepagents-code.mdx</code></td><td>LangChain 变体</td></tr>
+</table>
+</section>
+
+<section id="path">
+<h2><span class="num">§</span>推荐学习路径（10 步）</h2>
+<ol class="path-list">
+  <li><b>心智模型</b>：NemoClaw 封装了什么 — CLI → OpenShell → 沙箱 → agent<br><span class="ref">→ 模块 1</span></li>
+  <li><b>CLI 架构</b>：oclif pattern strategy, src/commands/, public-dispatch.ts, runner.ts<br><span class="ref">→ 模块 2</span></li>
+  <li><b>蓝图系统</b>：blueprint.yaml, 生命周期阶段, 推理 profile<br><span class="ref">→ 模块 3</span></li>
+  <li><b>入门流程</b>：onboard.ts + onboard/ — 8 步向导<br><span class="ref">→ 模块 4</span></li>
+  <li><b>状态与恢复</b>：session 持久化, --resume/--fresh, 运行时恢复<br><span class="ref">→ 模块 5</span></li>
+  <li><b>沙箱生命周期</b>：connect, exec, rebuild（备份→删除→创建→恢复）<br><span class="ref">→ 模块 6</span></li>
+  <li><b>推理路由</b>：provider profile, 凭证注册, 健康探测<br><span class="ref">→ 模块 7</span></li>
+  <li><b>网络策略</b>：层级定义, 预设 CRUD, agent-aware 过滤<br><span class="ref">→ 模块 8</span></li>
+  <li><b>安全与 Shields</b>：配置锁定, 凭证存储, 边界检查<br><span class="ref">→ 模块 9</span></li>
+  <li><b>集成点</b>：消息, 仪表盘, 隧道, agent skills<br><span class="ref">→ 模块 10</span></li>
+</ol>
+</section>
+
+<section id="modules">
+<h2><span class="num">§</span>10 个模块详解</h2>
+
+<div class="modules-grid">
+
+<div class="module-card" id="m-mental"><span class="step">STEP 1</span>
+<h3>心智模型</h3>
+<p class="resp">NemoClaw 是用户 CLI 和 OpenShell 之间的"薄编排层"。3 个代理变体：OpenClaw（聊天）、Hermes（API）、dcode（无头编码）。理解技术栈后再看代码。</p>
+<div class="keys"><b>关键：</b>README.md:12-13 + blueprint.yaml + src/nemoclaw.ts（16 行）+ quickstart-langchain-deepagents-code.mdx</div>
+<div class="start"><b>起点：</b>README 第 12 行 — "reference stack for running always-on AI agents inside OpenShell sandboxes"。</div>
+</div>
+
+<div class="module-card" id="m-cli"><span class="step">STEP 2</span>
+<h3>CLI 架构</h3>
+<p class="resp">oclif pattern strategy + flexible taxonomy。public-dispatch.ts 路由 <code>&lt;name&gt; &lt;command&gt;</code> 格式。runner.ts 注入生命周期 hooks。6 步分发链：shim → dispatchCli → taxonomy → oclif → runner → command.run()。</p>
+<div class="keys"><b>关键：</b>src/nemoclaw.ts + src/lib/cli/public-dispatch.ts + src/lib/runner.ts</div>
+<div class="start"><b>起点：</b>src/nemoclaw.ts — 16 行。然后追踪 public-dispatch.ts 中的 6 步分发序列。</div>
+</div>
+
+<div class="module-card" id="m-blueprint"><span class="step">STEP 3</span>
+<h3>蓝图系统</h3>
+<p class="resp">声明式 YAML 定义沙箱镜像、OpenShell 版本范围、5 个推理 profile、资源配额。Dockerfile 注入 NEMOCLAW_* 构建参数，含 secret 安全排除。</p>
+<div class="keys"><b>关键：</b>nemoclaw-blueprint/blueprint.yaml + provider-profiles/ + policies/ + Dockerfile</div>
+<div class="start"><b>起点：</b>blueprint.yaml — 108 行。找 digest pin + 5 个推理 profile。然后看 Dockerfile 的构建参数注入。</div>
+</div>
+
+<div class="module-card" id="m-onboard"><span class="step">STEP 4</span>
+<h3>入门流程</h3>
+<p class="resp">最复杂的编排逻辑。8 步向导：preflight → gateway → provider → credential → build → policy → messaging → finalize。每步可保存/恢复。</p>
+<div class="keys"><b>关键：</b>src/lib/onboard.ts + src/lib/onboard/ + src/lib/state/</div>
+<div class="start"><b>起点：</b>src/lib/onboard.ts — 找到串联 8 个阶段的主编排器。</div>
+</div>
+
+<div class="module-card" id="m-state"><span class="step">STEP 5</span>
+<h3>状态与恢复</h3>
+<p class="resp">入门 session 持久化 + 运行时崩溃恢复。--resume 重放保存的参数；recover 幂等重启网关。<code>doctor</code> 运行完整诊断。</p>
+<div class="keys"><b>关键：</b>src/lib/state/ + runtime-recovery.ts + registry-recovery-action.ts</div>
+<div class="start"><b>起点：</b>src/lib/state/ — session 如何序列化为 JSON。然后 <code>nemoclaw &lt;name&gt; doctor</code> 运行完整诊断。</div>
+</div>
+
+<div class="module-card" id="m-sandbox"><span class="step">STEP 6</span>
+<h3>沙箱生命周期</h3>
+<p class="resp">容器管理：connect（SSH 代理）、exec、rebuild（备份→删除→创建→恢复）、recover。全部通过 OpenShell API。</p>
+<div class="keys"><b>关键：</b>src/lib/sandbox/ + src/commands/sandbox/ + sandbox-base-image.ts</div>
+<div class="start"><b>起点：</b>src/commands/sandbox/connect.ts — 追踪 readiness probe → gateway 恢复 → SSH attach。</div>
+</div>
+
+<div class="module-card" id="m-inference"><span class="step">STEP 7</span>
+<h3>推理路由</h3>
+<p class="resp">将 NEMOCLAW_PROVIDER 映射到 OpenShell 网关路由。11+ 提供商。凭证仅内存注册，不落盘。</p>
+<div class="keys"><b>关键：</b>src/lib/inference/ + blueprint.yaml 推理段 + hermes-provider-auth.ts</div>
+<div class="start"><b>起点：</b>blueprint.yaml <code>components.inference.profiles</code> — 5 个声明式 profile。</div>
+</div>
+
+<div class="module-card" id="m-policy"><span class="step">STEP 8</span>
+<h3>网络策略</h3>
+<p class="resp">3 个层级（Restricted/Balanced/Open）+ 自定义预设。Agent-aware 过滤（Hermes 排除 Brave Search）。</p>
+<div class="keys"><b>关键：</b>src/lib/policy/ + nemoclaw-blueprint/policies/ + private-networks.yaml</div>
+<div class="start"><b>起点：</b>src/lib/policy/ — 找到层级 → 预设映射表。</div>
+</div>
+
+<div class="module-card" id="m-security"><span class="step">STEP 9</span>
+<h3>安全与 Shields</h3>
+<p class="resp">配置锁定（shields up/down）、凭证安全、沙箱加固、Hermes secret 边界校验器。</p>
+<div class="keys"><b>关键：</b>src/lib/shields/ + src/lib/security/ + src/lib/credentials/</div>
+<div class="start"><b>起点：</b>src/lib/shields/ — shields up 的可变性矩阵。</div>
+</div>
+
+<div class="module-card" id="m-integration"><span class="step">STEP 10</span>
+<h3>集成点</h3>
+<p class="resp">消息（Slack/Discord/Telegram）、仪表盘 UI、SSH 隧道。令牌在构建时烘焙到沙箱镜像中。</p>
+<div class="keys"><b>关键：</b>src/lib/messaging/ + dashboard/ + tunnel/ + hermes-dashboard.ts</div>
+<div class="start"><b>起点：</b>src/lib/messaging/ — Slack 双令牌如何处理。</div>
+</div>
+
+<div class="module-card" id="m-skills"><span class="step">BONUS</span>
+<h3>Agent Skills 与领域类型</h3>
+<p class="resp">25 个 checked-in SKILL.md 文件 + 共享领域类型（phases, presets, variants）。Skills 教 AI 编码助手使用本仓库。</p>
+<div class="keys"><b>关键：</b>.agents/skills/ + skills/nemoclaw-user-guide/ + src/lib/domain/</div>
+<div class="start"><b>起点：</b>.agents/skills/ — 浏览 25 个 skill。然后 src/lib/domain/ 看核心类型。</div>
+</div>
+
+</div>
+</section>
+
+<section id="tutorial">
+<h2><span class="num">§</span>教程 · 跟读任务</h2>
+
+<details open><summary>1. 画出技术栈图</summary><div class="pad">
+<p>读 <code>README.md</code> 第 1-20 行。不看代码，画出：用户 → NemoClaw CLI → OpenShell → Docker → Agent → Provider。在每个箭头上标注跨过的数据。</p></div></details>
+
+<details><summary>2. 追踪 CLI 分发链</summary><div class="pad">
+<p>读 <code>src/nemoclaw.ts</code>（16 行）→ <code>src/lib/cli/public-dispatch.ts</code> → <code>src/commands/onboard.ts</code>。追踪 <code>nemoclaw onboard --fresh</code> 从命令行到 <code>src/lib/onboard.ts</code> 的完整路径。写 5 行笔记：每一步在哪个文件、做了什么。</p></div></details>
+
+<details><summary>3. 理解蓝图 digest pin</summary><div class="pad">
+<p>读 <code>nemoclaw-blueprint/blueprint.yaml</code> 全文。找到 <code>digest</code> 字段和 <code>components.sandbox.image</code> 中的 digest。验证它们一致。理解为什么两个地方都要 pin（供应链安全，issue #1438）。</p></div></details>
+
+<details><summary>4. 追踪入门 8 步状态机</summary><div class="pad">
+<p>读 <code>src/lib/onboard.ts</code>。找到 8 个阶段。画状态机：哪些步骤可以 resume，哪些在 <code>--resume</code> 时必须重跑。找到每步保存 session state 的位置。</p></div></details>
+
+<details><summary>5. 追踪 recover 幂等性</summary><div class="pad">
+<p>读 <code>src/lib/runtime-recovery.ts</code>。找到 <code>recover</code> 如何判断"网关已健康"（幂等退出）vs"需要重启"。对比 <code>connect</code> 中的自动恢复路径。</p></div></details>
+
+<details><summary>6. 追踪凭证流（不落盘保证）</summary><div class="pad">
+<p>读 <code>src/lib/inference/</code> + <code>src/lib/credentials/</code>。追踪 <code>NEMOCLAW_PROVIDER=openai</code> 如何将 API key 传递到沙箱而不写入主机磁盘。验证仅网关存储的声明。</p></div></details>
+
+<details><summary>7. 追踪 agent-aware 策略过滤</summary><div class="pad">
+<p>读 <code>src/lib/policy/</code>。找到 Hermes 预设（<code>nous-web</code>、<code>nous-image</code>）在哪里添加，OpenClaw 专属预设（<code>brave</code>）在哪里为 Hermes 排除。画过滤管道。</p></div></details>
+
+<details><summary>8. 追踪 shields up/down 生命周期</summary><div class="pad">
+<p>读 <code>src/lib/shields/</code>。找到 <code>shields up</code> 在哪里读取已保存的限制性策略。追踪 <code>shields down --timeout 5m</code> → timeout 如何触发自动重新锁定。</p></div></details>
+
+<details><summary>9. 追踪消息令牌烘焙</summary><div class="pad">
+<p>读 <code>src/lib/messaging/</code>。找到 Slack <code>SLACK_APP_TOKEN</code> 在哪里存储到独立的 <code>slack-app</code> OpenShell provider（不与 bot token 混在一起）。理解为什么 Socket Mode 需要两个 token。</p></div></details>
+
+<details><summary>10. 阅读 nemoclaw-user-guide skill</summary><div class="pad">
+<p>读 <code>skills/nemoclaw-user-guide/SKILL.md</code>。找到 MCP server URL 和检索顺序（MCP → llms.txt → .md 页面）。理解这个 skill 如何教 AI 助手获取实时文档。</p></div></details>
+</section>
+
+<section id="exercises">
+<h2><span class="num">§</span>练习 · 实战检查</h2>
+
+<details><summary>练习 1 · 对比 Docker 直跑 vs NemoClaw</summary><div class="pad">
+<p><b>模块：</b>心智模型 &nbsp;<b>难度：</b>★☆☆ &nbsp;<b>预计：</b>30 min</p>
+<p>列出 NemoClaw 相比直接在 Docker 中运行代理提供的 5 个额外价值（提示：onboarding、policy、routing、shields、recovery）。对每个，指出哪个 <code>src/lib/</code> 模块实现了它。</p></div></details>
+
+<details><summary>练习 2 · 添加自定义 CLI 命令</summary><div class="pad">
+<p><b>模块：</b>CLI 架构 &nbsp;<b>难度：</b>★★☆ &nbsp;<b>预计：</b>1h</p>
+<p>创建 <code>src/commands/dev-info.ts</code>（最小 oclif command class）。<code>npm run build:cli</code> 后运行 <code>nemoclaw dev-info</code>。验证自动发现。然后添加 <code>--json</code> flag。</p></div></details>
+
+<details><summary>练习 3 · 添加 resource profile</summary><div class="pad">
+<p><b>模块：</b>蓝图系统 &nbsp;<b>难度：</b>★★☆ &nbsp;<b>预计：</b>30 min</p>
+<p>在 <code>blueprint.yaml</code> 中添加 <code>ai-researcher</code> profile（cpu: 80%, memory: 80%）。运行 <code>npm run validate:configs</code>。验证 schema 通过。</p></div></details>
+
+<details><summary>练习 4 · 入门计时分析</summary><div class="pad">
+<p><b>模块：</b>入门流程 &nbsp;<b>难度：</b>★★☆ &nbsp;<b>预计：</b>1h + Docker</p>
+<p>设置 <code>NEMOCLAW_TRACE=1</code>，运行 <code>nemoclaw onboard --fresh</code>。记录每步时间戳。识别最慢的步骤（通常是 sandbox build / image push）。记录优化机会。</p></div></details>
+
+<details><summary>练习 5 · 崩溃恢复演练</summary><div class="pad">
+<p><b>模块：</b>状态与恢复 &nbsp;<b>难度：</b>★☆☆ &nbsp;<b>预计：</b>20 min</p>
+<p>杀掉 OpenShell gateway 进程。运行 <code>nemoclaw &lt;name&gt; recover</code>。观察：检测 → 重启 → 验证。再次运行 recover 验证幂等性。</p></div></details>
+
+<details><summary>练习 6 · 对比 exec vs docker exec</summary><div class="pad">
+<p><b>模块：</b>沙箱生命周期 &nbsp;<b>难度：</b>★☆☆ &nbsp;<b>预计：</b>15 min</p>
+<p>运行 <code>nemoclaw &lt;name&gt; exec -- echo $HOME</code>（应输出 <code>/sandbox</code>）。然后运行 <code>docker exec &lt;container&gt; echo $HOME</code>（输出 <code>/root</code>）。记录为什么 NemoClaw exec 对 agent 配置解析更安全。</p></div></details>
+
+<details><summary>练习 7 · 运行时切换推理提供商</summary><div class="pad">
+<p><b>模块：</b>推理路由 &nbsp;<b>难度：</b>★★☆ &nbsp;<b>预计：</b>30 min</p>
+<p>用 NVIDIA cloud onboard。然后运行 <code>nemoclaw inference set --provider ollama --model llama3</code>。追踪网关路由如何变化。验证 <code>status</code> 反映新的提供商。</p></div></details>
+
+<details><summary>练习 8 · 添加和移除策略预设</summary><div class="pad">
+<p><b>模块：</b>网络策略 &nbsp;<b>难度：</b>★★☆ &nbsp;<b>预计：</b>30 min</p>
+<p>用 Restricted 层级 onboard。用 <code>policy-add</code> 添加一个预设。验证 agent 现在可以访问之前被阻止的服务。然后移除它，验证访问被再次阻止。</p></div></details>
+
+<details><summary>练习 9 · Shields 生命周期测试</summary><div class="pad">
+<p><b>模块：</b>安全与 Shields &nbsp;<b>难度：</b>★☆☆ &nbsp;<b>预计：</b>15 min</p>
+<p>运行 <code>shields up</code>，然后 <code>config get</code>（验证已锁定）。运行 <code>shields down --timeout 1m</code>。等 1 分钟。运行 <code>shields status</code> 验证自动重新锁定。</p></div></details>
+
+<details><summary>练习 10 · 写一个 dev-guide skill</summary><div class="pad">
+<p><b>模块：</b>Agent Skills &nbsp;<b>难度：</b>★★☆ &nbsp;<b>预计：</b>1h</p>
+<p>仿照 <code>nemoclaw-user-guide/SKILL.md</code> 格式，写 <code>nemoclaw-dev-guide</code> SKILL.md（30-50 行）：frontmatter / When to Use / First Command。放在 <code>.agents/skills/</code>。分析：什么开发者请求会触发它？</p></div></details>
+</section>
+
+<section id="glossary">
+<h2><span class="num">§</span>术语表</h2>
+<table>
+  <tr><th>术语</th><th>定义</th></tr>
+  <tr><td><b>OpenShell</b></td><td>NVIDIA 的沙箱管理系统 — 处理容器生命周期、路由和 SSH 隧道</td></tr>
+  <tr><td><b>Blueprint（蓝图）</b></td><td>声明式 YAML，定义沙箱镜像、版本范围、推理 profile（<code>nemoclaw-blueprint/blueprint.yaml</code>）</td></tr>
+  <tr><td><b>Onboard（入门）</b></td><td>8 步交互式设置向导（<code>nemoclaw onboard</code>）</td></tr>
+  <tr><td><b>Sandbox（沙箱）</b></td><td>运行 AI 代理的隔离 Docker 容器，具有网络控制</td></tr>
+  <tr><td><b>Gateway（网关）</b></td><td>管理沙箱路由和推理的 OpenShell 进程</td></tr>
+  <tr><td><b>Flexible Taxonomy</b></td><td>oclif 特性，允许 <code>nemoclaw &lt;name&gt; &lt;command&gt;</code> 格式，无需 <code>:</code> 分隔符</td></tr>
+  <tr><td><b>Shields</b></td><td>配置锁定状态 — 锁定/解锁代理配置，带自动 timeout</td></tr>
+  <tr><td><b>Policy Tier（策略层级）</b></td><td>网络访问预设 — Restricted / Balanced / Open</td></tr>
+  <tr><td><b>Preset（预设）</b></td><td>单个网络访问规则（如 <code>brave</code>、<code>nous-web</code>、<code>dev-tooling</code>）</td></tr>
+  <tr><td><b>Inference Profile</b></td><td>蓝图中的声明式提供商配置（default/ncp/nim-local/vllm/routed）</td></tr>
+  <tr><td><b>Recover（恢复）</b></td><td>重启网关但不打开 shell — 幂等操作</td></tr>
+  <tr><td><b>Rebuild（重建）</b></td><td>重新创建沙箱：备份工作区 → 删除 → 用新镜像创建 → 恢复</td></tr>
+  <tr><td><b>Agent Variant（代理变体）</b></td><td>OpenClaw vs Hermes — 影响默认值、预设、配置路径</td></tr>
+  <tr><td><b>Digest Pin</b></td><td>蓝图中固定的 SHA256 镜像 digest，防止供应链攻击</td></tr>
+  <tr><td><b>Session State</b></td><td>序列化的入门进度 — 支持 <code>--resume</code> 中断后恢复</td></tr>
+  <tr><td><b>Failure Layer</b></td><td>分类的故障类型：<code>docker_unreachable</code>、<code>sandbox_container_stopped</code>、<code>sandbox_dashboard_port_conflict</code></td></tr>
+  <tr><td><b>NIM</b></td><td>NVIDIA 推理微服务 — 容器化模型端点</td></tr>
+  <tr><td><b>vLLM</b></td><td>开源 LLM 服务引擎 — 本地推理选项</td></tr>
+  <tr><td><b>Ollama</b></td><td>本地 LLM 运行时 — 无需 API key，支持 CPU/GPU</td></tr>
+</table>
+</section>
+
+<section>
+<h2><span class="num">§</span>下一步</h2>
+<h3>产物</h3>
+<ul>
+  <li><code>.learning/repo-map.md</code> — 仓库总览</li>
+  <li><code>.learning/modules/*.md</code> × 10 — 模块笔记</li>
+  <li><code>.learning/out/index.html</code> — 本页</li>
+  <li><code>.machine-facts/*.json</code> × 8 — 共享 IR（Machine Facts）</li>
+</ul>
+<h3>继续深入</h3>
+<ol>
+  <li>读 <code>src/lib/onboard.ts</code> 全文 — 代码库中最复杂的编排</li>
+  <li>读 <code>src/lib/cli/public-dispatch.ts</code> — flexible taxonomy 路由</li>
+  <li>读 <code>nemoclaw-blueprint/blueprint.yaml</code> — 声明式定义</li>
+  <li>读 <code>docs/reference/architecture.mdx</code> — 官方架构文档</li>
+  <li>运行 <code>npm run build:cli && nemoclaw --help</code> — 验证 CLI 构建和运行</li>
+</ol>
+
+<div class="callout tip"><strong>记住 3 件事：</strong>
+<ol style="margin:6px 0 0 0">
+<li>NemoClaw 是 OpenShell 之上的<b>薄编排层</b>。所有沙箱操作都委托给它。</li>
+<li><b>薄命令，厚库</b>：src/commands/ 解析参数；src/lib/（88 文件）做所有事。</li>
+<li><b>声明式蓝图 + agent-aware 运行时</b>：镜像/版本 pin 在 YAML，变体差异在运行时。</li>
+</ol>
+</div>
+</section>
+
+</main>
+</div>
+
+<footer>由 <b>developer-guide-designer</b> 生成 · 来源：<code>.learning/repo-map.md</code> + 10 个模块 · 为 <code>NemoClaw</code> 构建</footer>
+
+<script>
+const sections=document.querySelectorAll('section[id]');
+const links=document.querySelectorAll('.sidebar a[href^="#"]');
+const obs=new IntersectionObserver((e)=>{e.forEach(e=>{if(e.isIntersecting){links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+e.target.id))}})},{rootMargin:'-30% 0px -60% 0px'});
+sections.forEach(s=>obs.observe(s));
+document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',function(e){const t=document.querySelector(this.getAttribute('href'));if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth',block:'start'})}}));
+</script>
+
+</body>
+</html>

@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NemoClaw · Developer Guide</title>
+<style>
+:root{--bg:#0d1117;--bg-soft:#161b22;--bg-card:#1c2128;--border:#30363d;--text:#c9d1d9;--text-dim:#8b949e;--accent:#58a6ff;--accent-2:#79c0ff;--green:#7ee787;--yellow:#f2cc60;--orange:#ffa657;--red:#ff7b72;--purple:#d2a8ff;--max:1400px}
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",Helvetica,Arial,sans-serif;line-height:1.65;font-size:15px}
+code,pre,.mono{font-family:"SF Mono","JetBrains Mono","Fira Code",Menlo,Consolas,monospace;font-size:.88em}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(13,17,23,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding:10px 24px;display:flex;align-items:center;gap:16px}
+.topbar .brand{font-weight:700;font-size:16px;color:var(--text)}
+.topbar .tag{background:var(--bg-card);border:1px solid var(--border);padding:2px 8px;border-radius:4px;font-size:12px;color:var(--text-dim)}
+.topbar .grow{flex:1}
+.topbar nav a{color:var(--text-dim);margin-left:14px;font-size:13px}
+.topbar nav a:hover{color:var(--accent)}
+.layout{max-width:var(--max);margin:0 auto;display:grid;grid-template-columns:260px 1fr;gap:32px;padding:24px}
+@media(max-width:980px){.layout{grid-template-columns:1fr;padding:16px}.sidebar{position:static!important}}
+.sidebar{position:sticky;top:72px;align-self:start;max-height:calc(100vh - 96px);overflow-y:auto;padding:8px 0;font-size:13.5px}
+.sidebar h3{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);margin:18px 0 6px 0;padding-left:10px}
+.sidebar a{display:block;color:var(--text-dim);padding:5px 10px;border-radius:5px;border-left:2px solid transparent}
+.sidebar a:hover{background:var(--bg-soft);color:var(--text);text-decoration:none}
+.sidebar a.active{color:var(--accent);border-left-color:var(--accent);background:var(--bg-soft)}
+.sidebar a.sub{padding-left:22px;font-size:13px}
+main{min-width:0}
+section{padding:28px 0 8px 0;border-bottom:1px solid var(--border);scroll-margin-top:70px}
+section:last-child{border-bottom:none}
+h1{font-size:30px;margin:0 0 4px 0;background:linear-gradient(120deg,var(--accent),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+h1+p{color:var(--text-dim);margin-top:0}
+h2{font-size:22px;margin:0 0 14px 0;padding-bottom:6px;border-bottom:1px solid var(--border)}
+h2 .num{display:inline-block;min-width:32px;color:var(--accent);font-variant-numeric:tabular-nums}
+h3{font-size:17px;margin:18px 0 8px 0;color:var(--accent-2)}
+h4{font-size:14px;margin:12px 0 6px 0;color:var(--text)}
+p{margin:8px 0}ul,ol{padding-left:22px;margin:8px 0}li{margin:4px 0}
+code{background:var(--bg-soft);border:1px solid var(--border);padding:1px 6px;border-radius:4px;color:var(--orange)}
+pre{background:var(--bg-soft);border:1px solid var(--border);padding:14px 16px;border-radius:8px;overflow-x:auto;line-height:1.55}pre code{background:none;border:none;padding:0;color:var(--text)}
+.callout{border-left:3px solid var(--accent);background:var(--bg-soft);padding:10px 14px;margin:12px 0;border-radius:0 6px 6px 0}
+.callout.warn{border-left-color:var(--yellow)}.callout.tip{border-left-color:var(--green)}.callout.danger{border-left-color:var(--red)}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+th{background:var(--bg-soft);color:var(--accent-2);font-weight:600;font-size:13px}td code{white-space:nowrap}
+.modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;margin-top:14px}
+.module-card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:16px 18px;transition:border-color .15s,transform .15s}
+.module-card:hover{border-color:var(--accent);transform:translateY(-1px)}
+.module-card .step{display:inline-block;background:var(--bg-soft);color:var(--accent);border:1px solid var(--border);padding:1px 8px;border-radius:10px;font-size:11px;font-weight:600;margin-bottom:6px}
+.module-card h3{margin:4px 0 6px 0;font-size:16px;color:var(--text)}
+.module-card .resp{color:var(--text-dim);font-size:13.5px;margin:0}
+.module-card .keys{margin-top:10px;font-size:13px;color:var(--text-dim)}
+.module-card .keys b{color:var(--accent-2);font-weight:500}
+.module-card .start{margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);font-size:13px;color:var(--text-dim)}
+.module-card .start b{color:var(--green);font-weight:500}
+details{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:0;margin:10px 0}
+details>summary{cursor:pointer;padding:10px 14px;font-weight:500;color:var(--text);user-select:none;list-style:none}
+details>summary::-webkit-details-marker{display:none}
+details>summary::before{content:"▸";color:var(--accent);margin-right:8px;display:inline-block;transition:transform .15s}
+details[open]>summary::before{transform:rotate(90deg)}
+details>div.pad{padding:0 14px 12px 14px}
+.path-list{list-style:none;padding:0;counter-reset:step;margin:16px 0}
+.path-list li{counter-increment:step;position:relative;padding:10px 14px 10px 50px;margin:6px 0;background:var(--bg-soft);border:1px solid var(--border);border-radius:8px;transition:border-color .15s}
+.path-list li:hover{border-color:var(--accent)}
+.path-list li::before{content:counter(step);position:absolute;left:14px;top:50%;transform:translateY(-50%);width:26px;height:26px;background:var(--bg);color:var(--accent);border:1px solid var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px}
+.path-list li b{color:var(--text)}.path-list li .ref{color:var(--text-dim);font-size:13px}
+footer{text-align:center;color:var(--text-dim);padding:30px 24px;font-size:13px;border-top:1px solid var(--border);margin-top:24px}
+footer a{color:var(--accent)}
+@media print{.topbar,.sidebar{display:none}.layout{display:block}body{background:white;color:black}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="brand">🐾 NemoClaw</span>
+  <span class="tag">Developer Guide</span>
+  <span class="grow"></span>
+  <nav>
+    <a href="#overview">Overview</a>
+    <a href="#architecture">Architecture</a>
+    <a href="#path">Learning Path</a>
+    <a href="#modules">Modules</a>
+    <a href="#tutorial">Tutorial</a>
+    <a href="#glossary">Glossary</a>
+    <a href="#exercises">Exercises</a>
+  </nav>
+</div>
+
+<div class="layout">
+
+<aside class="sidebar">
+  <h3>Navigation</h3>
+  <a href="#overview">Overview</a>
+  <a href="#architecture">Architecture</a>
+  <a href="#path">Learning Path</a>
+  <a href="#modules">10 Modules</a>
+  <h3>Modules</h3>
+  <a href="#m-mental" class="sub">Mental Model</a>
+  <a href="#m-cli" class="sub">CLI Architecture</a>
+  <a href="#m-blueprint" class="sub">Blueprint System</a>
+  <a href="#m-onboard" class="sub">Onboard Flow</a>
+  <a href="#m-state" class="sub">State & Recovery</a>
+  <a href="#m-sandbox" class="sub">Sandbox Lifecycle</a>
+  <a href="#m-inference" class="sub">Inference Routing</a>
+  <a href="#m-policy" class="sub">Network Policy</a>
+  <a href="#m-security" class="sub">Security & Shields</a>
+  <a href="#m-integration" class="sub">Integration Points</a>
+  <a href="#m-skills" class="sub">Agent Skills</a>
+  <h3>Hands-On</h3>
+  <a href="#tutorial" class="sub">Tutorial · Trace Tasks</a>
+  <a href="#exercises" class="sub">Exercises · Practice Tasks</a>
+  <a href="#glossary" class="sub">Glossary</a>
+</aside>
+
+<main>
+
+<section id="overview">
+<h1>NemoClaw</h1>
+<p>OpenShell sandbox manager for AI agents · TypeScript / oclif / Node.js ≥22.16 · v0.1.0 (Alpha)</p>
+
+<h3>What this repo does</h3>
+<p>NemoClaw wraps the <code>openshell</code> CLI with a higher-level orchestration layer: guided onboarding wizard, sandbox lifecycle (create/connect/exec/recover/rebuild/destroy), inference provider routing, network policy management, config lockdown (shields), and messaging platform integration. It provides guided onboarding, a hardened blueprint, routed inference, network policy, and lifecycle management through a single CLI.</p>
+
+<h3>Tech Stack</h3>
+<table>
+  <tr><th>Dimension</th><th>Choice</th></tr>
+  <tr><td>Language</td><td>TypeScript 6.0.2</td></tr>
+  <tr><td>Runtime</td><td>Node.js ≥ 22.16</td></tr>
+  <tr><td>CLI Framework</td><td>oclif ^4.10.5 (pattern strategy, flexibleTaxonomy)</td></tr>
+  <tr><td>Build</td><td><code>tsc</code> → <code>dist/</code></td></tr>
+  <tr><td>Lint/Format</td><td>Biome 2.4.14</td></tr>
+  <tr><td>Test</td><td>Vitest 4.1.0 (276 test files)</td></tr>
+  <tr><td>Docs</td><td>Fern (MDX → docs.nvidia.com)</td></tr>
+  <tr><td>Container</td><td>Docker (engine/desktop/colima)</td></tr>
+  <tr><td>Sandbox Engine</td><td>OpenShell (npm package)</td></tr>
+  <tr><td>License</td><td>Apache 2.0 · NVIDIA CORPORATION</td></tr>
+</table>
+
+<h3>Supported Agents</h3>
+<div class="callout tip">
+<p><b>OpenClaw</b> (default) — TUI chat agent with messaging bots · <b>Hermes</b> — OpenAI-compatible API service · <b>LangChain Deep Agents Code</b> (<code>dcode</code>) — headless terminal coding agent</p>
+<p>Key differences: OpenClaw has dashboard + <code>/nemoclaw</code> slash commands. Hermes exposes port 8642 API. <code>dcode</code> has no dashboard, disables MCP at runtime, and runs via <code>dcode</code> / <code>dcode -n "task"</code>. Config paths: <code>/sandbox/.openclaw</code> · <code>/sandbox/.hermes</code> · <code>/sandbox/.deepagents</code>.</p>
+</div>
+</section>
+
+<section id="architecture">
+<h2><span class="num">§</span>Architecture Overview</h2>
+
+<h3>Top-Level Directory Quick Reference</h3>
+<table>
+  <tr><th>Directory</th><th>Role</th></tr>
+  <tr><td><code>src/lib/</code> (88 files)</td><td><b>Core library</b>: CLI, onboarding, sandbox, inference, policy, shields, security, messaging, diagnostics, state, domain types — every CLI command delegates here</td></tr>
+  <tr><td><code>src/commands/</code></td><td>oclif command tree — each <code>.ts</code> exports a command class. Auto-discovered via pattern strategy</td></tr>
+  <tr><td><code>nemoclaw/</code></td><td>Bundled agent package: OpenClaw plugin, separate npm workspace</td></tr>
+  <tr><td><code>nemoclaw-blueprint/</code></td><td>Blueprint definitions: lifecycle stages, provider profiles, policy presets, router config</td></tr>
+  <tr><td><code>scripts/</code></td><td>Installer, uninstaller, build resources, release, validation scripts</td></tr>
+  <tr><td><code>docs/</code></td><td>Fern documentation (MDX) → docs.nvidia.com/nemoclaw</td></tr>
+  <tr><td><code>.agents/skills/</code></td><td>25 agent skills (SKILL.md) — canonical + <code>.claude/</code> mirror</td></tr>
+  <tr><td><code>test/</code></td><td>276 test files (Vitest) — heavy coverage, co-located with source</td></tr>
+  <tr><td><code>ci/</code></td><td>CI platform matrix — <code>platform-matrix.json</code> is the single source of truth for tested platforms</td></tr>
+  <tr><td><code>schemas/</code></td><td>JSON/YAML config schemas — validation schemas for blueprint, policy, and config files</td></tr>
+  <tr><td><code>tools/</code></td><td>Auxiliary tooling — supporting dev tools not part of the core CLI</td></tr>
+  <tr><td><code>fern/</code></td><td>Fern docs config — generates docs.nvidia.com/nemoclaw from <code>docs/</code> MDX source</td></tr>
+</table>
+
+<h3>Developer Workflow Commands</h3>
+<table>
+  <tr><th>Command</th><th>Purpose</th></tr>
+  <tr><td><code>npm run build:cli</code></td><td>Compile TypeScript → dist/ + generate oclif metadata</td></tr>
+  <tr><td><code>npm run test</code></td><td>Run Vitest test suite</td></tr>
+  <tr><td><code>npm run check</code></td><td>Run pre-commit checks (Biome + custom checks)</td></tr>
+  <tr><td><code>npm run lint</code> / <code>lint:fix</code></td><td>Lint with Biome + custom checks / auto-fix</td></tr>
+  <tr><td><code>npm run format</code></td><td>Format with Biome</td></tr>
+  <tr><td><code>npm run typecheck</code></td><td>TypeScript type checking without emit</td></tr>
+  <tr><td><code>npm run validate:configs</code></td><td>Validate config files against schemas</td></tr>
+  <tr><td><code>npm run docs:live</code></td><td>Live-preview Fern documentation locally</td></tr>
+</table>
+
+<h3>Three-Layer Architecture</h3>
+<pre><code>┌──────────────────────────────────────────────────────────────┐
+│ Layer 3: CLI Commands (src/commands/)                         │
+│ oclif pattern strategy + flexible taxonomy                    │
+│ onboard / list / resources / sandbox/{connect,exec,...}       │
+│ Thin command classes → delegate to Layer 2                    │
+├──────────────────────────────────────────────────────────────┤
+│ Layer 2: Core Library (src/lib/)                              │
+│ 88 files: onboard.ts, sandbox/, inference/, policy/,          │
+│ shields/, security/, messaging/, state/, diagnostics/, ...    │
+│ All business logic lives here. Commands are thin wrappers.    │
+├──────────────────────────────────────────────────────────────┤
+│ Layer 1: Foundation (src/lib/core/ + adapters/)               │
+│ OpenShell client, Docker interaction, platform detection      │
+│ GPU detection, SSH tunnels, credential storage                │
+└──────────────────────────────────────────────────────────────┘
+
+Declarative: nemoclaw-blueprint/blueprint.yaml → image pin, version range, profiles
+Horizontal: .agents/skills/ 25 skills → agent "instruction manuals"</code></pre>
+
+<h3>Key Design Conventions</h3>
+<ul>
+<li><b>Thin commands, thick library</b>: <code>src/commands/</code> classes only parse args and validate; all logic is in <code>src/lib/</code></li>
+<li><b>Flexible taxonomy</b>: oclif accepts <code>nemoclaw &lt;name&gt; &lt;command&gt;</code> without <code>:</code> separator</li>
+<li><b>Agent-aware</b>: OpenClaw vs Hermes differences handled at runtime via variant checks</li>
+<li><b>Declarative blueprint</b>: image digests, version ranges, and inference profiles are pinned in YAML</li>
+<li><b>Co-located tests</b>: <code>.test.ts</code> files sit next to their source in <code>src/lib/</code></li>
+<li><b>Credentials never touch disk</b>: API keys registered to OpenShell gateway in-memory only</li>
+</ul>
+
+<h3>Platform-Specific Guides</h3>
+<table>
+  <tr><th>Guide</th><th>Path</th><th>Audience</th></tr>
+  <tr><td>DGX Spark setup</td><td><code>spark-install.md</code></td><td>DGX Spark users</td></tr>
+  <tr><td>Windows WSL2 prep</td><td><code>docs/get-started/windows-preparation.mdx</code></td><td>Windows users</td></tr>
+  <tr><td>LangChain Deep Agents</td><td><code>docs/get-started/quickstart-langchain-deepagents-code.mdx</code></td><td>LangChain variant</td></tr>
+</table>
+</section>
+
+<section id="path">
+<h2><span class="num">§</span>Recommended Learning Path (10 Steps)</h2>
+<ol class="path-list">
+  <li><b>Mental Model</b>: What NemoClaw wraps — CLI → OpenShell → sandbox → agent<br><span class="ref">→ Module 1</span></li>
+  <li><b>CLI Architecture</b>: oclif pattern strategy, src/commands/, public-dispatch.ts, runner.ts<br><span class="ref">→ Module 2</span></li>
+  <li><b>Blueprint System</b>: blueprint.yaml, lifecycle stages, provider profiles<br><span class="ref">→ Module 3</span></li>
+  <li><b>Onboard Flow</b>: onboard.ts + onboard/ — the 8-step wizard<br><span class="ref">→ Module 4</span></li>
+  <li><b>State & Recovery</b>: session persistence, --resume/--fresh, runtime recovery<br><span class="ref">→ Module 5</span></li>
+  <li><b>Sandbox Lifecycle</b>: connect, exec, rebuild (backup→delete→create→restore)<br><span class="ref">→ Module 6</span></li>
+  <li><b>Inference Routing</b>: provider profiles, credential registration, health probes<br><span class="ref">→ Module 7</span></li>
+  <li><b>Network Policy</b>: tier definitions, preset CRUD, agent-aware filtering<br><span class="ref">→ Module 8</span></li>
+  <li><b>Security & Shields</b>: config lockdown, credential storage, boundary checks<br><span class="ref">→ Module 9</span></li>
+  <li><b>Integration Points</b>: messaging, dashboard, tunnel, agent skills<br><span class="ref">→ Module 10</span></li>
+</ol>
+</section>
+
+<section id="modules">
+<h2><span class="num">§</span>10 Modules in Detail</h2>
+
+<div class="modules-grid">
+
+<div class="module-card" id="m-mental"><span class="step">STEP 1</span>
+<h3>Mental Model</h3>
+<p class="resp">NemoClaw is a "thin orchestration layer" between user CLI and OpenShell. 3 agent variants: OpenClaw (chat), Hermes (API), dcode (headless coding). Understand the stack before the code.</p>
+<div class="keys"><b>Key:</b> README.md:12-13 + blueprint.yaml + src/nemoclaw.ts (16 lines) + quickstart-langchain-deepagents-code.mdx</div>
+<div class="start"><b>Start:</b> README line 12 — "reference stack for running always-on AI agents inside OpenShell sandboxes".</div>
+</div>
+
+<div class="module-card" id="m-cli"><span class="step">STEP 2</span>
+<h3>CLI Architecture</h3>
+<p class="resp">oclif pattern strategy + flexible taxonomy. public-dispatch.ts routes <code>&lt;name&gt; &lt;command&gt;</code> format. runner.ts adds lifecycle hooks. 6-step dispatch: shim → dispatchCli → taxonomy → oclif → runner → command.run().</p>
+<div class="keys"><b>Key:</b> src/nemoclaw.ts + src/lib/cli/public-dispatch.ts + src/lib/runner.ts</div>
+<div class="start"><b>Start:</b> src/nemoclaw.ts — 16 lines. Then trace the 6-step dispatch sequence in public-dispatch.ts.</div>
+</div>
+
+<div class="module-card" id="m-blueprint"><span class="step">STEP 3</span>
+<h3>Blueprint System</h3>
+<p class="resp">Declarative YAML defining sandbox image, OpenShell version range, 5 inference profiles, resource quotas. Dockerfile injects NEMOCLAW_* build args with secret-safety exclusions.</p>
+<div class="keys"><b>Key:</b> nemoclaw-blueprint/blueprint.yaml + provider-profiles/ + policies/ + Dockerfile</div>
+<div class="start"><b>Start:</b> blueprint.yaml — 108 lines. Find digest pin + 5 inference profiles. Then Dockerfile for build arg injection.</div>
+</div>
+
+<div class="module-card" id="m-onboard"><span class="step">STEP 4</span>
+<h3>Onboard Flow</h3>
+<p class="resp">Most complex orchestration. 8-step wizard: preflight → gateway → provider → credential → build → policy → messaging → finalize. Each step saveable/resumable.</p>
+<div class="keys"><b>Key:</b> src/lib/onboard.ts + src/lib/onboard/ + src/lib/state/</div>
+<div class="start"><b>Start:</b> src/lib/onboard.ts — find the main orchestrator that chains 8 stages.</div>
+</div>
+
+<div class="module-card" id="m-state"><span class="step">STEP 5</span>
+<h3>State & Recovery</h3>
+<p class="resp">Onboard session persistence + runtime crash recovery. --resume replays saved parameters; recover restarts gateway idempotently. <code>doctor</code> runs full diagnostics.</p>
+<div class="keys"><b>Key:</b> src/lib/state/ + runtime-recovery.ts + registry-recovery-action.ts</div>
+<div class="start"><b>Start:</b> src/lib/state/ — how session serializes to JSON. Then <code>nemoclaw &lt;name&gt; doctor</code> for full diagnostics.</div>
+</div>
+
+<div class="module-card" id="m-sandbox"><span class="step">STEP 6</span>
+<h3>Sandbox Lifecycle</h3>
+<p class="resp">Container management: connect (SSH proxy), exec, rebuild (backup→delete→create→restore), recover. All via OpenShell API.</p>
+<div class="keys"><b>Key:</b> src/lib/sandbox/ + src/commands/sandbox/ + sandbox-base-image.ts</div>
+<div class="start"><b>Start:</b> src/commands/sandbox/connect.ts — trace readiness probe → gateway recovery → SSH attach.</div>
+</div>
+
+<div class="module-card" id="m-inference"><span class="step">STEP 7</span>
+<h3>Inference Routing</h3>
+<p class="resp">Maps NEMOCLAW_PROVIDER to OpenShell gateway routes. 11+ providers. Credentials registered in-memory, never to disk.</p>
+<div class="keys"><b>Key:</b> src/lib/inference/ + blueprint.yaml inference section + hermes-provider-auth.ts</div>
+<div class="start"><b>Start:</b> blueprint.yaml <code>components.inference.profiles</code> — 5 declarative profiles.</div>
+</div>
+
+<div class="module-card" id="m-policy"><span class="step">STEP 8</span>
+<h3>Network Policy</h3>
+<p class="resp">3 tiers (Restricted/Balanced/Open) + custom presets. Agent-aware filtering (Hermex excludes Brave Search).</p>
+<div class="keys"><b>Key:</b> src/lib/policy/ + nemoclaw-blueprint/policies/ + private-networks.yaml</div>
+<div class="start"><b>Start:</b> src/lib/policy/ — find tier → preset mapping table.</div>
+</div>
+
+<div class="module-card" id="m-security"><span class="step">STEP 9</span>
+<h3>Security & Shields</h3>
+<p class="resp">Config lockdown (shields up/down), credential safety, sandbox hardening, Hermes secret boundary validator.</p>
+<div class="keys"><b>Key:</b> src/lib/shields/ + src/lib/security/ + src/lib/credentials/</div>
+<div class="start"><b>Start:</b> src/lib/shields/ — shields up mutability matrix.</div>
+</div>
+
+<div class="module-card" id="m-integration"><span class="step">STEP 10</span>
+<h3>Integration Points</h3>
+<p class="resp">Messaging (Slack/Discord/Telegram), dashboard UI, SSH tunnels. Tokens baked into sandbox image at build time.</p>
+<div class="keys"><b>Key:</b> src/lib/messaging/ + dashboard/ + tunnel/ + hermes-dashboard.ts</div>
+<div class="start"><b>Start:</b> src/lib/messaging/ — how Slack dual-token is handled.</div>
+</div>
+
+<div class="module-card" id="m-skills"><span class="step">BONUS</span>
+<h3>Agent Skills & Domain Types</h3>
+<p class="resp">25 checked-in SKILL.md files + shared domain types (phases, presets, variants). Skills teach AI coding assistants to use the repo.</p>
+<div class="keys"><b>Key:</b> .agents/skills/ + skills/nemoclaw-user-guide/ + src/lib/domain/</div>
+<div class="start"><b>Start:</b> .agents/skills/ — browse 25 skills. Then src/lib/domain/ for core types.</div>
+</div>
+
+</div>
+</section>
+
+<section id="tutorial">
+<h2><span class="num">§</span>Tutorial · Trace Tasks</h2>
+
+<details open><summary>1. Draw the stack diagram</summary><div class="pad">
+<p>Read <code>README.md</code> lines 1-20. Without reading code, draw: User → NemoClaw CLI → OpenShell → Docker → Agent → Provider. Label each arrow with what data crosses it.</p></div></details>
+
+<details><summary>2. Trace CLI dispatch</summary><div class="pad">
+<p>Read <code>src/nemoclaw.ts</code> (16 lines) → <code>src/lib/cli/public-dispatch.ts</code> → <code>src/commands/onboard.ts</code>. Trace how <code>nemoclaw onboard --fresh</code> flows from command line to <code>src/lib/onboard.ts</code>. Write 5 lines: each step, which file, what it does.</p></div></details>
+
+<details><summary>3. Understand blueprint digest pinning</summary><div class="pad">
+<p>Read <code>nemoclaw-blueprint/blueprint.yaml</code> fully. Find <code>digest</code> field and <code>components.sandbox.image</code> digest. Verify they match. Understand why both are pinned (supply chain security, issue #1438).</p></div></details>
+
+<details><summary>4. Trace onboard 8-step state machine</summary><div class="pad">
+<p>Read <code>src/lib/onboard.ts</code>. Find the 8 stages. Draw a state machine: which steps can resume, which must rerun on <code>--resume</code>. Find where session state is saved per step.</p></div></details>
+
+<details><summary>5. Trace recover idempotency</summary><div class="pad">
+<p>Read <code>src/lib/runtime-recovery.ts</code>. Find how <code>recover</code> determines "gateway already healthy" (idempotent exit) vs "needs restart". Compare with the auto-recovery path in <code>connect</code>.</p></div></details>
+
+<details><summary>6. Trace credential flow (no-disk guarantee)</summary><div class="pad">
+<p>Read <code>src/lib/inference/</code> + <code>src/lib/credentials/</code>. Trace how <code>NEMOCLAW_PROVIDER=openai</code> passes an API key to the sandbox without writing to host disk. Verify the gateway-only storage claim.</p></div></details>
+
+<details><summary>7. Trace agent-aware policy filtering</summary><div class="pad">
+<p>Read <code>src/lib/policy/</code>. Find where Hermes presets (<code>nous-web</code>, <code>nous-image</code>) are added and where OpenClaw-only presets (<code>brave</code>) are excluded for Hermes. Draw the filtering pipeline.</p></div></details>
+
+<details><summary>8. Trace shields up/down lifecycle</summary><div class="pad">
+<p>Read <code>src/lib/shields/</code>. Find where <code>shields up</code> reads the saved restrictive policy. Trace <code>shields down --timeout 5m</code> → how the timeout triggers auto re-lock.</p></div></details>
+
+<details><summary>9. Trace messaging token baking</summary><div class="pad">
+<p>Read <code>src/lib/messaging/</code>. Find where Slack <code>SLACK_APP_TOKEN</code> is stored in a separate <code>slack-app</code> OpenShell provider (not mixed with bot token). Understand why Socket Mode needs both tokens.</p></div></details>
+
+<details><summary>10. Read the nemoclaw-user-guide skill</summary><div class="pad">
+<p>Read <code>skills/nemoclaw-user-guide/SKILL.md</code>. Find the MCP server URL and retrieval order (MCP → llms.txt → .md pages). Understand how this skill teaches AI assistants to fetch live docs.</p></div></details>
+</section>
+
+<section id="exercises">
+<h2><span class="num">§</span>Exercises · Practice Tasks</h2>
+
+<details><summary>Exercise 1 · Compare Docker-direct vs NemoClaw</summary><div class="pad">
+<p><b>Module:</b> Mental Model &nbsp;<b>Difficulty:</b> ★☆☆ &nbsp;<b>Estimate:</b> 30 min</p>
+<p>List 5 additional values NemoClaw provides over running agents directly in Docker (hint: onboarding, policy, routing, shields, recovery). For each, identify which <code>src/lib/</code> module implements it.</p></div></details>
+
+<details><summary>Exercise 2 · Add a custom CLI command</summary><div class="pad">
+<p><b>Module:</b> CLI Architecture &nbsp;<b>Difficulty:</b> ★★☆ &nbsp;<b>Estimate:</b> 1h</p>
+<p>Create <code>src/commands/dev-info.ts</code> (minimal oclif command class). <code>npm run build:cli</code> then run <code>nemoclaw dev-info</code>. Verify auto-discovery works. Then add a <code>--json</code> flag.</p></div></details>
+
+<details><summary>Exercise 3 · Add a resource profile</summary><div class="pad">
+<p><b>Module:</b> Blueprint System &nbsp;<b>Difficulty:</b> ★★☆ &nbsp;<b>Estimate:</b> 30 min</p>
+<p>Add <code>ai-researcher</code> profile (cpu: 80%, memory: 80%) to <code>blueprint.yaml</code>. Run <code>npm run validate:configs</code>. Verify schema validation passes.</p></div></details>
+
+<details><summary>Exercise 4 · Profile onboard timing</summary><div class="pad">
+<p><b>Module:</b> Onboard Flow &nbsp;<b>Difficulty:</b> ★★☆ &nbsp;<b>Estimate:</b> 1h + Docker</p>
+<p>Set <code>NEMOCLAW_TRACE=1</code>, run <code>nemoclaw onboard --fresh</code>. Record per-step timestamps. Identify the slowest step (likely sandbox build / image push). Document optimization opportunities.</p></div></details>
+
+<details><summary>Exercise 5 · Crash recovery drill</summary><div class="pad">
+<p><b>Module:</b> State & Recovery &nbsp;<b>Difficulty:</b> ★☆☆ &nbsp;<b>Estimate:</b> 20 min</p>
+<p>Kill the OpenShell gateway process. Run <code>nemoclaw &lt;name&gt; recover</code>. Observe: detection → restart → verification. Run recover again to verify idempotency.</p></div></details>
+
+<details><summary>Exercise 6 · Compare exec vs docker exec</summary><div class="pad">
+<p><b>Module:</b> Sandbox Lifecycle &nbsp;<b>Difficulty:</b> ★☆☆ &nbsp;<b>Estimate:</b> 15 min</p>
+<p>Run <code>nemoclaw &lt;name&gt; exec -- echo $HOME</code> (should print <code>/sandbox</code>). Then run <code>docker exec &lt;container&gt; echo $HOME</code> (prints <code>/root</code>). Document why NemoClaw exec is safer for agent config resolution.</p></div></details>
+
+<details><summary>Exercise 7 · Switch inference provider at runtime</summary><div class="pad">
+<p><b>Module:</b> Inference Routing &nbsp;<b>Difficulty:</b> ★★☆ &nbsp;<b>Estimate:</b> 30 min</p>
+<p>Onboard with NVIDIA cloud. Then run <code>nemoclaw inference set --provider ollama --model llama3</code>. Trace how the gateway route changes. Verify <code>status</code> reflects the new provider.</p></div></details>
+
+<details><summary>Exercise 8 · Add and remove policy presets</summary><div class="pad">
+<p><b>Module:</b> Network Policy &nbsp;<b>Difficulty:</b> ★★☆ &nbsp;<b>Estimate:</b> 30 min</p>
+<p>Onboard with Restricted tier. Add a preset with <code>policy-add</code>. Verify the agent can now reach the previously-blocked service. Then remove it and verify access is blocked again.</p></div></details>
+
+<details><summary>Exercise 9 · Shields lifecycle test</summary><div class="pad">
+<p><b>Module:</b> Security & Shields &nbsp;<b>Difficulty:</b> ★☆☆ &nbsp;<b>Estimate:</b> 15 min</p>
+<p>Run <code>shields up</code>, then <code>config get</code> (verify locked). Run <code>shields down --timeout 1m</code>. Wait 1 minute. Verify auto re-lock by running <code>shields status</code>.</p></div></details>
+
+<details><summary>Exercise 10 · Write a dev-guide skill</summary><div class="pad">
+<p><b>Module:</b> Agent Skills &nbsp;<b>Difficulty:</b> ★★☆ &nbsp;<b>Estimate:</b> 1h</p>
+<p>Following <code>nemoclaw-user-guide/SKILL.md</code> format, write <code>nemoclaw-dev-guide</code> SKILL.md (30-50 lines): frontmatter / When to Use / First Command. Place in <code>.agents/skills/</code>. Analyze: what developer request would trigger it?</p></div></details>
+</section>
+
+<section id="glossary">
+<h2><span class="num">§</span>Glossary</h2>
+<table>
+  <tr><th>Term</th><th>Definition</th></tr>
+  <tr><td><b>OpenShell</b></td><td>NVIDIA's sandbox management system — handles container lifecycle, routing, and SSH tunnels</td></tr>
+  <tr><td><b>Blueprint</b></td><td>Declarative YAML defining sandbox image, version ranges, inference profiles (<code>nemoclaw-blueprint/blueprint.yaml</code>)</td></tr>
+  <tr><td><b>Onboard</b></td><td>8-step interactive setup wizard (<code>nemoclaw onboard</code>)</td></tr>
+  <tr><td><b>Sandbox</b></td><td>Isolated Docker container running an AI agent with network controls</td></tr>
+  <tr><td><b>Gateway</b></td><td>OpenShell process managing sandbox routing and inference</td></tr>
+  <tr><td><b>Flexible Taxonomy</b></td><td>oclif feature allowing <code>nemoclaw &lt;name&gt; &lt;command&gt;</code> format without <code>:</code> separator</td></tr>
+  <tr><td><b>Shields</b></td><td>Config lockdown posture — lock/unlock agent configuration with auto-timeout</td></tr>
+  <tr><td><b>Policy Tier</b></td><td>Network access preset — Restricted / Balanced / Open</td></tr>
+  <tr><td><b>Preset</b></td><td>Individual network access rule (e.g., <code>brave</code>, <code>nous-web</code>, <code>dev-tooling</code>)</td></tr>
+  <tr><td><b>Inference Profile</b></td><td>Declarative provider configuration in blueprint (default/ncp/nim-local/vllm/routed)</td></tr>
+  <tr><td><b>Recover</b></td><td>Restart gateway without opening shell — idempotent operation</td></tr>
+  <tr><td><b>Rebuild</b></td><td>Recreate sandbox: backup workspace → delete → create with new image → restore</td></tr>
+  <tr><td><b>Agent Variant</b></td><td>OpenClaw vs Hermes — affects defaults, presets, config paths</td></tr>
+  <tr><td><b>Digest Pin</b></td><td>SHA256 image digest pinned in blueprint to prevent supply-chain attacks</td></tr>
+  <tr><td><b>Session State</b></td><td>Serialized onboard progress — enables <code>--resume</code> after interruption</td></tr>
+  <tr><td><b>Failure Layer</b></td><td>Classified failure type: <code>docker_unreachable</code>, <code>sandbox_container_stopped</code>, <code>sandbox_dashboard_port_conflict</code></td></tr>
+  <tr><td><b>NIM</b></td><td>NVIDIA Inference Microservice — containerized model endpoint</td></tr>
+  <tr><td><b>vLLM</b></td><td>Open-source LLM serving engine — local inference option</td></tr>
+  <tr><td><b>Ollama</b></td><td>Local LLM runtime — no API key needed, CPU/GPU supported</td></tr>
+</table>
+</section>
+
+<section>
+<h2><span class="num">§</span>Next Steps</h2>
+<h3>Generated Artifacts</h3>
+<ul>
+  <li><code>.learning/repo-map.md</code> — Repo overview</li>
+  <li><code>.learning/modules/*.md</code> × 10 — Module notes</li>
+  <li><code>.learning/out/index.html</code> — This page</li>
+  <li><code>.machine-facts/*.json</code> × 8 — Shared IR (Machine Facts)</li>
+</ul>
+<h3>Go Deeper</h3>
+<ol>
+  <li>Read <code>src/lib/onboard.ts</code> fully — the most complex orchestration in the codebase</li>
+  <li>Read <code>src/lib/cli/public-dispatch.ts</code> — flexible taxonomy routing</li>
+  <li>Read <code>nemoclaw-blueprint/blueprint.yaml</code> — declarative definitions</li>
+  <li>Read <code>docs/reference/architecture.mdx</code> — official architecture docs</li>
+  <li>Run <code>npm run build:cli && nemoclaw --help</code> — verify the CLI builds and runs</li>
+</ol>
+
+<div class="callout tip"><strong>Remember 3 things:</strong>
+<ol style="margin:6px 0 0 0">
+<li>NemoClaw is a <b>thin orchestration layer</b> over OpenShell. All sandbox operations delegate to it.</li>
+<li><b>Thin commands, thick library</b>: src/commands/ parses args; src/lib/ (88 files) does everything.</li>
+<li><b>Declarative blueprint + agent-aware runtime</b>: image/version pins in YAML, variant differences at runtime.</li>
+</ol>
+</div>
+</section>
+
+</main>
+</div>
+
+<footer>Generated by <b>developer-guide-designer</b> · Source: <code>.learning/repo-map.md</code> + 10 modules · Built for <code>NemoClaw</code></footer>
+
+<script>
+const sections=document.querySelectorAll('section[id]');
+const links=document.querySelectorAll('.sidebar a[href^="#"]');
+const obs=new IntersectionObserver((e)=>{e.forEach(e=>{if(e.isIntersecting){links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+e.target.id))}})},{rootMargin:'-30% 0px -60% 0px'});
+sections.forEach(s=>obs.observe(s));
+document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',function(e){const t=document.querySelector(this.getAttribute('href'));if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth',block:'start'})}}));
+</script>
+
+</body>
+</html>

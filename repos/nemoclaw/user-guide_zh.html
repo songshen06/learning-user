@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NemoClaw — 使用指南</title>
+<style>
+:root{--bg:#0d1117;--bg-soft:#161b22;--bg-card:#1c2128;--border:#30363d;--text:#c9d1d9;--text-dim:#8b949e;--accent:#76b900;--accent-2:#a3e635;--green:#7ee787;--yellow:#f2cc60;--orange:#ffa657;--red:#ff7b72;--purple:#d2a8ff;--blue:#79c0ff}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.75;font-size:15px}
+code,pre{font-family:'SF Mono','JetBrains Mono',Menlo,Consolas,monospace;font-size:.88em}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(13,17,23,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding:10px 24px;display:flex;align-items:center;gap:16px}
+.topbar .brand{font-weight:700;font-size:16px;color:var(--text)}
+.topbar .tag{background:var(--bg-card);border:1px solid var(--border);padding:2px 8px;border-radius:4px;font-size:12px;color:var(--text-dim)}
+.topbar .grow{flex:1}
+.topbar nav a{color:var(--text-dim);margin-left:14px;font-size:13px}
+.topbar nav a:hover{color:var(--accent)}
+.layout{max-width:1400px;margin:0 auto;display:grid;grid-template-columns:260px 1fr;gap:32px;padding:24px}
+@media(max-width:980px){.layout{grid-template-columns:1fr;padding:16px}.sidebar{position:static!important}}
+.sidebar{position:sticky;top:72px;align-self:start;max-height:calc(100vh - 96px);overflow-y:auto;font-size:13.5px}
+.sidebar h3{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);margin:18px 0 6px;padding-left:10px}
+.sidebar a{display:block;color:var(--text-dim);padding:5px 10px;border-radius:5px;border-left:2px solid transparent}
+.sidebar a:hover{background:var(--bg-soft);color:var(--text);text-decoration:none}
+.sidebar a.active{color:var(--accent);border-left-color:var(--accent);background:var(--bg-soft)}
+main{min-width:0}
+section{padding:28px 0 8px;border-bottom:1px solid var(--border);scroll-margin-top:70px}
+section:last-child{border-bottom:none}
+h1{font-size:30px;margin:0 0 4px;background:linear-gradient(120deg,var(--accent),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+h1+p{color:var(--text-dim);margin-top:0}
+h2{font-size:22px;margin:0 0 14px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+h3{font-size:17px;margin:18px 0 8px;color:var(--accent-2)}
+h4{font-size:14px;margin:12px 0 6px;color:var(--text)}
+p{margin:8px 0}ul,ol{padding-left:22px;margin:8px 0}li{margin:4px 0}
+code{background:var(--bg-soft);border:1px solid var(--border);padding:1px 6px;border-radius:4px;color:var(--orange)}
+pre{background:var(--bg-soft);border:1px solid var(--border);padding:14px 16px;border-radius:8px;overflow-x:auto;line-height:1.55}pre code{background:none;border:none;padding:0;color:var(--text)}
+.callout{border-left:3px solid var(--accent);background:var(--bg-soft);padding:10px 14px;margin:12px 0;border-radius:0 6px 6px 0}
+.callout.warn{border-left-color:var(--yellow)}.callout.tip{border-left-color:var(--green)}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+th{background:var(--bg-soft);color:var(--accent-2);font-weight:600;font-size:13px}
+.badge{display:inline-block;padding:1px 7px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid var(--border);background:var(--bg-soft);color:var(--text-dim)}
+.badge.green{color:var(--green);border-color:rgba(126,231,135,.4)}.badge.orange{color:var(--orange);border-color:rgba(255,166,87,.4)}
+.badge.blue{color:var(--blue);border-color:rgba(121,192,255,.4)}
+details{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;margin:10px 0}
+details>summary{cursor:pointer;padding:10px 14px;font-weight:500;color:var(--text);user-select:none;list-style:none}
+details>summary::-webkit-details-marker{display:none}
+details>summary::before{content:"▸";color:var(--accent);margin-right:8px;display:inline-block;transition:transform .15s}
+details[open]>summary::before{transform:rotate(90deg)}
+details>div.pad{padding:0 14px 12px}
+.tabs{display:flex;gap:4px;margin-bottom:0}
+.tab-btn{padding:6px 16px;border:1px solid var(--border);border-bottom:none;border-radius:6px 6px 0 0;background:var(--bg-soft);cursor:pointer;font-size:.85rem;font-weight:500;color:var(--text-dim)}
+.tab-btn.active{background:var(--bg-card);border-bottom:1px solid var(--bg-card);margin-bottom:-1px;color:var(--accent)}
+.tab-content{display:none;border:1px solid var(--border);border-top:none;border-radius:0 6px 6px 6px;padding:16px;background:var(--bg-card)}
+.tab-content.active{display:block}
+.checklist{list-style:none;padding-left:0}.checklist li{padding:2px 0}.checklist li::before{content:'☐ ';color:var(--text-dim)}
+footer{text-align:center;color:var(--text-dim);padding:30px 24px;font-size:13px;border-top:1px solid var(--border);margin-top:24px}
+footer a{color:var(--accent)}
+@media print{.topbar,.sidebar{display:none}.layout{display:block}body{background:white;color:black}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="brand">🐾 NemoClaw</span>
+  <span class="tag">使用指南</span>
+  <span class="grow"></span>
+  <nav>
+    <a href="#is-this-for-me">适合我吗？</a>
+    <a href="#install">安装</a>
+    <a href="#first-run">首次运行</a>
+    <a href="#workflows">工作流</a>
+    <a href="#reference">参考</a>
+    <a href="#troubleshooting">故障排除</a>
+    <a href="#cheat-sheet">速查卡</a>
+  </nav>
+</div>
+
+<div class="layout">
+<aside class="sidebar">
+  <h3>入门</h3>
+  <a href="#is-this-for-me">适合我吗？</a>
+  <a href="#what-it-does">功能概览</a>
+  <a href="#install">安装</a>
+  <a href="#first-run">首次运行</a>
+  <h3>工作流</h3>
+  <a href="#wf-status">查看状态</a>
+  <a href="#wf-connect">连接与交互</a>
+  <a href="#wf-exec">运行命令</a>
+  <a href="#wf-recover">故障恢复</a>
+  <a href="#wf-rebuild">重建沙箱</a>
+  <a href="#wf-policy">网络策略</a>
+  <a href="#wf-shields">锁定配置</a>
+  <a href="#wf-messaging">消息集成</a>
+  <h3>参考</h3>
+  <a href="#reference">命令与环境变量</a>
+  <a href="#troubleshooting">故障排除</a>
+  <a href="#cheat-sheet">速查卡</a>
+  <a href="#glossary">术语表</a>
+  <a href="#tutorial">教程</a>
+  <a href="#exercises">练习</a>
+</aside>
+
+<main>
+
+<section id="is-this-for-me">
+<h1>NemoClaw</h1>
+<p>在 NVIDIA OpenShell 沙箱中安全运行常驻 AI 代理的开源参考技术栈。通过单一 CLI 提供引导式入门、加固蓝图、推理路由、网络策略和生命周期管理。<strong>Alpha 项目 — Apache 2.0。</strong></p>
+
+<h3>谁应该使用 NemoClaw</h3>
+<table>
+<tr><th>角色</th><th>是否适合</th><th>你能做什么</th></tr>
+<tr><td><strong>AI 应用开发者</strong></td><td><span class="badge green">是</span></td><td>在沙箱中运行代理进行开发</td></tr>
+<tr><td><strong>DevOps / 平台工程师</strong></td><td><span class="badge green">是</span></td><td>管理沙箱生命周期、策略和推理</td></tr>
+<tr><td><strong>注重安全的用户</strong></td><td><span class="badge green">是</span></td><td>出口控制、能力裁剪、配置锁定</td></tr>
+<tr><td><strong>企业管理员</strong></td><td><span class="badge green">是</span></td><td>多沙箱部署 + 策略分层</td></tr>
+<tr><td><strong>非技术终端用户</strong></td><td><span class="badge orange">否</span></td><td>需要命令行，无 GUI 工作流</td></tr>
+<tr><td><strong>未安装 Docker</strong></td><td><span class="badge orange">否</span></td><td>Docker 是必需的</td></tr>
+</table>
+
+<h3>前提条件</h3>
+<ul class="checklist">
+<li>Node.js ≥ 22.16</li>
+<li>npm ≥ 10</li>
+<li>Docker（Engine、Desktop 或 Colima）正在运行</li>
+<li>4+ vCPU、8+ GB 内存（推荐 16 GB）、20+ GB 磁盘</li>
+<li>Linux、macOS（Apple Silicon）、Windows WSL2 或 DGX Spark</li>
+<li>推理服务 API 密钥（OpenAI/Anthropic 等）或本地模型（Ollama/vLLM）</li>
+</ul>
+
+<h3>你能做什么</h3>
+<ul>
+<li>在沙箱中运行 OpenClaw、Hermes 或 LangChain Deep Agents</li>
+<li>连接 11+ 推理提供商（NVIDIA、OpenAI、Anthropic、Gemini、Ollama、vLLM、NIM、自定义）</li>
+<li>用 3 个策略层级 + 自定义预设控制网络出口</li>
+<li>启用 Slack、Discord、Telegram 消息机器人</li>
+<li>NVIDIA GPU 直通</li>
+<li>非交互式 / 脚本化安装（支持 CI/CD）</li>
+<li>监控健康状态、运行诊断、锁定/解锁配置</li>
+</ul>
+
+<h3>你不能做什么</h3>
+<ul>
+<li>在没有 Docker 的情况下运行</li>
+<li>在裸 Windows 上运行（需要 WSL2）</li>
+<li>原地自动升级代理（必须重建沙箱）</li>
+<li>在 Hermes 中使用 Brave Search（仅 OpenClaw 支持）</li>
+<li>在同一个沙箱中混合多个代理</li>
+</ul>
+
+<div class="callout tip"><strong>快速检查：</strong>运行 <code>docker info && node --version</code> — 两者都必须成功且版本正确。</div>
+</section>
+
+<section id="what-it-does">
+<h2>功能概览</h2>
+<p>NemoClaw 将 AI 代理（OpenClaw、Hermes、LangChain Deep Agents）封装在 <strong>NVIDIA OpenShell 沙箱</strong>中 — 隔离的容器环境，具有网络出口控制、能力裁剪和推理路由。你通过单一 CLI（<code>nemoclaw</code>）管理完整生命周期：入门 → 连接 → 管理 → 恢复 → 重建 → 销毁。</p>
+<table>
+<tr><th>组件</th><th>用户所见</th></tr>
+<tr><td><strong>CLI</strong></td><td><code>nemoclaw</code> / <code>nemohermes</code> — 所有操作的单一命令</td></tr>
+<tr><td><strong>沙箱</strong></td><td>运行 AI 代理的隔离 Docker 容器</td></tr>
+<tr><td><strong>网关</strong></td><td>管理沙箱路由和推理的 OpenShell 网关</td></tr>
+<tr><td><strong>策略引擎</strong></td><td>网络出口控制 — Restricted / Balanced / Open 层级</td></tr>
+<tr><td><strong>推理路由</strong></td><td>将请求路由到 NVIDIA/OpenAI/Anthropic/Gemini/Ollama 等</td></tr>
+<tr><td><strong>Shields</strong></td><td>配置锁定状态 — 锁定/解锁代理配置</td></tr>
+</table>
+</section>
+
+<section id="install">
+<h2>安装</h2>
+<p>预计耗时：5–15 分钟（取决于 Docker/Node 就绪状态）。</p>
+
+<h3>步骤 1：验证前提条件</h3>
+<pre><code>node --version    # 必须 ≥ 22.16
+npm --version     # 必须 ≥ 10
+docker info       # Docker 必须正在运行</code></pre>
+
+<div class="tabs">
+<button class="tab-btn active" onclick="switchTab(event,'docker-linux')">Linux Docker</button>
+<button class="tab-btn" onclick="switchTab(event,'docker-mac')">macOS</button>
+<button class="tab-btn" onclick="switchTab(event,'docker-win')">Windows WSL2</button>
+</div>
+<div id="docker-linux" class="tab-content active">
+<pre><code>sudo apt-get install -y docker.io zstd binutils
+sudo systemctl start docker
+sudo usermod -aG docker $USER
+newgrp docker</code></pre>
+</div>
+<div id="docker-mac" class="tab-content">
+<p>安装 Docker Desktop 或 Colima 并启动。安装 Xcode 命令行工具：</p>
+<pre><code>xcode-select --install</code></pre>
+</div>
+<div id="docker-win" class="tab-content">
+<p>确保 WSL2 已启用并使用 Docker Desktop（WSL 后端）。参见 <a href="https://docs.nvidia.com/nemoclaw/latest/get-started/windows-preparation.html">Windows 准备指南</a>。</p>
+</div>
+
+<h3>步骤 2：安装 NemoClaw</h3>
+<pre><code>curl -fsSL https://www.nvidia.com/nemoclaw.sh | bash</code></pre>
+<p><strong>Hermes 变体：</strong></p>
+<pre><code>curl -fsSL https://www.nvidia.com/nemoclaw.sh | NEMOCLAW_AGENT=hermes bash</code></pre>
+<p><strong>非交互式安装（CI/CD）：</strong></p>
+<pre><code>curl -fsSL https://www.nvidia.com/nemoclaw.sh | \
+  NEMOCLAW_NON_INTERACTIVE=1 \
+  NEMOCLAW_ACCEPT_THIRD_PARTY_SOFTWARE=1 \
+  bash</code></pre>
+
+<h3>步骤 3：验证</h3>
+<pre><code>nemoclaw --version
+nemoclaw resources</code></pre>
+</section>
+
+<section id="first-run">
+<h2>首次运行 — 创建你的第一个沙箱</h2>
+
+<h3>运行入门向导</h3>
+<pre><code>nemoclaw onboard</code></pre>
+<p>向导引导你完成以下步骤：</p>
+<ol>
+<li><strong>提供商</strong> — 选择 NVIDIA/OpenAI/Anthropic/Gemini/Ollama 等</li>
+<li><strong>凭证</strong> — API 密钥（从不持久化到磁盘）</li>
+<li><strong>沙箱名称</strong> — 默认 <code>my-assistant</code></li>
+<li><strong>可选集成</strong> — 网页搜索（Brave）、Slack、Discord、Telegram</li>
+<li><strong>策略层级</strong> — Restricted / Balanced（默认）/ Open</li>
+<li><strong>预设自定义</strong> — 包含/排除单个预设</li>
+<li><strong>沙箱构建</strong> — ~2.4 GB 镜像（首次构建需数分钟）</li>
+</ol>
+
+<h3>连接</h3>
+<pre><code>nemoclaw my-assistant connect</code></pre>
+<p>如果仍在构建中，<code>connect</code> 会轮询并显示进度。就绪后进入代理 shell。</p>
+
+<p><strong>代理专属交互方式：</strong></p>
+<ul>
+<li><strong>OpenClaw：</strong>启动 TUI 聊天界面。用 <code>/nemoclaw</code> 执行快捷命令。</li>
+<li><strong>Hermes：</strong>进入沙箱 shell。使用仪表盘或端口 8642 上的 OpenAI 兼容 API。</li>
+<li><strong>LangChain Deep Agents Code：</strong>运行 <code>dcode</code> 进行交互式编码，或 <code>dcode -n "总结这个仓库"</code> 执行无头任务。无仪表盘 — 纯终端。用 <code>nemoclaw onboard --agent langchain-deepagents-code</code> 入门。</li>
+</ul>
+
+<div class="callout"><strong>代理选择指南：</strong>OpenClaw 用于常驻聊天 + 消息机器人。Hermes 用于 OpenAI 兼容 API 接入。<code>dcode</code> 用于无头编码任务（类似 Claude Code）。</div>
+
+<h3>沙箱内斜杠命令（OpenClaw）</h3>
+<pre><code>/nemoclaw          # 显示帮助
+/nemoclaw status   # 显示沙箱 + 推理状态
+/nemoclaw eject    # 显示回滚说明
+/exit              # 离开聊天</code></pre>
+
+<div class="callout"><strong>首次构建需要时间：</strong>~2.4 GB 沙箱镜像需要构建和推送。后续入门运行更快（有缓存层）。</div>
+</section>
+
+<section id="workflows">
+<h2>工作流</h2>
+
+<details id="wf-status" open><summary><strong>1. 查看沙箱状态</strong></summary><div class="pad">
+<pre><code>nemoclaw my-assistant status          # 文本输出
+nemoclaw my-assistant status --json   # JSON（用于自动化）
+nemoclaw list                         # 列出所有沙箱</code></pre>
+<p>显示：阶段（Ready/NotReady）、推理健康、GPU 状态、策略、已连接会话。</p>
+</div></details>
+
+<details id="wf-connect"><summary><strong>2. 连接并交互</strong></summary><div class="pad">
+<pre><code>nemoclaw my-assistant connect              # SSH 进入沙箱
+nemoclaw my-assistant connect --probe-only # 仅健康检查</code></pre>
+<p>OpenClaw 内：输入消息与代理聊天。用 <code>/exit</code> 离开聊天，再 <code>exit</code> 回到主机 shell。</p>
+</div></details>
+
+<details id="wf-exec"><summary><strong>3. 非交互式运行命令</strong></summary><div class="pad">
+<pre><code># 在沙箱中运行 shell 命令
+nemoclaw my-assistant exec -- ls -la /sandbox
+
+# 运行一次 OpenClaw 代理对话
+nemoclaw my-assistant agent --agent work -m "总结 README.md"
+
+# 指定工作目录
+nemoclaw my-assistant exec --workdir /sandbox/workspace -- pwd</code></pre>
+</div></details>
+
+<details id="wf-recover"><summary><strong>4. 恢复崩溃的沙箱</strong></summary><div class="pad">
+<pre><code>nemoclaw my-assistant recover    # 重启网关（幂等）
+nemoclaw my-assistant status     # 验证恢复
+nemoclaw my-assistant connect    # 重新连接</code></pre>
+<p><code>recover</code> 重启沙箱内网关但不打开 shell。网关健康时运行也安全。</p>
+</div></details>
+
+<details id="wf-rebuild"><summary><strong>5. 重建沙箱（升级代理）</strong></summary><div class="pad">
+<pre><code>nemoclaw my-assistant rebuild --yes</code></pre>
+<p>复用沙箱名称和凭证。删除前备份工作区状态，重建后恢复。</p>
+</div></details>
+
+<details id="wf-policy"><summary><strong>6. 管理网络策略</strong></summary><div class="pad">
+<pre><code>nemoclaw my-assistant policy-add <preset>
+nemoclaw my-assistant policy-remove <preset>
+nemoclaw inference set --provider openai --model gpt-4o</code></pre>
+<table>
+<tr><th>层级</th><th>访问范围</th></tr>
+<tr><td>Restricted（受限）</td><td>仅推理 + 核心工具</td></tr>
+<tr><td>Balanced（平衡，默认）</td><td>开发工具 + 网页搜索 + 包安装</td></tr>
+<tr><td>Open（开放）</td><td>广泛访问 + 消息平台</td></tr>
+</table>
+</div></details>
+
+<details id="wf-shields"><summary><strong>7. 锁定/解锁配置</strong></summary><div class="pad">
+<pre><code>nemoclaw my-assistant shields status
+nemoclaw my-assistant shields up                    # 锁定配置
+nemoclaw my-assistant shields down --timeout 5m     # 临时解锁</code></pre>
+</div></details>
+
+<details id="wf-messaging"><summary><strong>8. 启用消息集成</strong></summary><div class="pad">
+<table>
+<tr><th>平台</th><th>要求</th></tr>
+<tr><td><strong>Slack</strong></td><td><code>SLACK_BOT_TOKEN</code> + <code>SLACK_APP_TOKEN</code>。可选：允许的用户/频道。</td></tr>
+<tr><td><strong>Discord</strong></td><td>可选服务器 ID、仅提及模式、用户白名单。</td></tr>
+<tr><td><strong>Telegram</strong></td><td>默认仅提及回复。<code>TELEGRAM_REQUIRE_MENTION=0</code> 回复所有消息。</td></tr>
+</table>
+<p>在 <code>nemoclaw onboard</code> 时配置。消息令牌烘焙到沙箱镜像中，重建后保留。</p>
+</div></details>
+
+<h3>卸载</h3>
+<pre><code>./uninstall.sh --yes                        # 完全卸载
+./uninstall.sh --yes --keep-openshell       # 保留 OpenShell
+./uninstall.sh --yes --delete-models        # 同时删除模型</code></pre>
+</section>
+
+<section id="reference">
+<h2>参考</h2>
+
+<h3>核心 CLI 命令</h3>
+<table>
+<tr><th>命令</th><th>用途</th></tr>
+<tr><td><code>nemoclaw onboard</code></td><td>交互式入门向导</td></tr>
+<tr><td><code>nemoclaw list</code></td><td>列出所有沙箱</td></tr>
+<tr><td><code>nemoclaw resources</code></td><td>硬件清单</td></tr>
+<tr><td><code>nemoclaw &lt;name&gt; connect</code></td><td>SSH 进入沙箱</td></tr>
+<tr><td><code>nemoclaw &lt;name&gt; exec -- &lt;cmd&gt;</code></td><td>在沙箱中运行命令</td></tr>
+<tr><td><code>nemoclaw &lt;name&gt; agent -- ...</code></td><td>非交互式代理对话</td></tr>
+<tr><td><code>nemoclaw &lt;name&gt; status</code></td><td>健康检查</td></tr>
+<tr><td><code>nemoclaw &lt;name&gt; recover</code></td><td>重启网关（幂等）</td></tr>
+<tr><td><code>nemoclaw &lt;name&gt; rebuild</code></td><td>重建沙箱</td></tr>
+<tr><td><code>nemoclaw &lt;name&gt; config get</code></td><td>读取脱敏配置</td></tr>
+<tr><td><code>nemoclaw &lt;name&gt; shields</code></td><td>锁定/解锁配置</td></tr>
+<tr><td><code>nemoclaw inference set</code></td><td>更改提供商/模型</td></tr>
+<tr><td><code>nemoclaw &lt;name&gt; policy-add/remove</code></td><td>管理网络预设</td></tr>
+<tr><td><code>nemohermes</code></td><td>Hermes 变体别名</td></tr>
+</table>
+
+<h3>关键环境变量</h3>
+<table>
+<tr><th>变量</th><th>默认值</th><th>用途</th></tr>
+<tr><td><code>NEMOCLAW_AGENT</code></td><td><code>openclaw</code></td><td>代理：openclaw 或 hermes</td></tr>
+<tr><td><code>NEMOCLAW_PROVIDER</code></td><td>—</td><td>推理提供商</td></tr>
+<tr><td><code>NEMOCLAW_POLICY_TIER</code></td><td><code>balanced</code></td><td>restricted/balanced/open</td></tr>
+<tr><td><code>NEMOCLAW_POLICY_MODE</code></td><td><code>suggested</code></td><td>suggested/custom/skip</td></tr>
+<tr><td><code>NEMOCLAW_SANDBOX_NAME</code></td><td><code>my-assistant</code></td><td>沙箱名称</td></tr>
+<tr><td><code>NEMOCLAW_NON_INTERACTIVE</code></td><td>—</td><td>跳过提示</td></tr>
+<tr><td><code>NEMOCLAW_CONNECT_TIMEOUT</code></td><td><code>120</code></td><td>连接等待（秒）</td></tr>
+<tr><td><code>NEMOCLAW_INSTALL_TAG</code></td><td><code>lkg</code></td><td>安装版本</td></tr>
+</table>
+
+<h3>推理提供商</h3>
+<table>
+<tr><th>提供商</th><th>类型</th></tr>
+<tr><td>build（NVIDIA Endpoints）</td><td>云端</td></tr>
+<tr><td>openai</td><td>云端</td></tr>
+<tr><td>anthropic</td><td>云端</td></tr>
+<tr><td>anthropicCompatible</td><td>云端（自定义端点）</td></tr>
+<tr><td>gemini</td><td>云端</td></tr>
+<tr><td>ollama</td><td>本地</td></tr>
+<tr><td>nim-local</td><td>本地（NIM 容器）</td></tr>
+<tr><td>vllm</td><td>本地</td></tr>
+<tr><td>custom</td><td>自定义端点</td></tr>
+<tr><td>routed</td><td>OpenShell 网关路由</td></tr>
+</table>
+
+<h3>已测试平台</h3>
+<table>
+<tr><th>操作系统</th><th>运行时</th><th>状态</th></tr>
+<tr><td>Linux（Ubuntu 24.04）</td><td>Docker</td><td><span class="badge green">主要</span></td></tr>
+<tr><td>macOS（Apple Silicon）</td><td>Colima / Docker Desktop</td><td><span class="badge blue">已测试</span></td></tr>
+<tr><td>Windows WSL2</td><td>Docker Desktop（WSL）</td><td><span class="badge blue">已测试</span></td></tr>
+<tr><td>DGX Spark</td><td>Docker</td><td><span class="badge green">已测试</span></td></tr>
+</table>
+</section>
+
+<section id="troubleshooting">
+<h2>故障排除</h2>
+
+<h3>安装</h3>
+<table>
+<tr><th>症状</th><th>解决方法</th></tr>
+<tr><td>找不到 <code>nemoclaw</code></td><td><code>source ~/.bashrc</code> 或将 <code>~/.local/bin</code> 加入 PATH</td></tr>
+<tr><td>Node.js 版本过旧</td><td><code>nvm install 22 && nvm use 22</code></td></tr>
+<tr><td>Docker 未运行</td><td>Linux：<code>sudo systemctl start docker</code>。macOS：打开 Docker Desktop。</td></tr>
+<tr><td>Docker 权限拒绝</td><td><code>sudo usermod -aG docker $USER && newgrp docker</code></td></tr>
+<tr><td>镜像推送 OOM（<8GB 内存）</td><td>配置 ≥8GB 交换空间</td></tr>
+</table>
+
+<h3>入门</h3>
+<table>
+<tr><th>症状</th><th>解决方法</th></tr>
+<tr><td>入门中断</td><td><code>nemoclaw onboard --resume</code></td></tr>
+<tr><td>网关不健康</td><td><code>nemoclaw &lt;name&gt; recover</code></td></tr>
+<tr><td>防火墙阻止网关（UFW）</td><td><code>NEMOCLAW_AUTO_FIX_FIREWALL=1</code> 或手动 UFW 规则</td></tr>
+<tr><td>OpenShell 版本不匹配</td><td>按错误链接安装兼容版本</td></tr>
+<tr><td>沙箱名称被拒</td><td>1-63 字符，小写，字母开头，不含保留名称</td></tr>
+</table>
+
+<h3>运行时</h3>
+<table>
+<tr><th>症状</th><th>解决方法</th></tr>
+<tr><td><code>connect</code> 卡住</td><td>沙箱仍在构建 — 等待或检查 <code>status</code>。增大 <code>NEMOCLAW_CONNECT_TIMEOUT</code>。</td></tr>
+<tr><td>推理 <code>unreachable</code></td><td>检查 API 密钥和网络。提供商可能宕机。</td></tr>
+<tr><td>沙箱 <code>NotReady</code></td><td><code>nemoclaw &lt;name&gt; recover</code></td></tr>
+<tr><td>Docker 容器暂停</td><td><code>docker unpause &lt;container&gt;</code></td></tr>
+<tr><td>代理版本过旧</td><td><code>nemoclaw &lt;name&gt; rebuild --yes</code></td></tr>
+<tr><td>仪表盘端口冲突</td><td>入门时使用 <code>--control-ui-port &lt;N&gt;</code></td></tr>
+<tr><td>SSH 主机密钥变更（重启后）</td><td><code>connect</code> 自动处理 — 无需手动操作</td></tr>
+</table>
+
+<h3>策略 / 网络</h3>
+<table>
+<tr><th>症状</th><th>解决方法</th></tr>
+<tr><td>代理无法访问外部服务</td><td>添加预设：<code>nemoclaw &lt;name&gt; policy-add &lt;preset&gt;</code></td></tr>
+<tr><td>Brave Search 不工作</td><td>入门时设置 <code>BRAVE_API_KEY</code>（仅 OpenClaw）</td></tr>
+<tr><td>Telegram 409 冲突</td><td>另一个沙箱使用了相同机器人令牌 — 检查跨沙箱重叠警告</td></tr>
+</table>
+</section>
+
+<section id="cheat-sheet">
+<h2>速查卡</h2>
+<pre><code># 安装
+curl -fsSL https://www.nvidia.com/nemoclaw.sh | bash
+
+# 入门（交互式）
+nemoclaw onboard
+
+# 日常操作
+nemoclaw list                         # 列出沙箱
+nemoclaw my-assistant connect         # SSH 进入沙箱
+nemoclaw my-assistant status          # 健康检查
+nemoclaw my-assistant exec -- <cmd>   # 运行命令
+nemoclaw my-assistant recover         # 重启网关
+nemoclaw my-assistant rebuild --yes   # 升级代理
+nemoclaw my-assistant shields up      # 锁定配置
+
+# 非交互式入门
+NEMOCLAW_NON_INTERACTIVE=1 NEMOCLAW_POLICY_TIER=restricted \
+  nemoclaw onboard --yes-i-accept-third-party-software
+
+# 卸载
+./uninstall.sh --yes</code></pre>
+
+<h3>快速修复</h3>
+<table>
+<tr><th>问题</th><th>修复</th></tr>
+<tr><td>找不到 <code>nemoclaw</code></td><td><code>source ~/.bashrc</code></td></tr>
+<tr><td>Docker 未运行</td><td><code>sudo systemctl start docker</code></td></tr>
+<tr><td>权限拒绝</td><td><code>sudo usermod -aG docker $USER && newgrp docker</code></td></tr>
+<tr><td>入门中断</td><td><code>nemoclaw onboard --resume</code></td></tr>
+<tr><td>网关宕机</td><td><code>nemoclaw &lt;name&gt; recover</code></td></tr>
+<tr><td>代理过旧</td><td><code>nemoclaw &lt;name&gt; rebuild --yes</code></td></tr>
+</table>
+</section>
+
+<section id="glossary">
+<h2>术语表</h2>
+<table>
+<tr><th>术语</th><th>定义</th></tr>
+<tr><td><strong>NemoClaw</strong></td><td>在 OpenShell 沙箱中安全运行 AI 代理的参考技术栈</td></tr>
+<tr><td><strong>OpenShell</strong></td><td>NVIDIA 的沙箱管理系统 — 处理容器生命周期和路由</td></tr>
+<tr><td><strong>OpenClaw</strong></td><td>默认 AI 代理（openclaw.ai）— 基于 TUI 的聊天界面</td></tr>
+<tr><td><strong>Hermes</strong></td><td>替代 AI 代理（get-hermes.ai）— 端口 8642 上的 OpenAI 兼容 API</td></tr>
+<tr><td><strong>沙箱（Sandbox）</strong></td><td>运行 AI 代理的隔离 Docker 容器，具有网络控制</td></tr>
+<tr><td><strong>网关（Gateway）</strong></td><td>管理沙箱路由和推理的 OpenShell 进程</td></tr>
+<tr><td><strong>入门（Onboard）</strong></td><td>交互式设置向导（<code>nemoclaw onboard</code>）</td></tr>
+<tr><td><strong>策略层级（Policy Tier）</strong></td><td>网络访问预设 — Restricted / Balanced / Open</td></tr>
+<tr><td><strong>Shields</strong></td><td>配置锁定状态 — 锁定/解锁代理配置</td></tr>
+<tr><td><strong>推理提供商</strong></td><td>LLM 后端 — NVIDIA/OpenAI/Anthropic/Gemini/Ollama/vLLM 等</td></tr>
+<tr><td><strong>路由推理</strong></td><td>通过 OpenShell 网关路由推理请求</td></tr>
+<tr><td><strong>出口控制（Egress Control）</strong></td><td>限制沙箱出站连接的网络策略</td></tr>
+<tr><td><strong>恢复（Recover）</strong></td><td>重启网关但不打开 shell — 幂等操作</td></tr>
+<tr><td><strong>重建（Rebuild）</strong></td><td>用更新的代理版本重新创建沙箱</td></tr>
+<tr><td><strong>蓝图（Blueprint）</strong></td><td>沙箱生命周期和兼容性范围的声明式定义</td></tr>
+<tr><td><strong>NIM</strong></td><td>NVIDIA 推理微服务 — 容器化模型端点</td></tr>
+</table>
+</section>
+
+<section id="tutorial">
+<h2>教程</h2>
+<ol>
+<li><strong>安装：</strong><code>curl -fsSL https://www.nvidia.com/nemoclaw.sh | bash</code>。用 <code>nemoclaw --version</code> 验证。</li>
+<li><strong>入门：</strong>运行 <code>nemoclaw onboard</code>。选择提供商，命名沙箱，选择 Balanced 层级。</li>
+<li><strong>连接：</strong><code>nemoclaw my-assistant connect</code>。如仍在构建则等待 Ready 阶段。</li>
+<li><strong>聊天：</strong>输入消息与代理对话。用 <code>/nemoclaw status</code> 检查状态。输入 <code>/exit</code> 离开。</li>
+<li><strong>状态检查：</strong>从主机运行 <code>nemoclaw my-assistant status</code>。验证 Ready + 推理健康。</li>
+<li><strong>非交互式执行：</strong><code>nemoclaw my-assistant exec -- echo hello</code>。验证输出。</li>
+<li><strong>恢复：</strong><code>nemoclaw my-assistant recover</code>。验证幂等性（健康时运行也安全）。</li>
+</ol>
+</section>
+
+<section id="exercises">
+<h2>练习</h2>
+<ol>
+<li><strong>多沙箱：</strong>用不同提供商（如 Ollama）和 Restricted 层级入门第二个沙箱。验证两个沙箱都出现在 <code>nemoclaw list</code> 中。</li>
+<li><strong>非交互式入门：</strong>编写 bash 脚本非交互式安装 NemoClaw 并入门，指定提供商和策略层级。在 CI 中测试。</li>
+<li><strong>消息集成：</strong>入门时启用 Slack 或 Discord。从消息平台向机器人发送消息。验证代理响应。</li>
+<li><strong>策略管理：</strong>从 Restricted 层级开始。用 <code>policy-add</code> 添加预设。验证代理现在可以访问之前被阻止的服务。</li>
+<li><strong>恢复演练：</strong>杀掉网关进程。运行 <code>nemoclaw &lt;name&gt; recover</code>。验证沙箱无数据丢失地恢复到 Ready。</li>
+<li><strong>自定义 Dockerfile：</strong>用 <code>--from ./Dockerfile.custom</code> 入门，在沙箱中添加 Python 包。验证包可用。</li>
+</ol>
+</section>
+
+<footer>
+  <p>NemoClaw 使用指南 · 基于 <a href="https://github.com/NVIDIA/NemoClaw">NVIDIA/NemoClaw</a> 文档生成 · <a href="https://docs.nvidia.com/nemoclaw/latest/">官方文档</a></p>
+</footer>
+
+</main>
+</div>
+
+<script>
+function switchTab(e,id){const b=e.target,c=b.parentElement;c.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));c.parentElement.querySelectorAll('.tab-content').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById(id).classList.add('active')}
+const sections=document.querySelectorAll('section[id]'),links=document.querySelectorAll('.sidebar a[href^="#"]');
+const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+e.target.id))}),{rootMargin:'-30% 0px -60% 0px'});
+sections.forEach(s=>obs.observe(s));
+document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',function(e){const t=document.querySelector(this.getAttribute('href'));if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth',block:'start'})}}));
+</script>
+</body>
+</html>

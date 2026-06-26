@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NemoClaw — Usage Guide</title>
+<style>
+:root{--bg:#0d1117;--bg-soft:#161b22;--bg-card:#1c2128;--border:#30363d;--text:#c9d1d9;--text-dim:#8b949e;--accent:#76b900;--accent-2:#a3e635;--green:#7ee787;--yellow:#f2cc60;--orange:#ffa657;--red:#ff7b72;--purple:#d2a8ff;--blue:#79c0ff}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.65;font-size:15px}
+code,pre{font-family:'SF Mono','JetBrains Mono',Menlo,Consolas,monospace;font-size:.88em}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(13,17,23,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding:10px 24px;display:flex;align-items:center;gap:16px}
+.topbar .brand{font-weight:700;font-size:16px;color:var(--text)}
+.topbar .tag{background:var(--bg-card);border:1px solid var(--border);padding:2px 8px;border-radius:4px;font-size:12px;color:var(--text-dim)}
+.topbar .grow{flex:1}
+.topbar nav a{color:var(--text-dim);margin-left:14px;font-size:13px}
+.topbar nav a:hover{color:var(--accent)}
+.layout{max-width:1400px;margin:0 auto;display:grid;grid-template-columns:260px 1fr;gap:32px;padding:24px}
+@media(max-width:980px){.layout{grid-template-columns:1fr;padding:16px}.sidebar{position:static!important}}
+.sidebar{position:sticky;top:72px;align-self:start;max-height:calc(100vh - 96px);overflow-y:auto;font-size:13.5px}
+.sidebar h3{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);margin:18px 0 6px;padding-left:10px}
+.sidebar a{display:block;color:var(--text-dim);padding:5px 10px;border-radius:5px;border-left:2px solid transparent}
+.sidebar a:hover{background:var(--bg-soft);color:var(--text);text-decoration:none}
+.sidebar a.active{color:var(--accent);border-left-color:var(--accent);background:var(--bg-soft)}
+main{min-width:0}
+section{padding:28px 0 8px;border-bottom:1px solid var(--border);scroll-margin-top:70px}
+section:last-child{border-bottom:none}
+h1{font-size:30px;margin:0 0 4px;background:linear-gradient(120deg,var(--accent),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+h1+p{color:var(--text-dim);margin-top:0}
+h2{font-size:22px;margin:0 0 14px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+h3{font-size:17px;margin:18px 0 8px;color:var(--accent-2)}
+h4{font-size:14px;margin:12px 0 6px;color:var(--text)}
+p{margin:8px 0}ul,ol{padding-left:22px;margin:8px 0}li{margin:4px 0}
+code{background:var(--bg-soft);border:1px solid var(--border);padding:1px 6px;border-radius:4px;color:var(--orange)}
+pre{background:var(--bg-soft);border:1px solid var(--border);padding:14px 16px;border-radius:8px;overflow-x:auto;line-height:1.55}pre code{background:none;border:none;padding:0;color:var(--text)}
+.callout{border-left:3px solid var(--accent);background:var(--bg-soft);padding:10px 14px;margin:12px 0;border-radius:0 6px 6px 0}
+.callout.warn{border-left-color:var(--yellow)}.callout.tip{border-left-color:var(--green)}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+th{background:var(--bg-soft);color:var(--accent-2);font-weight:600;font-size:13px}
+.badge{display:inline-block;padding:1px 7px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid var(--border);background:var(--bg-soft);color:var(--text-dim)}
+.badge.green{color:var(--green);border-color:rgba(126,231,135,.4)}.badge.orange{color:var(--orange);border-color:rgba(255,166,87,.4)}
+.badge.blue{color:var(--blue);border-color:rgba(121,192,255,.4)}.badge.purple{color:var(--purple);border-color:rgba(210,168,255,.4)}
+details{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;margin:10px 0}
+details>summary{cursor:pointer;padding:10px 14px;font-weight:500;color:var(--text);user-select:none;list-style:none}
+details>summary::-webkit-details-marker{display:none}
+details>summary::before{content:"▸";color:var(--accent);margin-right:8px;display:inline-block;transition:transform .15s}
+details[open]>summary::before{transform:rotate(90deg)}
+details>div.pad{padding:0 14px 12px}
+.tabs{display:flex;gap:4px;margin-bottom:0}
+.tab-btn{padding:6px 16px;border:1px solid var(--border);border-bottom:none;border-radius:6px 6px 0 0;background:var(--bg-soft);cursor:pointer;font-size:.85rem;font-weight:500;color:var(--text-dim)}
+.tab-btn.active{background:var(--bg-card);border-bottom:1px solid var(--bg-card);margin-bottom:-1px;color:var(--accent)}
+.tab-content{display:none;border:1px solid var(--border);border-top:none;border-radius:0 6px 6px 6px;padding:16px;background:var(--bg-card)}
+.tab-content.active{display:block}
+.checklist{list-style:none;padding-left:0}.checklist li{padding:2px 0}.checklist li::before{content:'☐ ';color:var(--text-dim)}
+footer{text-align:center;color:var(--text-dim);padding:30px 24px;font-size:13px;border-top:1px solid var(--border);margin-top:24px}
+footer a{color:var(--accent)}
+@media print{.topbar,.sidebar{display:none}.layout{display:block}body{background:white;color:black}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="brand">🐾 NemoClaw</span>
+  <span class="tag">Usage Guide</span>
+  <span class="grow"></span>
+  <nav>
+    <a href="#is-this-for-me">Is this for me?</a>
+    <a href="#install">Install</a>
+    <a href="#first-run">First Run</a>
+    <a href="#workflows">Workflows</a>
+    <a href="#reference">Reference</a>
+    <a href="#troubleshooting">Troubleshooting</a>
+    <a href="#cheat-sheet">Cheat Sheet</a>
+  </nav>
+</div>
+
+<div class="layout">
+<aside class="sidebar">
+  <h3>Getting Started</h3>
+  <a href="#is-this-for-me">Is this for me?</a>
+  <a href="#what-it-does">What it does</a>
+  <a href="#install">Install</a>
+  <a href="#first-run">First Run</a>
+  <h3>Workflows</h3>
+  <a href="#wf-status">Check status</a>
+  <a href="#wf-connect">Connect & interact</a>
+  <a href="#wf-exec">Run commands</a>
+  <a href="#wf-recover">Recover</a>
+  <a href="#wf-rebuild">Rebuild</a>
+  <a href="#wf-policy">Network policies</a>
+  <a href="#wf-shields">Lock config</a>
+  <a href="#wf-messaging">Messaging</a>
+  <h3>Reference</h3>
+  <a href="#reference">Commands & env vars</a>
+  <a href="#troubleshooting">Troubleshooting</a>
+  <a href="#cheat-sheet">Cheat Sheet</a>
+  <a href="#glossary">Glossary</a>
+  <a href="#tutorial">Tutorial</a>
+  <a href="#exercises">Exercises</a>
+</aside>
+
+<main>
+
+<section id="is-this-for-me">
+<h1>NemoClaw</h1>
+<p>Open source reference stack for running always-on AI agents safely inside NVIDIA OpenShell sandboxes. Guided onboarding, hardened blueprint, routed inference, network policy, and lifecycle management through a single CLI. <strong>Alpha project — Apache 2.0.</strong></p>
+
+<h3>Who should use NemoClaw</h3>
+<table>
+<tr><th>Persona</th><th>Fit?</th><th>What you do</th></tr>
+<tr><td><strong>AI App Developer</strong></td><td><span class="badge green">Yes</span></td><td>Run agents in sandboxes for development</td></tr>
+<tr><td><strong>DevOps / Platform Engineer</strong></td><td><span class="badge green">Yes</span></td><td>Manage sandbox lifecycle, policies, inference</td></tr>
+<tr><td><strong>Security-conscious user</strong></td><td><span class="badge green">Yes</span></td><td>Egress control, capability drops, shields</td></tr>
+<tr><td><strong>Enterprise admin</strong></td><td><span class="badge green">Yes</span></td><td>Multiple sandboxes with policy tiers</td></tr>
+<tr><td><strong>Non-technical end user</strong></td><td><span class="badge orange">No</span></td><td>CLI-first, no GUI workflow</td></tr>
+<tr><td><strong>No Docker installed</strong></td><td><span class="badge orange">No</span></td><td>Docker is required</td></tr>
+</table>
+
+<h3>Prerequisites</h3>
+<ul class="checklist">
+<li>Node.js ≥ 22.16</li>
+<li>npm ≥ 10</li>
+<li>Docker (Engine, Desktop, or Colima) running</li>
+<li>4+ vCPU, 8+ GB RAM (16 GB recommended), 20+ GB disk</li>
+<li>Linux, macOS (Apple Silicon), Windows WSL2, or DGX Spark</li>
+<li>Inference provider API key (OpenAI/Anthropic/etc.) or local model (Ollama/vLLM)</li>
+</ul>
+
+<h3>What you can do</h3>
+<ul>
+<li>Run OpenClaw, Hermes, or LangChain Deep Agents in sandboxes</li>
+<li>Connect 11+ inference providers (NVIDIA, OpenAI, Anthropic, Gemini, Ollama, vLLM, NIM, custom)</li>
+<li>Control network egress with 3 policy tiers + custom presets</li>
+<li>Enable Slack, Discord, Telegram messaging bots</li>
+<li>GPU passthrough for NVIDIA GPUs</li>
+<li>Non-interactive / scripted installs for CI/CD</li>
+<li>Monitor health, run diagnostics, lock/unlock config</li>
+</ul>
+
+<h3>What you cannot do</h3>
+<ul>
+<li>Run without Docker</li>
+<li>Run on bare Windows (needs WSL2)</li>
+<li>Auto-upgrade agents in-place (must rebuild sandbox)</li>
+<li>Use Brave Search with Hermes (OpenClaw-only)</li>
+<li>Mix multiple agents in the same sandbox</li>
+</ul>
+
+<div class="callout tip"><strong>Quick check:</strong> Run <code>docker info && node --version</code> — both must succeed with correct versions.</div>
+</section>
+
+<section id="what-it-does">
+<h2>What it does</h2>
+<p>NemoClaw wraps AI agents (OpenClaw, Hermes, LangChain Deep Agents) in <strong>NVIDIA OpenShell sandboxes</strong> — isolated container environments with network egress control, capability drops, and routed inference. You interact through a single CLI (<code>nemoclaw</code>) that handles the full lifecycle: onboard → connect → manage → recover → rebuild → destroy.</p>
+<table>
+<tr><th>Component</th><th>What users see</th></tr>
+<tr><td><strong>CLI</strong></td><td><code>nemoclaw</code> / <code>nemohermes</code> — single command for all operations</td></tr>
+<tr><td><strong>Sandbox</strong></td><td>Isolated Docker container running the AI agent</td></tr>
+<tr><td><strong>Gateway</strong></td><td>OpenShell gateway managing sandbox routing and inference</td></tr>
+<tr><td><strong>Policy Engine</strong></td><td>Network egress control — Restricted / Balanced / Open tiers</td></tr>
+<tr><td><strong>Inference Routing</strong></td><td>Routes requests to NVIDIA/OpenAI/Anthropic/Gemini/Ollama/etc.</td></tr>
+<tr><td><strong>Shields</strong></td><td>Config lockdown posture — lock/unlock agent configuration</td></tr>
+</table>
+</section>
+
+<section id="install">
+<h2>Install</h2>
+<p>Estimated time: 5–15 min (depending on Docker/Node readiness).</p>
+
+<h3>Step 1: Verify prerequisites</h3>
+<pre><code>node --version    # Must be ≥ 22.16
+npm --version     # Must be ≥ 10
+docker info       # Docker must be running</code></pre>
+
+<div class="tabs">
+<button class="tab-btn active" onclick="switchTab(event,'docker-linux')">Linux Docker setup</button>
+<button class="tab-btn" onclick="switchTab(event,'docker-mac')">macOS</button>
+<button class="tab-btn" onclick="switchTab(event,'docker-win')">Windows WSL2</button>
+</div>
+<div id="docker-linux" class="tab-content active">
+<pre><code>sudo apt-get install -y docker.io zstd binutils
+sudo systemctl start docker
+sudo usermod -aG docker $USER
+newgrp docker</code></pre>
+</div>
+<div id="docker-mac" class="tab-content">
+<p>Install Docker Desktop or Colima and start it. Install Xcode CLI tools:</p>
+<pre><code>xcode-select --install</code></pre>
+</div>
+<div id="docker-win" class="tab-content">
+<p>Ensure WSL2 is enabled with Docker Desktop (WSL backend). See the <a href="https://docs.nvidia.com/nemoclaw/latest/get-started/windows-preparation.html">Windows Preparation Guide</a>.</p>
+</div>
+
+<h3>Step 2: Install NemoClaw</h3>
+<pre><code>curl -fsSL https://www.nvidia.com/nemoclaw.sh | bash</code></pre>
+<p><strong>Hermes variant:</strong></p>
+<pre><code>curl -fsSL https://www.nvidia.com/nemoclaw.sh | NEMOCLAW_AGENT=hermes bash</code></pre>
+<p><strong>Non-interactive (CI/CD):</strong></p>
+<pre><code>curl -fsSL https://www.nvidia.com/nemoclaw.sh | \
+  NEMOCLAW_NON_INTERACTIVE=1 \
+  NEMOCLAW_ACCEPT_THIRD_PARTY_SOFTWARE=1 \
+  bash</code></pre>
+
+<h3>Step 3: Verify</h3>
+<pre><code>nemoclaw --version
+nemoclaw resources</code></pre>
+</section>
+
+<section id="first-run">
+<h2>First Run — Onboard your first sandbox</h2>
+
+<h3>Run the wizard</h3>
+<pre><code>nemoclaw onboard</code></pre>
+<p>The wizard walks you through 8 steps:</p>
+<ol>
+<li><strong>Provider</strong> — choose NVIDIA/OpenAI/Anthropic/Gemini/Ollama/etc.</li>
+<li><strong>Credential</strong> — API key (never persisted to disk)</li>
+<li><strong>Sandbox name</strong> — default <code>my-assistant</code></li>
+<li><strong>Optional integrations</strong> — web search (Brave), Slack, Discord, Telegram</li>
+<li><strong>Policy tier</strong> — Restricted / Balanced (default) / Open</li>
+<li><strong>Preset customization</strong> — include/exclude individual presets</li>
+<li><strong>Sandbox build</strong> — ~2.4 GB image (first build takes minutes)</li>
+</ol>
+
+<h3>Connect</h3>
+<pre><code>nemoclaw my-assistant connect</code></pre>
+<p>If still building, <code>connect</code> polls and shows progress. Once ready, you're in the agent shell.</p>
+
+<p><strong>Agent-specific interaction:</strong></p>
+<ul>
+<li><strong>OpenClaw:</strong> TUI chat interface launches. Use <code>/nemoclaw</code> for quick commands.</li>
+<li><strong>Hermes:</strong> Sandbox shell. Use dashboard or OpenAI-compatible API on port 8642.</li>
+<li><strong>LangChain Deep Agents Code:</strong> Run <code>dcode</code> for interactive coding, or <code>dcode -n "Summarize this repository"</code> for headless tasks. No dashboard — pure terminal. Onboard with <code>nemoclaw onboard --agent langchain-deepagents-code</code>.</li>
+</ul>
+
+<div class="callout"><strong>Choosing an agent:</strong> OpenClaw for always-on chat + messaging bots. Hermes for OpenAI-compatible API access. <code>dcode</code> for headless coding tasks (similar to Claude Code).</div>
+
+<h3>In-sandbox slash commands (OpenClaw)</h3>
+<pre><code>/nemoclaw          # Show help
+/nemoclaw status   # Show sandbox + inference state
+/nemoclaw eject    # Show rollback instructions
+/exit              # Leave chat</code></pre>
+
+<div class="callout"><strong>First build takes time:</strong> The ~2.4 GB sandbox image needs to be built and pushed. Subsequent onboard runs are faster (cached layers).</div>
+</section>
+
+<section id="workflows">
+<h2>Workflows</h2>
+
+<details id="wf-status" open><summary><strong>1. Check sandbox status</strong></summary><div class="pad">
+<pre><code>nemoclaw my-assistant status          # Text output
+nemoclaw my-assistant status --json   # JSON for automation
+nemoclaw list                         # All sandboxes</code></pre>
+<p>Shows: phase (Ready/NotReady), inference health, GPU state, policy, connected sessions.</p>
+</div></details>
+
+<details id="wf-connect"><summary><strong>2. Connect and interact</strong></summary><div class="pad">
+<pre><code>nemoclaw my-assistant connect              # SSH into sandbox
+nemoclaw my-assistant connect --probe-only # Health check only</code></pre>
+<p>Inside OpenClaw: type messages to chat. Use <code>/exit</code> to leave chat, then <code>exit</code> for host shell.</p>
+</div></details>
+
+<details id="wf-exec"><summary><strong>3. Run commands non-interactively</strong></summary><div class="pad">
+<pre><code># Shell command in sandbox
+nemoclaw my-assistant exec -- ls -la /sandbox
+
+# One OpenClaw agent turn
+nemoclaw my-assistant agent --agent work -m "Summarize README.md"
+
+# With working directory
+nemoclaw my-assistant exec --workdir /sandbox/workspace -- pwd</code></pre>
+</div></details>
+
+<details id="wf-recover"><summary><strong>4. Recover a crashed sandbox</strong></summary><div class="pad">
+<pre><code>nemoclaw my-assistant recover    # Restart gateway (idempotent)
+nemoclaw my-assistant status     # Verify recovery
+nemoclaw my-assistant connect    # Reconnect</code></pre>
+<p><code>recover</code> restarts the in-sandbox gateway without opening a shell. Safe to run when already healthy.</p>
+</div></details>
+
+<details id="wf-rebuild"><summary><strong>5. Rebuild sandbox (upgrade agent)</strong></summary><div class="pad">
+<pre><code>nemoclaw my-assistant rebuild --yes</code></pre>
+<p>Reuses sandbox name + credentials. Backs up workspace state before delete, restores after rebuild.</p>
+</div></details>
+
+<details id="wf-policy"><summary><strong>6. Manage network policies</strong></summary><div class="pad">
+<pre><code>nemoclaw my-assistant policy-add <preset>
+nemoclaw my-assistant policy-remove <preset>
+nemoclaw inference set --provider openai --model gpt-4o</code></pre>
+<table>
+<tr><th>Tier</th><th>Access</th></tr>
+<tr><td>Restricted</td><td>Inference + core tooling only</td></tr>
+<tr><td>Balanced (default)</td><td>Dev tooling + web search + packages</td></tr>
+<tr><td>Open</td><td>Broad access + messaging</td></tr>
+</table>
+</div></details>
+
+<details id="wf-shields"><summary><strong>7. Lock/unlock configuration</strong></summary><div class="pad">
+<pre><code>nemoclaw my-assistant shields status
+nemoclaw my-assistant shields up                    # Lock config
+nemoclaw my-assistant shields down --timeout 5m     # Temp unlock</code></pre>
+</div></details>
+
+<details id="wf-messaging"><summary><strong>8. Enable messaging integrations</strong></summary><div class="pad">
+<table>
+<tr><th>Platform</th><th>Requirements</th></tr>
+<tr><td><strong>Slack</strong></td><td><code>SLACK_BOT_TOKEN</code> + <code>SLACK_APP_TOKEN</code>. Optional: allowed users/channels.</td></tr>
+<tr><td><strong>Discord</strong></td><td>Optional server ID, mention-only mode, user allowlist.</td></tr>
+<tr><td><strong>Telegram</strong></td><td>Mention-only by default. <code>TELEGRAM_REQUIRE_MENTION=0</code> for all messages.</td></tr>
+</table>
+<p>Configured during <code>nemoclaw onboard</code>. Messaging tokens are baked into the sandbox image and persist across rebuilds.</p>
+</div></details>
+
+<h3>Uninstall</h3>
+<pre><code>./uninstall.sh --yes                        # Full uninstall
+./uninstall.sh --yes --keep-openshell       # Keep OpenShell
+./uninstall.sh --yes --delete-models        # Also delete models</code></pre>
+</section>
+
+<section id="reference">
+<h2>Reference</h2>
+
+<h3>Core CLI commands</h3>
+<table>
+<tr><th>Command</th><th>Purpose</th></tr>
+<tr><td><code>nemoclaw onboard</code></td><td>Interactive setup wizard</td></tr>
+<tr><td><code>nemoclaw list</code></td><td>List all sandboxes</td></tr>
+<tr><td><code>nemoclaw resources</code></td><td>Hardware inventory</td></tr>
+<tr><td><code>nemoclaw &lt;name&gt; connect</code></td><td>SSH into sandbox</td></tr>
+<tr><td><code>nemoclaw &lt;name&gt; exec -- &lt;cmd&gt;</code></td><td>Run command in sandbox</td></tr>
+<tr><td><code>nemoclaw &lt;name&gt; agent -- ...</code></td><td>Non-interactive agent turn</td></tr>
+<tr><td><code>nemoclaw &lt;name&gt; status</code></td><td>Health check</td></tr>
+<tr><td><code>nemoclaw &lt;name&gt; recover</code></td><td>Restart gateway (idempotent)</td></tr>
+<tr><td><code>nemoclaw &lt;name&gt; rebuild</code></td><td>Rebuild sandbox</td></tr>
+<tr><td><code>nemoclaw &lt;name&gt; config get</code></td><td>Read sanitized config</td></tr>
+<tr><td><code>nemoclaw &lt;name&gt; shields</code></td><td>Lock/unlock config</td></tr>
+<tr><td><code>nemoclaw inference set</code></td><td>Change provider/model</td></tr>
+<tr><td><code>nemoclaw &lt;name&gt; policy-add/remove</code></td><td>Manage network presets</td></tr>
+<tr><td><code>nemohermes</code></td><td>Hermes variant alias</td></tr>
+</table>
+
+<h3>Key environment variables</h3>
+<table>
+<tr><th>Variable</th><th>Default</th><th>Purpose</th></tr>
+<tr><td><code>NEMOCLAW_AGENT</code></td><td><code>openclaw</code></td><td>Agent: openclaw or hermes</td></tr>
+<tr><td><code>NEMOCLAW_PROVIDER</code></td><td>—</td><td>Inference provider</td></tr>
+<tr><td><code>NEMOCLAW_POLICY_TIER</code></td><td><code>balanced</code></td><td>restricted/balanced/open</td></tr>
+<tr><td><code>NEMOCLAW_POLICY_MODE</code></td><td><code>suggested</code></td><td>suggested/custom/skip</td></tr>
+<tr><td><code>NEMOCLAW_SANDBOX_NAME</code></td><td><code>my-assistant</code></td><td>Sandbox name</td></tr>
+<tr><td><code>NEMOCLAW_NON_INTERACTIVE</code></td><td>—</td><td>Skip prompts</td></tr>
+<tr><td><code>NEMOCLAW_CONNECT_TIMEOUT</code></td><td><code>120</code></td><td>Connect wait (seconds)</td></tr>
+<tr><td><code>NEMOCLAW_INSTALL_TAG</code></td><td><code>lkg</code></td><td>Version to install</td></tr>
+</table>
+
+<h3>Inference providers</h3>
+<table>
+<tr><th>Provider</th><th>Type</th></tr>
+<tr><td>build (NVIDIA Endpoints)</td><td>Cloud</td></tr>
+<tr><td>openai</td><td>Cloud</td></tr>
+<tr><td>anthropic</td><td>Cloud</td></tr>
+<tr><td>anthropicCompatible</td><td>Cloud (custom endpoint)</td></tr>
+<tr><td>gemini</td><td>Cloud</td></tr>
+<tr><td>ollama</td><td>Local</td></tr>
+<tr><td>nim-local</td><td>Local (NIM container)</td></tr>
+<tr><td>vllm</td><td>Local</td></tr>
+<tr><td>custom</td><td>Custom endpoint</td></tr>
+<tr><td>routed</td><td>OpenShell gateway routing</td></tr>
+</table>
+
+<h3>Tested platforms</h3>
+<table>
+<tr><th>OS</th><th>Runtime</th><th>Status</th></tr>
+<tr><td>Linux (Ubuntu 24.04)</td><td>Docker</td><td><span class="badge green">Primary</span></td></tr>
+<tr><td>macOS (Apple Silicon)</td><td>Colima / Docker Desktop</td><td><span class="badge blue">Tested</span></td></tr>
+<tr><td>Windows WSL2</td><td>Docker Desktop (WSL)</td><td><span class="badge blue">Tested</span></td></tr>
+<tr><td>DGX Spark</td><td>Docker</td><td><span class="badge green">Tested</span></td></tr>
+</table>
+</section>
+
+<section id="troubleshooting">
+<h2>Troubleshooting</h2>
+
+<h3>Installation</h3>
+<table>
+<tr><th>Symptom</th><th>Fix</th></tr>
+<tr><td><code>nemoclaw</code> not found</td><td><code>source ~/.bashrc</code> or add <code>~/.local/bin</code> to PATH</td></tr>
+<tr><td>Node.js too old</td><td><code>nvm install 22 && nvm use 22</code></td></tr>
+<tr><td>Docker not running</td><td>Linux: <code>sudo systemctl start docker</code>. macOS: open Docker Desktop.</td></tr>
+<tr><td>Docker permission denied</td><td><code>sudo usermod -aG docker $USER && newgrp docker</code></td></tr>
+<tr><td>Image push OOM (<8GB RAM)</td><td>Configure ≥8GB swap</td></tr>
+</table>
+
+<h3>Onboarding</h3>
+<table>
+<tr><th>Symptom</th><th>Fix</th></tr>
+<tr><td>Onboard interrupted</td><td><code>nemoclaw onboard --resume</code></td></tr>
+<tr><td>Gateway unhealthy</td><td><code>nemoclaw &lt;name&gt; recover</code></td></tr>
+<tr><td>Firewall blocks gateway (UFW)</td><td><code>NEMOCLAW_AUTO_FIX_FIREWALL=1</code> or manual UFW rule</td></tr>
+<tr><td>OpenShell version mismatch</td><td>Follow error link to compatible releases</td></tr>
+<tr><td>Sandbox name rejected</td><td>1-63 chars, lowercase, start with letter, no reserved names</td></tr>
+</table>
+
+<h3>Runtime</h3>
+<table>
+<tr><th>Symptom</th><th>Fix</th></tr>
+<tr><td><code>connect</code> hangs</td><td>Sandbox still building — wait or check <code>status</code>. Increase <code>NEMOCLAW_CONNECT_TIMEOUT</code>.</td></tr>
+<tr><td>Inference <code>unreachable</code></td><td>Check API key and network. Provider may be down.</td></tr>
+<tr><td>Sandbox <code>NotReady</code></td><td><code>nemoclaw &lt;name&gt; recover</code></td></tr>
+<tr><td>Docker container paused</td><td><code>docker unpause &lt;container&gt;</code></td></tr>
+<tr><td>Agent version outdated</td><td><code>nemoclaw &lt;name&gt; rebuild --yes</code></td></tr>
+<tr><td>Dashboard port conflict</td><td>Use <code>--control-ui-port &lt;N&gt;</code> during onboard</td></tr>
+<tr><td>SSH host key changed (after reboot)</td><td>Auto-handled by <code>connect</code> — no action needed</td></tr>
+</table>
+
+<h3>Policy / network</h3>
+<table>
+<tr><th>Symptom</th><th>Fix</th></tr>
+<tr><td>Agent can't reach external services</td><td>Add presets: <code>nemoclaw &lt;name&gt; policy-add &lt;preset&gt;</code></td></tr>
+<tr><td>Brave Search not working</td><td>Set <code>BRAVE_API_KEY</code> during onboard (OpenClaw only)</td></tr>
+<tr><td>Telegram 409 Conflict</td><td>Another sandbox uses same bot token — check cross-sandbox overlap warning</td></tr>
+</table>
+</section>
+
+<section id="cheat-sheet">
+<h2>Cheat Sheet</h2>
+<pre><code># Install
+curl -fsSL https://www.nvidia.com/nemoclaw.sh | bash
+
+# Onboard (interactive)
+nemoclaw onboard
+
+# Daily operations
+nemoclaw list                         # List sandboxes
+nemoclaw my-assistant connect         # SSH into sandbox
+nemoclaw my-assistant status          # Health check
+nemoclaw my-assistant exec -- <cmd>   # Run command
+nemoclaw my-assistant recover         # Restart gateway
+nemoclaw my-assistant rebuild --yes   # Upgrade agent
+nemoclaw my-assistant shields up      # Lock config
+
+# Non-interactive onboard
+NEMOCLAW_NON_INTERACTIVE=1 NEMOCLAW_POLICY_TIER=restricted \
+  nemoclaw onboard --yes-i-accept-third-party-software
+
+# Uninstall
+./uninstall.sh --yes</code></pre>
+
+<h3>Quick fixes</h3>
+<table>
+<tr><th>Problem</th><th>Fix</th></tr>
+<tr><td><code>nemoclaw</code> not found</td><td><code>source ~/.bashrc</code></td></tr>
+<tr><td>Docker not running</td><td><code>sudo systemctl start docker</code></td></tr>
+<tr><td>Permission denied</td><td><code>sudo usermod -aG docker $USER && newgrp docker</code></td></tr>
+<tr><td>Onboard interrupted</td><td><code>nemoclaw onboard --resume</code></td></tr>
+<tr><td>Gateway down</td><td><code>nemoclaw &lt;name&gt; recover</code></td></tr>
+<tr><td>Agent outdated</td><td><code>nemoclaw &lt;name&gt; rebuild --yes</code></td></tr>
+</table>
+</section>
+
+<section id="glossary">
+<h2>Glossary</h2>
+<table>
+<tr><th>Term</th><th>Definition</th></tr>
+<tr><td><strong>NemoClaw</strong></td><td>Reference stack for running AI agents safely in OpenShell sandboxes</td></tr>
+<tr><td><strong>OpenShell</strong></td><td>NVIDIA's sandbox management system — handles container lifecycle and routing</td></tr>
+<tr><td><strong>OpenClaw</strong></td><td>Default AI agent (openclaw.ai) — TUI-based chat interface</td></tr>
+<tr><td><strong>Hermes</strong></td><td>Alternative AI agent (get-hermes.ai) — OpenAI-compatible API on port 8642</td></tr>
+<tr><td><strong>Sandbox</strong></td><td>Isolated Docker container running an AI agent with network controls</td></tr>
+<tr><td><strong>Gateway</strong></td><td>OpenShell process managing sandbox routing and inference</td></tr>
+<tr><td><strong>Onboard</strong></td><td>Interactive setup wizard (<code>nemoclaw onboard</code>)</td></tr>
+<tr><td><strong>Policy Tier</strong></td><td>Network access preset — Restricted / Balanced / Open</td></tr>
+<tr><td><strong>Shields</strong></td><td>Config lockdown posture — lock/unlock agent configuration</td></tr>
+<tr><td><strong>Inference Provider</strong></td><td>LLM backend — NVIDIA/OpenAI/Anthropic/Gemini/Ollama/vLLM/etc.</td></tr>
+<tr><td><strong>Routed Inference</strong></td><td>Inference requests routed through OpenShell gateway</td></tr>
+<tr><td><strong>Egress Control</strong></td><td>Network policy restricting outbound connections from sandbox</td></tr>
+<tr><td><strong>Recover</strong></td><td>Restart gateway without opening shell — idempotent</td></tr>
+<tr><td><strong>Rebuild</strong></td><td>Recreate sandbox with updated agent version</td></tr>
+<tr><td><strong>Blueprint</strong></td><td>Declarative definition of sandbox lifecycle and compatibility ranges</td></tr>
+<tr><td><strong>NIM</strong></td><td>NVIDIA Inference Microservice — containerized model endpoint</td></tr>
+</table>
+</section>
+
+<section id="tutorial">
+<h2>Tutorial</h2>
+<ol>
+<li><strong>Install:</strong> <code>curl -fsSL https://www.nvidia.com/nemoclaw.sh | bash</code>. Verify with <code>nemoclaw --version</code>.</li>
+<li><strong>Onboard:</strong> Run <code>nemoclaw onboard</code>. Choose a provider, name your sandbox, pick Balanced tier.</li>
+<li><strong>Connect:</strong> <code>nemoclaw my-assistant connect</code>. Wait for Ready phase if still building.</li>
+<li><strong>Chat:</strong> Type a message to the agent. Use <code>/nemoclaw status</code> to check state. Type <code>/exit</code> to leave.</li>
+<li><strong>Status check:</strong> From host: <code>nemoclaw my-assistant status</code>. Verify Ready + healthy inference.</li>
+<li><strong>Non-interactive exec:</strong> <code>nemoclaw my-assistant exec -- echo hello</code>. Verify output.</li>
+<li><strong>Recover:</strong> <code>nemoclaw my-assistant recover</code>. Verify it's idempotent (safe when healthy).</li>
+</ol>
+</section>
+
+<section id="exercises">
+<h2>Exercises</h2>
+<ol>
+<li><strong>Multi-sandbox:</strong> Onboard a second sandbox with a different provider (e.g., Ollama) and Restricted tier. Verify both appear in <code>nemoclaw list</code>.</li>
+<li><strong>Non-interactive onboard:</strong> Write a bash script that installs NemoClaw and onboards non-interactively with a specific provider and policy tier. Test in CI.</li>
+<li><strong>Messaging integration:</strong> Enable Slack or Discord during onboard. Send a message to the bot from the messaging platform. Verify the agent responds.</li>
+<li><strong>Policy management:</strong> Start with Restricted tier. Add a preset with <code>policy-add</code>. Verify the agent can now reach the previously-blocked service.</li>
+<li><strong>Recovery drill:</strong> Kill the gateway process. Run <code>nemoclaw &lt;name&gt; recover</code>. Verify the sandbox returns to Ready without data loss.</li>
+<li><strong>Custom Dockerfile:</strong> Onboard with <code>--from ./Dockerfile.custom</code> that adds a Python package to the sandbox. Verify the package is available inside.</li>
+</ol>
+</section>
+
+<footer>
+  <p>NemoClaw Usage Guide · Generated from <a href="https://github.com/NVIDIA/NemoClaw">NVIDIA/NemoClaw</a> docs · <a href="https://docs.nvidia.com/nemoclaw/latest/">Official Documentation</a></p>
+</footer>
+
+</main>
+</div>
+
+<script>
+function switchTab(e,id){const b=e.target,c=b.parentElement;c.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));c.parentElement.querySelectorAll('.tab-content').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById(id).classList.add('active')}
+const sections=document.querySelectorAll('section[id]'),links=document.querySelectorAll('.sidebar a[href^="#"]');
+const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+e.target.id))}),{rootMargin:'-30% 0px -60% 0px'});
+sections.forEach(s=>obs.observe(s));
+document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',function(e){const t=document.querySelector(this.getAttribute('href'));if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth',block:'start'})}}));
+</script>
+</body>
+</html>
