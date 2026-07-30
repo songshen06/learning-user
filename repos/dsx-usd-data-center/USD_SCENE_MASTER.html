@@ -1,0 +1,1057 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DSX USD 场景主文档</title>
+  <style>
+    :root { color-scheme: light; --bg:#f5f7fb; --paper:#fff; --ink:#1c2430; --muted:#637084; --line:#dce2ea; --brand:#2369d8; --code:#eff3f8; }
+    * { box-sizing:border-box; } body { margin:0; color:var(--ink); background:var(--bg); font:16px/1.72 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif; }
+    header { position:sticky; top:0; z-index:5; display:flex; align-items:center; gap:16px; padding:12px max(24px,calc((100vw - 1440px)/2)); color:#fff; background:#13233c; box-shadow:0 1px 8px #13233c44; }
+    header strong { font-size:15px; } header span { margin-left:auto; color:#c9d6ea; font-size:13px; }
+    .layout { display:grid; grid-template-columns:260px minmax(0,980px); gap:28px; max-width:1300px; margin:0 auto; padding:28px 24px 56px; }
+    nav { position:sticky; top:70px; align-self:start; max-height:calc(100vh - 90px); overflow:auto; padding:14px; border:1px solid var(--line); border-radius:10px; background:var(--paper); }
+    nav h2 { margin:0 0 8px; font-size:14px; } nav a { display:block; padding:3px 0; color:var(--muted); font-size:13px; text-decoration:none; } nav a:hover { color:var(--brand); text-decoration:underline; }
+    main { min-width:0; padding:44px 56px; border:1px solid var(--line); border-radius:12px; background:var(--paper); box-shadow:0 4px 18px #1d32480d; }
+    h1,h2,h3,h4 { line-height:1.28; scroll-margin-top:76px; } h1 { margin-top:0; font-size:30px; } h2 { margin-top:46px; padding-bottom:8px; border-bottom:1px solid var(--line); font-size:24px; } h3 { margin-top:32px; font-size:19px; } h4 { margin-top:24px; font-size:16px; }
+    a { color:var(--brand); } blockquote { margin:18px 0; padding:10px 16px; border-left:4px solid var(--brand); background:#f0f6ff; color:#43546d; }
+    table { width:100%; margin:18px 0; border-collapse:collapse; font-size:14px; } th,td { padding:10px 12px; border:1px solid var(--line); vertical-align:top; text-align:left; } th { background:#edf3fc; } tr:nth-child(even) { background:#fafbfd; }
+    main img { display:block; width:100%; max-width:100%; height:auto; margin:22px auto; border:1px solid var(--line); border-radius:8px; background:#fff; }
+    code { padding:2px 5px; border-radius:4px; background:var(--code); font:0.9em ui-monospace,SFMono-Regular,Consolas,monospace; } pre { overflow:auto; padding:16px; border-radius:8px; background:#172033; color:#e9f0fb; line-height:1.5; } pre code { padding:0; background:transparent; color:inherit; }
+    pre.mermaid { padding:18px; background:#fff; color:inherit; text-align:center; } pre.mermaid svg { max-width:100%; height:auto; }
+    @media(max-width:860px) { header { padding:12px 16px; } header span { display:none; } .layout { display:block; padding:16px; } nav { position:static; max-height:220px; margin-bottom:16px; } main { padding:26px 20px; } h1 { font-size:25px; } h2 { font-size:21px; } table { display:block; overflow:auto; } }
+    @media print { header,nav { display:none; } body { background:#fff; } .layout { display:block; padding:0; } main { border:0; box-shadow:none; padding:0; } main img { break-inside:avoid; margin:14px auto; } }
+  </style>
+</head>
+<body><header><strong>DSX USD 场景主文档</strong><span>单文件 HTML 版本</span></header><div class="layout"><nav aria-label="文档目录"><h2>目录</h2><a href="#dsx-数据中心-usd-场景主文档" style="padding-left: 0px;">DSX 数据中心 USD 场景主文档</a><a href="#1-文档目的与边界" style="padding-left: 12px;">1. 文档目的与边界</a><a href="#2-主场景装配总览" style="padding-left: 12px;">2. 主场景装配总览</a><a href="#2-1-world-一级模块" style="padding-left: 24px;">2.1 /World 一级模块</a><a href="#3-专业组件映射" style="padding-left: 12px;">3. 专业组件映射</a><a href="#4-室内-bim-的细分结构" style="padding-left: 12px;">4. 室内 BIM 的细分结构</a><a href="#4-1-bim-集成进入-usd-的信息" style="padding-left: 24px;">4.1 BIM 集成进入 USD 的信息</a><a href="#4-2-未由当前-usd-单独承载或不能据此确认的信息" style="padding-left: 24px;">4.2 未由当前 USD 单独承载或不能据此确认的信息</a><a href="#5-usd-资产复用方式" style="padding-left: 12px;">5. USD 资产复用方式</a><a href="#6-当前资源完整性备注" style="padding-left: 12px;">6. 当前资源完整性备注</a><a href="#7-场景制作所需的专业知识与协作角色" style="padding-left: 12px;">7. 场景制作所需的专业知识与协作角色</a><a href="#7-1-etap-与-cfd-在-usd-中的正确定位" style="padding-left: 24px;">7.1 ETAP 与 CFD 在 USD 中的正确定位</a><a href="#7-2-建议的最小协作闭环" style="padding-left: 24px;">7.2 建议的最小协作闭环</a><a href="#7-3-启动试点所需的最小团队配置" style="padding-left: 24px;">7.3 启动试点所需的最小团队配置</a><a href="#7-4-人员能力要求-什么人需要学到什么程度" style="padding-left: 24px;">7.4 人员能力要求：什么人需要学到什么程度</a><a href="#7-5-建议培训路径" style="padding-left: 24px;">7.5 建议培训路径</a><a href="#7-6-试点开始前的能力验收清单" style="padding-left: 24px;">7.6 试点开始前的能力验收清单</a><a href="#7-7-招聘或外包-usd-技术人员时的筛选标准" style="padding-left: 24px;">7.7 招聘或外包 USD 技术人员时的筛选标准</a><a href="#8-有了-usd-场景后可以开展的工作" style="padding-left: 12px;">8. 有了 USD 场景后可以开展的工作</a><a href="#8-1-分阶段说明-具体做什么-收益是什么" style="padding-left: 24px;">8.1 分阶段说明：具体做什么、收益是什么</a><a href="#阶段-a-方案与概念设计-先把-要建成什么样-说清楚" style="padding-left: 36px;">阶段 A：方案与概念设计——先把“要建成什么样”说清楚</a><a href="#阶段-b-详细设计与跨专业协调-在现场施工前发现-空间打架" style="padding-left: 36px;">阶段 B：详细设计与跨专业协调——在现场施工前发现“空间打架”</a><a href="#阶段-c-施工准备与建设过程-把计划-作业面和现场问题放回空间" style="padding-left: 36px;">阶段 C：施工准备与建设过程——把计划、作业面和现场问题放回空间</a><a href="#阶段-d-调试与验收-确认-装好了-能否组成可运行的系统" style="padding-left: 36px;">阶段 D：调试与验收——确认“装好了”能否组成可运行的系统</a><a href="#阶段-e-运维-培训与扩容-让竣工模型继续产生价值" style="padding-left: 36px;">阶段 E：运维、培训与扩容——让竣工模型继续产生价值</a><a href="#8-2-典型案例库-把-usd-用到具体问题上" style="padding-left: 24px;">8.2 典型案例库：把 USD 用到具体问题上</a><a href="#8-3-可复用的协同会议流程" style="padding-left: 24px;">8.3 可复用的协同会议流程</a><a href="#8-4-数据中心建设周期中的重点价值" style="padding-left: 24px;">8.4 数据中心建设周期中的重点价值</a><a href="#8-5-从-好看的三维模型-走向项目管理工具所需的条件" style="padding-left: 24px;">8.5 从“好看的三维模型”走向项目管理工具所需的条件</a><a href="#9-建议-以-小范围协同试点-使用-usd-而非一次性建设全功能平台" style="padding-left: 12px;">9. 建议：以“小范围协同试点”使用 USD，而非一次性建设全功能平台</a><a href="#9-1-结论" style="padding-left: 24px;">9.1 结论</a><a href="#9-2-第-0-步-先把场景变成-可信的共同底图" style="padding-left: 24px;">9.2 第 0 步：先把场景变成“可信的共同底图”</a><a href="#9-3-第-1-步-只做三类高价值试点" style="padding-left: 24px;">9.3 第 1 步：只做三类高价值试点</a><a href="#9-4-如何判断试点是否值得继续" style="padding-left: 24px;">9.4 如何判断试点是否值得继续</a><a href="#9-5-第二-三阶段再逐步增加能力" style="padding-left: 24px;">9.5 第二、三阶段再逐步增加能力</a><a href="#9-6-对当前项目的最小下一步" style="padding-left: 24px;">9.6 对当前项目的最小下一步</a><a href="#10-后续待补充" style="padding-left: 12px;">10. 后续待补充</a></nav><main><h1 id="dsx-数据中心-usd-场景主文档">DSX 数据中心 USD 场景主文档</h1>
+<blockquote>
+<p>状态：初稿，可持续补充。<br>主入口：<code>DSX_BP/Assembly/DSX_Main_BP.usda</code>（<code>defaultPrim = /World</code>）</p>
+</blockquote>
+<h2 id="1-文档目的与边界">1. 文档目的与边界</h2>
+<p>本文档记录 DSX 数据中心 USD 场景的资产组成、USD 装配关系和专业组件分层，作为后续撰写、核查和沟通的主文件。</p>
+<ul>
+<li><strong>已观察到的 USD 事实</strong>：Prim 路径、层级、payload/reference、实例和材料/可见性层。</li>
+<li><strong>基于名称的组件归类</strong>：如 UPS、RPP、CDU、通信机柜等；用于空间和资产沟通。</li>
+<li><strong>不在本文件中直接确认的工程结论</strong>：真实回路、A/B 路、容量校核、保护配合、冗余拓扑及施工设计要求。</li>
+</ul>
+<h2 id="2-主场景装配总览">2. 主场景装配总览</h2>
+<p><code>DSX_Main_BP.usda</code> 不是单一网格文件。它在 <code>/World</code> 下通过多个可按需加载的 payload，装配场地、建筑、室内 BIM、设备、相机和 CFD 数据。</p>
+<pre class="mermaid" data-processed="true"><svg id="mermaid-1785397004976" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="flowchart" style="max-width: 1925.45703125px;" viewBox="0 0 1925.45703125 350" role="graphics-document document" aria-roledescription="flowchart-v2"><style>#mermaid-1785397004976{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#000000;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#mermaid-1785397004976 .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#mermaid-1785397004976 .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#mermaid-1785397004976 .error-icon{fill:#552222;}#mermaid-1785397004976 .error-text{fill:#552222;stroke:#552222;}#mermaid-1785397004976 .edge-thickness-normal{stroke-width:1px;}#mermaid-1785397004976 .edge-thickness-thick{stroke-width:3.5px;}#mermaid-1785397004976 .edge-pattern-solid{stroke-dasharray:0;}#mermaid-1785397004976 .edge-thickness-invisible{stroke-width:0;fill:none;}#mermaid-1785397004976 .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-1785397004976 .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-1785397004976 .marker{fill:#666;stroke:#666;}#mermaid-1785397004976 .marker.cross{stroke:#666;}#mermaid-1785397004976 svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#mermaid-1785397004976 p{margin:0;}#mermaid-1785397004976 .label{font-family:"trebuchet ms",verdana,arial,sans-serif;color:#000000;}#mermaid-1785397004976 .cluster-label text{fill:#333;}#mermaid-1785397004976 .cluster-label span{color:#333;}#mermaid-1785397004976 .cluster-label span p{background-color:transparent;}#mermaid-1785397004976 .label text,#mermaid-1785397004976 span{fill:#000000;color:#000000;}#mermaid-1785397004976 .node rect,#mermaid-1785397004976 .node circle,#mermaid-1785397004976 .node ellipse,#mermaid-1785397004976 .node polygon,#mermaid-1785397004976 .node path{fill:#eee;stroke:#999;stroke-width:1px;}#mermaid-1785397004976 .rough-node .label text,#mermaid-1785397004976 .node .label text,#mermaid-1785397004976 .image-shape .label,#mermaid-1785397004976 .icon-shape .label{text-anchor:middle;}#mermaid-1785397004976 .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#mermaid-1785397004976 .rough-node .label,#mermaid-1785397004976 .node .label,#mermaid-1785397004976 .image-shape .label,#mermaid-1785397004976 .icon-shape .label{text-align:center;}#mermaid-1785397004976 .node.clickable{cursor:pointer;}#mermaid-1785397004976 .root .anchor path{fill:#666!important;stroke-width:0;stroke:#666;}#mermaid-1785397004976 .arrowheadPath{fill:#333333;}#mermaid-1785397004976 .edgePath .path{stroke:#666;stroke-width:1px;}#mermaid-1785397004976 .flowchart-link{stroke:#666;fill:none;}#mermaid-1785397004976 .edgeLabel{background-color:white;text-align:center;}#mermaid-1785397004976 .edgeLabel p{background-color:white;}#mermaid-1785397004976 .edgeLabel rect{opacity:0.5;background-color:white;fill:white;}#mermaid-1785397004976 .labelBkg{background-color:rgba(255, 255, 255, 0.5);}#mermaid-1785397004976 .cluster rect{fill:hsl(0, 0%, 98.9215686275%);stroke:#707070;stroke-width:1px;}#mermaid-1785397004976 .cluster text{fill:#333;}#mermaid-1785397004976 .cluster span{color:#333;}#mermaid-1785397004976 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:12px;background:hsl(-160, 0%, 93.3333333333%);border:1px solid #707070;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-1785397004976 .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#000000;}#mermaid-1785397004976 rect.text{fill:none;stroke-width:0;}#mermaid-1785397004976 .icon-shape,#mermaid-1785397004976 .image-shape{background-color:white;text-align:center;}#mermaid-1785397004976 .icon-shape p,#mermaid-1785397004976 .image-shape p{background-color:white;padding:2px;}#mermaid-1785397004976 .icon-shape .label rect,#mermaid-1785397004976 .image-shape .label rect{opacity:0.5;background-color:white;fill:white;}#mermaid-1785397004976 .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#mermaid-1785397004976 .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#mermaid-1785397004976 .node .neo-node{stroke:#999;}#mermaid-1785397004976 [data-look="neo"].node rect,#mermaid-1785397004976 [data-look="neo"].cluster rect,#mermaid-1785397004976 [data-look="neo"].node polygon{stroke:url(#mermaid-1785397004976-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785397004976 [data-look="neo"].swimlane.cluster rect{filter:none;}#mermaid-1785397004976 [data-look="neo"].node path{stroke:url(#mermaid-1785397004976-gradient);stroke-width:1px;}#mermaid-1785397004976 [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785397004976 [data-look="neo"].node .neo-line path{stroke:#999;filter:none;}#mermaid-1785397004976 [data-look="neo"].node circle{stroke:url(#mermaid-1785397004976-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785397004976 [data-look="neo"].node circle .state-start{fill:#000000;}#mermaid-1785397004976 [data-look="neo"].icon-shape .icon{fill:url(#mermaid-1785397004976-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785397004976 [data-look="neo"].icon-shape .icon-neo path{stroke:url(#mermaid-1785397004976-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785397004976 :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g><marker id="mermaid-1785397004976_flowchart-v2-pointEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1785397004976_flowchart-v2-pointStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1785397004976_flowchart-v2-pointEnd-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14" orient="auto"><path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1785397004976_flowchart-v2-pointStart-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14" orient="auto"><polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></polygon></marker><marker id="mermaid-1785397004976_flowchart-v2-circleEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1785397004976_flowchart-v2-circleStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1785397004976_flowchart-v2-circleEnd-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1785397004976_flowchart-v2-circleStart-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1785397004976_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1785397004976_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1785397004976_flowchart-v2-crossEnd-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5;"></path></marker><marker id="mermaid-1785397004976_flowchart-v2-crossStart-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5; stroke-dasharray: 1, 0;"></path></marker><g class="root"><g class="clusters"></g><g class="edgePaths"><path d="M941.551,55.808L835.13,65.007C728.71,74.205,515.868,92.603,409.448,105.301C303.027,118,303.027,125,303.027,128.5L303.027,132" id="mermaid-1785397004976-L_World_Site_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_World_Site_0" data-points="W3sieCI6OTQxLjU1MDc4MTI1LCJ5Ijo1NS44MDc4MTY0ODk3NTQ1N30seyJ4IjozMDMuMDI3MzQzNzUsInkiOjExMX0seyJ4IjozMDMuMDI3MzQzNzUsInkiOjEzNn1d" data-look="classic" marker-end="url(#mermaid-1785397004976_flowchart-v2-pointEnd)"></path><path d="M941.551,58.935L867.467,67.613C793.384,76.29,645.217,93.645,571.134,105.823C497.051,118,497.051,125,497.051,128.5L497.051,132" id="mermaid-1785397004976-L_World_Exterior_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_World_Exterior_0" data-points="W3sieCI6OTQxLjU1MDc4MTI1LCJ5Ijo1OC45MzU0Mjk0NDU2NTk3OX0seyJ4Ijo0OTcuMDUwNzgxMjUsInkiOjExMX0seyJ4Ijo0OTcuMDUwNzgxMjUsInkiOjEzNn1d" data-look="classic" marker-end="url(#mermaid-1785397004976_flowchart-v2-pointEnd)"></path><path d="M941.551,68.335L907.589,75.446C873.626,82.557,805.702,96.778,771.74,107.389C737.777,118,737.777,125,737.777,128.5L737.777,132" id="mermaid-1785397004976-L_World_Interior_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_World_Interior_0" data-points="W3sieCI6OTQxLjU1MDc4MTI1LCJ5Ijo2OC4zMzQ5NjkwNzQyNzI4Nn0seyJ4Ijo3MzcuNzc3MzQzNzUsInkiOjExMX0seyJ4Ijo3MzcuNzc3MzQzNzUsInkiOjEzNn1d" data-look="classic" marker-end="url(#mermaid-1785397004976_flowchart-v2-pointEnd)"></path><path d="M1043.449,86L1043.449,90.167C1043.449,94.333,1043.449,102.667,1043.449,110.333C1043.449,118,1043.449,125,1043.449,128.5L1043.449,132" id="mermaid-1785397004976-L_World_BldgEquipment_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_World_BldgEquipment_0" data-points="W3sieCI6MTA0My40NDkyMTg3NSwieSI6ODZ9LHsieCI6MTA0My40NDkyMTg3NSwieSI6MTExfSx7IngiOjEwNDMuNDQ5MjE4NzUsInkiOjEzNn1d" data-look="classic" marker-end="url(#mermaid-1785397004976_flowchart-v2-pointEnd)"></path><path d="M1145.348,68.618L1178.642,75.682C1211.936,82.746,1278.525,96.873,1311.819,107.436C1345.113,118,1345.113,125,1345.113,128.5L1345.113,132" id="mermaid-1785397004976-L_World_SiteEquipment_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_World_SiteEquipment_0" data-points="W3sieCI6MTE0NS4zNDc2NTYyNSwieSI6NjguNjE4NDE4NjY3Mjg4MjF9LHsieCI6MTM0NS4xMTMyODEyNSwieSI6MTExfSx7IngiOjEzNDUuMTEzMjgxMjUsInkiOjEzNn1d" data-look="classic" marker-end="url(#mermaid-1785397004976_flowchart-v2-pointEnd)"></path><path d="M1145.348,58.283L1224.693,67.07C1304.038,75.856,1462.728,93.428,1542.073,105.714C1621.418,118,1621.418,125,1621.418,128.5L1621.418,132" id="mermaid-1785397004976-L_World_Cameras_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_World_Cameras_0" data-points="W3sieCI6MTE0NS4zNDc2NTYyNSwieSI6NTguMjgzNDgyMDIyMTY4MTV9LHsieCI6MTYyMS40MTc5Njg3NSwieSI6MTExfSx7IngiOjE2MjEuNDE3OTY4NzUsInkiOjEzNn1d" data-look="classic" marker-end="url(#mermaid-1785397004976_flowchart-v2-pointEnd)"></path><path d="M1145.348,55.134L1261.995,64.445C1378.642,73.756,1611.936,92.378,1728.583,105.189C1845.23,118,1845.23,125,1845.23,128.5L1845.23,132" id="mermaid-1785397004976-L_World_CFD_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_World_CFD_0" data-points="W3sieCI6MTE0NS4zNDc2NTYyNSwieSI6NTUuMTMzNzY0NjY0NjEzOTV9LHsieCI6MTg0NS4yMzA0Njg3NSwieSI6MTExfSx7IngiOjE4NDUuMjMwNDY4NzUsInkiOjEzNn1d" data-look="classic" marker-end="url(#mermaid-1785397004976_flowchart-v2-pointEnd)"></path><path d="M609.051,188.041L525.212,196.534C441.372,205.027,273.694,222.014,189.855,234.007C106.016,246,106.016,253,106.016,256.5L106.016,260" id="mermaid-1785397004976-L_Interior_Structure_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_Interior_Structure_0" data-points="W3sieCI6NjA5LjA1MDc4MTI1LCJ5IjoxODguMDQwNTE3ODk3MDAxODJ9LHsieCI6MTA2LjAxNTYyNSwieSI6MjM5fSx7IngiOjEwNi4wMTU2MjUsInkiOjI2NH1d" data-look="classic" marker-end="url(#mermaid-1785397004976_flowchart-v2-pointEnd)"></path><path d="M609.051,196.408L566.365,203.506C523.68,210.605,438.309,224.803,395.623,235.401C352.938,246,352.938,253,352.938,256.5L352.938,260" id="mermaid-1785397004976-L_Interior_Architecture_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_Interior_Architecture_0" data-points="W3sieCI6NjA5LjA1MDc4MTI1LCJ5IjoxOTYuNDA3NjA2NjU0NTUzOTR9LHsieCI6MzUyLjkzNzUsInkiOjIzOX0seyJ4IjozNTIuOTM3NSwieSI6MjY0fV0=" data-look="classic" marker-end="url(#mermaid-1785397004976_flowchart-v2-pointEnd)"></path><path d="M659.427,214L651.057,218.167C642.686,222.333,625.945,230.667,617.574,238.333C609.203,246,609.203,253,609.203,256.5L609.203,260" id="mermaid-1785397004976-L_Interior_Electrical_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_Interior_Electrical_0" data-points="W3sieCI6NjU5LjQyNzQyOTE5OTIxODgsInkiOjIxNH0seyJ4Ijo2MDkuMjAzMTI1LCJ5IjoyMzl9LHsieCI6NjA5LjIwMzEyNSwieSI6MjY0fV0=" data-look="classic" marker-end="url(#mermaid-1785397004976_flowchart-v2-pointEnd)"></path><path d="M816.127,214L824.498,218.167C832.869,222.333,849.61,230.667,857.981,238.333C866.352,246,866.352,253,866.352,256.5L866.352,260" id="mermaid-1785397004976-L_Interior_Mechanical_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_Interior_Mechanical_0" data-points="W3sieCI6ODE2LjEyNzI1ODMwMDc4MTIsInkiOjIxNH0seyJ4Ijo4NjYuMzUxNTYyNSwieSI6MjM5fSx7IngiOjg2Ni4zNTE1NjI1LCJ5IjoyNjR9XQ==" data-look="classic" marker-end="url(#mermaid-1785397004976_flowchart-v2-pointEnd)"></path><path d="M866.504,195.485L912.079,202.737C957.654,209.99,1048.803,224.495,1094.378,235.247C1139.953,246,1139.953,253,1139.953,256.5L1139.953,260" id="mermaid-1785397004976-L_Interior_Twin_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_Interior_Twin_0" data-points="W3sieCI6ODY2LjUwMzkwNjI1LCJ5IjoxOTUuNDg0ODIzNzYxMzc2MX0seyJ4IjoxMTM5Ljk1MzEyNSwieSI6MjM5fSx7IngiOjExMzkuOTUzMTI1LCJ5IjoyNjR9XQ==" data-look="classic" marker-end="url(#mermaid-1785397004976_flowchart-v2-pointEnd)"></path><path d="M866.504,186.916L960.281,195.597C1054.057,204.277,1241.611,221.639,1335.387,233.819C1429.164,246,1429.164,253,1429.164,256.5L1429.164,260" id="mermaid-1785397004976-L_Interior_InteriorLights_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_Interior_InteriorLights_0" data-points="W3sieCI6ODY2LjUwMzkwNjI1LCJ5IjoxODYuOTE1OTA3MjI5MDE3NzZ9LHsieCI6MTQyOS4xNjQwNjI1LCJ5IjoyMzl9LHsieCI6MTQyOS4xNjQwNjI1LCJ5IjoyNjR9XQ==" data-look="classic" marker-end="url(#mermaid-1785397004976_flowchart-v2-pointEnd)"></path></g><g class="edgeLabels"><g class="edgeLabel"><g class="label" data-id="L_World_Site_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_World_Exterior_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_World_Interior_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_World_BldgEquipment_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_World_SiteEquipment_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_World_Cameras_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_World_CFD_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_Interior_Structure_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_Interior_Architecture_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_Interior_Electrical_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_Interior_Mechanical_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_Interior_Twin_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_Interior_InteriorLights_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g></g><g class="nodes"><g class="node default  " id="mermaid-1785397004976-flowchart-World-0" data-look="classic" transform="translate(1043.44921875, 47)"><rect class="basic label-container" style="" x="-101.8984375" y="-39" width="203.796875" height="78"></rect><g class="label" style="" transform="translate(-71.8984375, -24)"><rect></rect><foreignObject width="143.796875" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>/World<br>DSX_Main_BP.usda</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397004976-flowchart-Site-2" data-look="classic" transform="translate(303.02734375, 175)"><rect class="basic label-container" style="" x="-82.0234375" y="-39" width="164.046875" height="78"></rect><g class="label" style="" transform="translate(-52.0234375, -24)"><rect></rect><foreignObject width="104.046875" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>assembly_Site<br>场地环境</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397004976-flowchart-Exterior-4" data-look="classic" transform="translate(497.05078125, 175)"><rect class="basic label-container" style="" x="-62" y="-39" width="124" height="78"></rect><g class="label" style="" transform="translate(-32, -24)"><rect></rect><foreignObject width="64" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>Building<br>建筑外壳</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397004976-flowchart-Interior-6" data-look="classic" transform="translate(737.77734375, 175)"><rect class="basic label-container" style="" x="-128.7265625" y="-39" width="257.453125" height="78"></rect><g class="label" style="" transform="translate(-98.7265625, -24)"><rect></rect><foreignObject width="197.453125" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>Assembly_Building_Internal<br>室内 BIM</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397004976-flowchart-BldgEquipment-8" data-look="classic" transform="translate(1043.44921875, 175)"><rect class="basic label-container" style="" x="-126.9453125" y="-39" width="253.890625" height="78"></rect><g class="label" style="" transform="translate(-96.9453125, -24)"><rect></rect><foreignObject width="193.890625" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>assembly_Bldg_Equipment<br>建筑设备</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397004976-flowchart-SiteEquipment-10" data-look="classic" transform="translate(1345.11328125, 175)"><rect class="basic label-container" style="" x="-124.71875" y="-39" width="249.4375" height="78"></rect><g class="label" style="" transform="translate(-94.71875, -24)"><rect></rect><foreignObject width="189.4375" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>assembly_Site_Equipment<br>场地设备</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397004976-flowchart-Cameras-12" data-look="classic" transform="translate(1621.41796875, 175)"><rect class="basic label-container" style="" x="-101.5859375" y="-39" width="203.171875" height="78"></rect><g class="label" style="" transform="translate(-71.5859375, -24)"><rect></rect><foreignObject width="143.171875" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>interactive_cameras<br>交互相机</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397004976-flowchart-CFD-14" data-look="classic" transform="translate(1845.23046875, 175)"><rect class="basic label-container" style="" x="-72.2265625" y="-39" width="144.453125" height="78"></rect><g class="label" style="" transform="translate(-42.2265625, -24)"><rect></rect><foreignObject width="84.453125" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>CFD_Layer<br>流场/体数据</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397004976-flowchart-Structure-16" data-look="classic" transform="translate(106.015625, 303)"><rect class="basic label-container" style="" x="-98.015625" y="-39" width="196.03125" height="78"></rect><g class="label" style="" transform="translate(-68.015625, -24)"><rect></rect><foreignObject width="136.03125" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>DSX_STRU_OMNI<br>结构</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397004976-flowchart-Architecture-18" data-look="classic" transform="translate(352.9375, 303)"><rect class="basic label-container" style="" x="-98.90625" y="-39" width="197.8125" height="78"></rect><g class="label" style="" transform="translate(-68.90625, -24)"><rect></rect><foreignObject width="137.8125" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>DSX_ARCH_OMNI<br>建筑</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397004976-flowchart-Electrical-20" data-look="classic" transform="translate(609.203125, 303)"><rect class="basic label-container" style="" x="-107.359375" y="-39" width="214.71875" height="78"></rect><g class="label" style="" transform="translate(-77.359375, -24)"><rect></rect><foreignObject width="154.71875" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>DSX_ELEC_OMNI_lit<br>电气</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397004976-flowchart-Mechanical-22" data-look="classic" transform="translate(866.3515625, 303)"><rect class="basic label-container" style="" x="-99.7890625" y="-39" width="199.578125" height="78"></rect><g class="label" style="" transform="translate(-69.7890625, -24)"><rect></rect><foreignObject width="139.578125" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>DSX_MECH_OMNI<br>机电/HVAC</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397004976-flowchart-Twin-24" data-look="classic" transform="translate(1139.953125, 303)"><rect class="basic label-container" style="" x="-123.8125" y="-39" width="247.625" height="78"></rect><g class="label" style="" transform="translate(-93.8125, -24)"><rect></rect><foreignObject width="187.625" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>DSX_Z0T0_AAA00_TWIN<br>弱电/通信相关</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397004976-flowchart-InteriorLights-26" data-look="classic" transform="translate(1429.1640625, 303)"><rect class="basic label-container" style="" x="-115.3984375" y="-39" width="230.796875" height="78"></rect><g class="label" style="" transform="translate(-85.3984375, -24)"><rect></rect><foreignObject width="170.796875" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>Lights_Building_Internal<br>室内照明</p></span></div></foreignObject></g></g></g></g></g><defs><filter id="mermaid-1785397004976-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"></feDropShadow></filter></defs><defs><filter id="mermaid-1785397004976-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"></feDropShadow></filter></defs><linearGradient id="mermaid-1785397004976-gradient" gradientUnits="objectBoundingBox" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="hsl(0, 0%, 83.3333333333%)" stop-opacity="1"></stop><stop offset="100%" stop-color="hsl(0, 0%, 88.9215686275%)" stop-opacity="1"></stop></linearGradient></svg></pre>
+<h3 id="2-1-world-一级模块">2.1 <code>/World</code> 一级模块</h3>
+<table>
+<thead>
+<tr>
+<th>USD 节点</th>
+<th>作用</th>
+<th>主要内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>assembly_Site</code></td>
+<td>场地环境</td>
+<td>道路、冷却塔、附属建筑、地形及环境资产</td>
+</tr>
+<tr>
+<td><code>Building</code></td>
+<td>建筑外壳</td>
+<td>外墙、屋顶</td>
+</tr>
+<tr>
+<td><code>Assembly_Building_Internal</code></td>
+<td>室内 BIM 主体</td>
+<td>结构、建筑、电气、机电、照明与专业模型</td>
+</tr>
+<tr>
+<td><code>assembly_Bldg_Equipment</code></td>
+<td>建筑设备装配</td>
+<td>建筑内的机电、电气、通信及数据中心设备资产</td>
+</tr>
+<tr>
+<td><code>assembly_Site_Equipment</code></td>
+<td>场地设备装配</td>
+<td>室外电气与机械设备资产</td>
+</tr>
+<tr>
+<td><code>interactive_cameras</code></td>
+<td>交互浏览</td>
+<td>数据厅、室外、CFD、CDU、网络和 RPP 等相机</td>
+</tr>
+<tr>
+<td><code>CFD_Layer</code></td>
+<td>仿真可视化</td>
+<td>单 POD CFD 流场/体数据</td>
+</tr>
+</tbody></table>
+<h2 id="3-专业组件映射">3. 专业组件映射</h2>
+<table>
+<thead>
+<tr>
+<th>类别</th>
+<th>对应 USD 节点/资产</th>
+<th>可见组件</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>建筑与结构</td>
+<td><code>DSX_ARCH_OMNI</code>、<code>DSX_STRU_OMNI</code>、<code>Building/Bldg_Exterior</code></td>
+<td>内外墙、屋顶、楼板、门、吊顶、楼梯、栏杆、柱、梁、基础</td>
+</tr>
+<tr>
+<td>电气</td>
+<td><code>DSX_ELEC_OMNI_lit</code>、<code>DS9_Z0E0_*_EQUIPMENT</code></td>
+<td>配电设备、电缆桥架及配件、灯具、线管及线管配件；资产名称含 RPP、MSB、RMU、UPS、UPS 电池、变压器、开关柜与配电板</td>
+</tr>
+<tr>
+<td>机械 / HVAC</td>
+<td><code>DSX_MECH_OMNI</code>、<code>DS9_Z0M0_*_EQUIPMENT</code></td>
+<td>机械设备、风管、风管配件、风口、冷却单元、CDU、加湿器、IPAK 空调机</td>
+</tr>
+<tr>
+<td>管道</td>
+<td><code>DSX_MECH_OMNI/Instances/Pipes</code></td>
+<td>管段、<code>PipeFittings</code> 管件、<code>PipeAccessories</code> 附件、<code>PipeInsulations</code> 保温；CDU 顶部管道作为设备族资产存在</td>
+</tr>
+<tr>
+<td>弱电 / 通信</td>
+<td><code>DSX_Z0T0_AAA00_TWIN</code>、<code>DS9_Z0T0_BLDG_EQUIPMENT</code></td>
+<td>通信设备、通信机柜/机架、桥架、线管</td>
+</tr>
+<tr>
+<td>场地设备</td>
+<td><code>assembly_Site_Equipment</code></td>
+<td>室外变压器、BESS 储能、应急燃气电源、室外主配电/开关设备及机械场地设备</td>
+</tr>
+<tr>
+<td>IT / 数据中心设备</td>
+<td>建筑设备中的 <code>Z0S0</code> 分支及 <code>Data_Center</code> 资产</td>
+<td>HAC、GPU/GB200/GB300 机柜、数据厅组合、供电电缆和托盘</td>
+</tr>
+</tbody></table>
+<h2 id="4-室内-bim-的细分结构">4. 室内 BIM 的细分结构</h2>
+<pre class="mermaid" data-processed="true"><svg id="mermaid-1785397005909" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="flowchart" style="max-width: 881.078125px;" viewBox="0 0 881.078125 582" role="graphics-document document" aria-roledescription="flowchart-v2"><style>#mermaid-1785397005909{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#000000;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#mermaid-1785397005909 .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#mermaid-1785397005909 .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#mermaid-1785397005909 .error-icon{fill:#552222;}#mermaid-1785397005909 .error-text{fill:#552222;stroke:#552222;}#mermaid-1785397005909 .edge-thickness-normal{stroke-width:1px;}#mermaid-1785397005909 .edge-thickness-thick{stroke-width:3.5px;}#mermaid-1785397005909 .edge-pattern-solid{stroke-dasharray:0;}#mermaid-1785397005909 .edge-thickness-invisible{stroke-width:0;fill:none;}#mermaid-1785397005909 .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-1785397005909 .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-1785397005909 .marker{fill:#666;stroke:#666;}#mermaid-1785397005909 .marker.cross{stroke:#666;}#mermaid-1785397005909 svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#mermaid-1785397005909 p{margin:0;}#mermaid-1785397005909 .label{font-family:"trebuchet ms",verdana,arial,sans-serif;color:#000000;}#mermaid-1785397005909 .cluster-label text{fill:#333;}#mermaid-1785397005909 .cluster-label span{color:#333;}#mermaid-1785397005909 .cluster-label span p{background-color:transparent;}#mermaid-1785397005909 .label text,#mermaid-1785397005909 span{fill:#000000;color:#000000;}#mermaid-1785397005909 .node rect,#mermaid-1785397005909 .node circle,#mermaid-1785397005909 .node ellipse,#mermaid-1785397005909 .node polygon,#mermaid-1785397005909 .node path{fill:#eee;stroke:#999;stroke-width:1px;}#mermaid-1785397005909 .rough-node .label text,#mermaid-1785397005909 .node .label text,#mermaid-1785397005909 .image-shape .label,#mermaid-1785397005909 .icon-shape .label{text-anchor:middle;}#mermaid-1785397005909 .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#mermaid-1785397005909 .rough-node .label,#mermaid-1785397005909 .node .label,#mermaid-1785397005909 .image-shape .label,#mermaid-1785397005909 .icon-shape .label{text-align:center;}#mermaid-1785397005909 .node.clickable{cursor:pointer;}#mermaid-1785397005909 .root .anchor path{fill:#666!important;stroke-width:0;stroke:#666;}#mermaid-1785397005909 .arrowheadPath{fill:#333333;}#mermaid-1785397005909 .edgePath .path{stroke:#666;stroke-width:1px;}#mermaid-1785397005909 .flowchart-link{stroke:#666;fill:none;}#mermaid-1785397005909 .edgeLabel{background-color:white;text-align:center;}#mermaid-1785397005909 .edgeLabel p{background-color:white;}#mermaid-1785397005909 .edgeLabel rect{opacity:0.5;background-color:white;fill:white;}#mermaid-1785397005909 .labelBkg{background-color:rgba(255, 255, 255, 0.5);}#mermaid-1785397005909 .cluster rect{fill:hsl(0, 0%, 98.9215686275%);stroke:#707070;stroke-width:1px;}#mermaid-1785397005909 .cluster text{fill:#333;}#mermaid-1785397005909 .cluster span{color:#333;}#mermaid-1785397005909 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:12px;background:hsl(-160, 0%, 93.3333333333%);border:1px solid #707070;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-1785397005909 .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#000000;}#mermaid-1785397005909 rect.text{fill:none;stroke-width:0;}#mermaid-1785397005909 .icon-shape,#mermaid-1785397005909 .image-shape{background-color:white;text-align:center;}#mermaid-1785397005909 .icon-shape p,#mermaid-1785397005909 .image-shape p{background-color:white;padding:2px;}#mermaid-1785397005909 .icon-shape .label rect,#mermaid-1785397005909 .image-shape .label rect{opacity:0.5;background-color:white;fill:white;}#mermaid-1785397005909 .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#mermaid-1785397005909 .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#mermaid-1785397005909 .node .neo-node{stroke:#999;}#mermaid-1785397005909 [data-look="neo"].node rect,#mermaid-1785397005909 [data-look="neo"].cluster rect,#mermaid-1785397005909 [data-look="neo"].node polygon{stroke:url(#mermaid-1785397005909-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785397005909 [data-look="neo"].swimlane.cluster rect{filter:none;}#mermaid-1785397005909 [data-look="neo"].node path{stroke:url(#mermaid-1785397005909-gradient);stroke-width:1px;}#mermaid-1785397005909 [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785397005909 [data-look="neo"].node .neo-line path{stroke:#999;filter:none;}#mermaid-1785397005909 [data-look="neo"].node circle{stroke:url(#mermaid-1785397005909-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785397005909 [data-look="neo"].node circle .state-start{fill:#000000;}#mermaid-1785397005909 [data-look="neo"].icon-shape .icon{fill:url(#mermaid-1785397005909-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785397005909 [data-look="neo"].icon-shape .icon-neo path{stroke:url(#mermaid-1785397005909-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785397005909 :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g><marker id="mermaid-1785397005909_flowchart-v2-pointEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1785397005909_flowchart-v2-pointStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1785397005909_flowchart-v2-pointEnd-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14" orient="auto"><path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1785397005909_flowchart-v2-pointStart-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14" orient="auto"><polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></polygon></marker><marker id="mermaid-1785397005909_flowchart-v2-circleEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1785397005909_flowchart-v2-circleStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1785397005909_flowchart-v2-circleEnd-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1785397005909_flowchart-v2-circleStart-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1785397005909_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1785397005909_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1785397005909_flowchart-v2-crossEnd-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5;"></path></marker><marker id="mermaid-1785397005909_flowchart-v2-crossStart-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5; stroke-dasharray: 1, 0;"></path></marker><g class="root"><g class="clusters"></g><g class="edgePaths"><path d="M152.94,276L175.859,237.833C198.778,199.667,244.615,123.333,275.334,85.167C306.052,47,321.651,47,329.451,47L337.25,47" id="mermaid-1785397005909-L_A_S_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_A_S_0" data-points="W3sieCI6MTUyLjkzOTkxMDg4ODY3MTg4LCJ5IjoyNzZ9LHsieCI6MjkwLjQ1MzEyNSwieSI6NDd9LHsieCI6MzQxLjI1LCJ5Ijo0N31d" data-look="classic" marker-end="url(#mermaid-1785397005909_flowchart-v2-pointEnd)"></path><path d="M169.153,276L189.37,259.167C209.587,242.333,250.02,208.667,277.888,191.833C305.755,175,321.057,175,328.708,175L336.359,175" id="mermaid-1785397005909-L_A_B_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_A_B_0" data-points="W3sieCI6MTY5LjE1MzI1OTI3NzM0Mzc1LCJ5IjoyNzZ9LHsieCI6MjkwLjQ1MzEyNSwieSI6MTc1fSx7IngiOjM0MC4zNTkzNzUsInkiOjE3NX1d" data-look="classic" marker-end="url(#mermaid-1785397005909_flowchart-v2-pointEnd)"></path><path d="M265.453,303L269.62,303C273.786,303,282.12,303,292.529,303C302.938,303,315.422,303,321.664,303L327.906,303" id="mermaid-1785397005909-L_A_E_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_A_E_0" data-points="W3sieCI6MjY1LjQ1MzEyNSwieSI6MzAzfSx7IngiOjI5MC40NTMxMjUsInkiOjMwM30seyJ4IjozMzEuOTA2MjUsInkiOjMwM31d" data-look="classic" marker-end="url(#mermaid-1785397005909_flowchart-v2-pointEnd)"></path><path d="M169.153,330L189.37,346.833C209.587,363.667,250.02,397.333,277.74,414.167C305.461,431,320.469,431,327.973,431L335.477,431" id="mermaid-1785397005909-L_A_M_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_A_M_0" data-points="W3sieCI6MTY5LjE1MzI1OTI3NzM0Mzc1LCJ5IjozMzB9LHsieCI6MjkwLjQ1MzEyNSwieSI6NDMxfSx7IngiOjMzOS40NzY1NjI1LCJ5Ijo0MzF9XQ==" data-look="classic" marker-end="url(#mermaid-1785397005909_flowchart-v2-pointEnd)"></path><path d="M153.737,330L176.523,366.167C199.309,402.333,244.881,474.667,271.167,510.833C297.453,547,304.453,547,307.953,547L311.453,547" id="mermaid-1785397005909-L_A_T_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_A_T_0" data-points="W3sieCI6MTUzLjczNzI4ODY3ODI3ODY3LCJ5IjozMzB9LHsieCI6MjkwLjQ1MzEyNSwieSI6NTQ3fSx7IngiOjMxNS40NTMxMjUsInkiOjU0N31d" data-look="classic" marker-end="url(#mermaid-1785397005909_flowchart-v2-pointEnd)"></path><path d="M537.281,47L545.747,47C554.214,47,571.146,47,583.112,47C595.078,47,602.078,47,605.578,47L609.078,47" id="mermaid-1785397005909-L_S_S1_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_S_S1_0" data-points="W3sieCI6NTM3LjI4MTI1LCJ5Ijo0N30seyJ4Ijo1ODguMDc4MTI1LCJ5Ijo0N30seyJ4Ijo2MTMuMDc4MTI1LCJ5Ijo0N31d" data-look="classic" marker-end="url(#mermaid-1785397005909_flowchart-v2-pointEnd)"></path><path d="M538.172,175L546.49,175C554.807,175,571.443,175,583.26,175C595.078,175,602.078,175,605.578,175L609.078,175" id="mermaid-1785397005909-L_B_B1_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_B_B1_0" data-points="W3sieCI6NTM4LjE3MTg3NSwieSI6MTc1fSx7IngiOjU4OC4wNzgxMjUsInkiOjE3NX0seyJ4Ijo2MTMuMDc4MTI1LCJ5IjoxNzV9XQ==" data-look="classic" marker-end="url(#mermaid-1785397005909_flowchart-v2-pointEnd)"></path><path d="M546.625,303L553.534,303C560.443,303,574.26,303,584.669,303C595.078,303,602.078,303,605.578,303L609.078,303" id="mermaid-1785397005909-L_E_E1_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_E_E1_0" data-points="W3sieCI6NTQ2LjYyNSwieSI6MzAzfSx7IngiOjU4OC4wNzgxMjUsInkiOjMwM30seyJ4Ijo2MTMuMDc4MTI1LCJ5IjozMDN9XQ==" data-look="classic" marker-end="url(#mermaid-1785397005909_flowchart-v2-pointEnd)"></path><path d="M539.055,431L547.225,431C555.396,431,571.737,431,583.408,431C595.078,431,602.078,431,605.578,431L609.078,431" id="mermaid-1785397005909-L_M_M1_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_M_M1_0" data-points="W3sieCI6NTM5LjA1NDY4NzUsInkiOjQzMX0seyJ4Ijo1ODguMDc4MTI1LCJ5Ijo0MzF9LHsieCI6NjEzLjA3ODEyNSwieSI6NDMxfV0=" data-look="classic" marker-end="url(#mermaid-1785397005909_flowchart-v2-pointEnd)"></path><path d="M563.078,547L567.245,547C571.411,547,579.745,547,590.745,547C601.745,547,615.411,547,622.245,547L629.078,547" id="mermaid-1785397005909-L_T_T1_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_T_T1_0" data-points="W3sieCI6NTYzLjA3ODEyNSwieSI6NTQ3fSx7IngiOjU4OC4wNzgxMjUsInkiOjU0N30seyJ4Ijo2MzMuMDc4MTI1LCJ5Ijo1NDd9XQ==" data-look="classic" marker-end="url(#mermaid-1785397005909_flowchart-v2-pointEnd)"></path></g><g class="edgeLabels"><g class="edgeLabel"><g class="label" data-id="L_A_S_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_A_B_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_A_E_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_A_M_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_A_T_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_S_S1_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_B_B1_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_E_E1_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_M_M1_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_T_T1_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g></g><g class="nodes"><g class="node default  " id="mermaid-1785397005909-flowchart-A-0" data-look="classic" transform="translate(136.7265625, 303)"><rect class="basic label-container" style="" x="-128.7265625" y="-27" width="257.453125" height="54"></rect><g class="label" style="" transform="translate(-98.7265625, -12)"><rect></rect><foreignObject width="197.453125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>Assembly_Building_Internal</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397005909-flowchart-S-1" data-look="classic" transform="translate(439.265625, 47)"><rect class="basic label-container" style="" x="-98.015625" y="-27" width="196.03125" height="54"></rect><g class="label" style="" transform="translate(-68.015625, -12)"><rect></rect><foreignObject width="136.03125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>DSX_STRU_OMNI</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397005909-flowchart-B-3" data-look="classic" transform="translate(439.265625, 175)"><rect class="basic label-container" style="" x="-98.90625" y="-27" width="197.8125" height="54"></rect><g class="label" style="" transform="translate(-68.90625, -12)"><rect></rect><foreignObject width="137.8125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>DSX_ARCH_OMNI</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397005909-flowchart-E-5" data-look="classic" transform="translate(439.265625, 303)"><rect class="basic label-container" style="" x="-107.359375" y="-27" width="214.71875" height="54"></rect><g class="label" style="" transform="translate(-77.359375, -12)"><rect></rect><foreignObject width="154.71875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>DSX_ELEC_OMNI_lit</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397005909-flowchart-M-7" data-look="classic" transform="translate(439.265625, 431)"><rect class="basic label-container" style="" x="-99.7890625" y="-27" width="199.578125" height="54"></rect><g class="label" style="" transform="translate(-69.7890625, -12)"><rect></rect><foreignObject width="139.578125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>DSX_MECH_OMNI</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397005909-flowchart-T-9" data-look="classic" transform="translate(439.265625, 547)"><rect class="basic label-container" style="" x="-123.8125" y="-27" width="247.625" height="54"></rect><g class="label" style="" transform="translate(-93.8125, -12)"><rect></rect><foreignObject width="187.625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>DSX_Z0T0_AAA00_TWIN</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397005909-flowchart-S1-11" data-look="classic" transform="translate(743.078125, 47)"><rect class="basic label-container" style="" x="-130" y="-39" width="260" height="78"></rect><g class="label" style="" transform="translate(-100, -24)"><rect></rect><foreignObject width="200" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel "><p>楼板、结构柱、结构梁、连接件、基础、结构墙</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397005909-flowchart-B1-13" data-look="classic" transform="translate(743.078125, 175)"><rect class="basic label-container" style="" x="-130" y="-39" width="260" height="78"></rect><g class="label" style="" transform="translate(-100, -24)"><rect></rect><foreignObject width="200" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel "><p>楼板、墙、门、吊顶、楼梯、栏杆、洁具</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397005909-flowchart-E1-15" data-look="classic" transform="translate(743.078125, 303)"><rect class="basic label-container" style="" x="-130" y="-39" width="260" height="78"></rect><g class="label" style="" transform="translate(-100, -24)"><rect></rect><foreignObject width="200" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel "><p>电气设备、桥架、桥架配件、灯具、线管</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397005909-flowchart-M1-17" data-look="classic" transform="translate(743.078125, 431)"><rect class="basic label-container" style="" x="-130" y="-39" width="260" height="78"></rect><g class="label" style="" transform="translate(-100, -24)"><rect></rect><foreignObject width="200" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel "><p>机械设备、风管、管道、管件、附件、保温、风口</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397005909-flowchart-T1-19" data-look="classic" transform="translate(743.078125, 547)"><rect class="basic label-container" style="" x="-110" y="-27" width="220" height="54"></rect><g class="label" style="" transform="translate(-80, -12)"><rect></rect><foreignObject width="160" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>通信设备、桥架、线管</p></span></div></foreignObject></g></g></g></g></g><defs><filter id="mermaid-1785397005909-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"></feDropShadow></filter></defs><defs><filter id="mermaid-1785397005909-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"></feDropShadow></filter></defs><linearGradient id="mermaid-1785397005909-gradient" gradientUnits="objectBoundingBox" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="hsl(0, 0%, 83.3333333333%)" stop-opacity="1"></stop><stop offset="100%" stop-color="hsl(0, 0%, 88.9215686275%)" stop-opacity="1"></stop></linearGradient></svg></pre>
+<h3 id="4-1-bim-集成进入-usd-的信息">4.1 BIM 集成进入 USD 的信息</h3>
+<p>可以把当前 USD 理解为：<strong>BIM 中适合空间协同、浏览和仿真的信息已经进入场景；计算与设计审批的源数据仍保留在各专业工程系统中。</strong></p>
+<table>
+<thead>
+<tr>
+<th>BIM 信息层</th>
+<th>进入 USD 的具体信息</th>
+<th>在当前场景中的表现</th>
+<th>可支持的用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>空间与几何</td>
+<td>构件/设备的三维几何、尺寸边界、朝向、世界坐标、层高关系</td>
+<td><code>Mesh</code>/其他几何 Prim、<code>extent</code>、变换矩阵；场景采用米为单位、Z 轴向上</td>
+<td>视图浏览、空间布置、净空与干涉候选检查、为 CFD 提供几何边界</td>
+</tr>
+<tr>
+<td>专业分类与层级</td>
+<td>建筑、结构、电气、机械、管道、弱电等专业树；构件类别</td>
+<td><code>DSX_ARCH_OMNI</code>、<code>DSX_STRU_OMNI</code>、<code>DSX_ELEC_OMNI_lit</code>、<code>DSX_MECH_OMNI</code> 等，以及 <code>Walls</code>、<code>Pipes</code>、<code>Conduits</code>、<code>CableTrays</code> 等子树</td>
+<td>按专业加载、显隐、筛选和分工协同</td>
+</tr>
+<tr>
+<td>构件/设备身份</td>
+<td>Prim 路径、<code>displayName</code>、<code>kind</code>、族/原型关系、部分设备名称与规格文本</td>
+<td><code>Families</code>、<code>Instances</code>、<code>Prototypes</code>；名称中可见 UPS、RPP、MSB、CDU、变压器等</td>
+<td>设备定位、设备 ID 映射、与 ETAP/CFD/DCIM 等外部数据建立关联</td>
+</tr>
+<tr>
+<td>重复构件与配置</td>
+<td>可复用设备原型、设备实例、变体选择</td>
+<td><code>reference</code>、<code>instanceable</code>、<code>variant</code></td>
+<td>控制模型体量；用统一资产更新重复设备</td>
+</tr>
+<tr>
+<td>材质与可视化</td>
+<td>表面材质、纹理、颜色、透明度、照明和相机</td>
+<td><code>Looks</code>、材质输入属性、<code>Lighting</code>、<code>interactive_cameras</code></td>
+<td>评审展示、交互浏览、面向非专业人员的空间沟通</td>
+</tr>
+<tr>
+<td>场地和建筑上下文</td>
+<td>场地道路、冷却塔、建筑外壳、室内建筑/结构构件</td>
+<td><code>assembly_Site</code>、<code>Building</code>、建筑与结构专业子树</td>
+<td>设备选址、运输/维护路径和室内外空间关系讨论</td>
+</tr>
+<tr>
+<td>仿真关联信息</td>
+<td>CFD 结果层及其所依附的空间模型</td>
+<td><code>CFD_Layer</code> 与 <code>NV_DC_DS9_GB300_SinglePOD</code></td>
+<td>在同一空间坐标中查看流场/温度等仿真结果；不取代 CFD 源模型</td>
+</tr>
+</tbody></table>
+<p>当前可直接确认的是上述 USD 路径、几何、变换、分类、显示名称、材质和资产组合关系。**不应假设所有 Revit 参数或 BIM 属性都已完整保留为 USD 属性。**本次检查并未把完整的构件参数表、系统连接关系或工程计算书作为场景数据读取出来。</p>
+<h3 id="4-2-未由当前-usd-单独承载或不能据此确认的信息">4.2 未由当前 USD 单独承载或不能据此确认的信息</h3>
+<table>
+<thead>
+<tr>
+<th>信息类型</th>
+<th>应以什么为准</th>
+<th>原因</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>电气单线图、回路连通、A/B 路、容量、短路与保护配合</td>
+<td>ETAP/正式电气设计文件</td>
+<td>现有 USD 清楚表达了设备和空间位置，但不等于电力网络计算模型</td>
+</tr>
+<tr>
+<td>风量、水量、管径选型、阀门工况、压降、控制逻辑</td>
+<td>MEP 设计模型、设备表和计算书</td>
+<td>USD 中的管道/风管几何不等于经过校核的系统计算结果</td>
+</tr>
+<tr>
+<td>CFD 网格、边界条件、热负荷、收敛标准和结果有效性</td>
+<td>CFD 求解器工程文件与仿真报告</td>
+<td>USD 可以展示结果，但不保存或验证全部求解过程</td>
+</tr>
+<tr>
+<td>构件参数、采购状态、运维状态、责任人与审批记录</td>
+<td>BIM 源模型、CDE/PLM/ERP/DCIM 等系统</td>
+<td>这些信息只有在明确映射为 USD 自定义属性或外部数据链接后，才能在场景中可靠使用</td>
+</tr>
+</tbody></table>
+<h2 id="5-usd-资产复用方式">5. USD 资产复用方式</h2>
+<p>场景采用下列组合机制，以在保持资产可复用的同时完成场景布置。</p>
+<table>
+<thead>
+<tr>
+<th>机制</th>
+<th>在本场景中的作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>payload</code></td>
+<td>将场地、建筑、设备等大模块按需加载到主场景；主装配层会以 <code>delete payload</code> 与 <code>prepend payload</code> 将原始收集路径重定向到发布包中的相对路径。</td>
+</tr>
+<tr>
+<td><code>reference</code></td>
+<td>将已有资产或原型引用至场景位置，避免复制几何。</td>
+</tr>
+<tr>
+<td><code>instanceable</code></td>
+<td>复用重复的设备族和构件原型；场景中的多个布置节点共享同一资产定义。</td>
+</tr>
+<tr>
+<td><code>variant</code></td>
+<td>表示设备族或配置的不同选择。</td>
+</tr>
+<tr>
+<td><code>sublayer</code></td>
+<td>为建筑内部叠加默认可见性和材质等意见层。</td>
+</tr>
+</tbody></table>
+<p>常见的资产组织方式为：</p>
+<pre><code class="language-text">装配层
+└─ 专业 / 区域层
+   ├─ Instances     已布置到场景中的实例
+   ├─ Prototypes    可复用原型
+   └─ Families      BIM/Revit 设备族资产
+      ├─ Geometry   几何
+      └─ Looks      材质外观
+</code></pre>
+<h2 id="6-当前资源完整性备注">6. 当前资源完整性备注</h2>
+<p>完整加载场景时，发现以下外部依赖存在缺失警告：</p>
+<table>
+<thead>
+<tr>
+<th>依赖类型</th>
+<th>影响范围</th>
+<th>当前影响</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>远景山体 payload</td>
+<td>场地环境</td>
+<td>局部远景环境资产可能缺失</td>
+</tr>
+<tr>
+<td>HVAC 材质 sublayer</td>
+<td>建筑设备</td>
+<td>局部 HVAC 材质可能缺失，结构层级不受影响</td>
+</tr>
+</tbody></table>
+<p>这些问题不改变本文档的组件层级判断，但在渲染发布或资源打包前需要单独核查。</p>
+<h2 id="7-场景制作所需的专业知识与协作角色">7. 场景制作所需的专业知识与协作角色</h2>
+<p>这类 USD 场景的核心不是由单一“建模人员”完成，而是把各工程专业的<strong>可信空间数据</strong>汇集到统一的可视化与协同底图中。建议的角色与知识结构如下。</p>
+<pre class="mermaid" data-processed="true"><svg id="mermaid-1785397006000" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="flowchart" style="max-width: 1690.09375px;" viewBox="0 0 1690.09375 302" role="graphics-document document" aria-roledescription="flowchart-v2"><style>#mermaid-1785397006000{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#000000;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#mermaid-1785397006000 .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#mermaid-1785397006000 .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#mermaid-1785397006000 .error-icon{fill:#552222;}#mermaid-1785397006000 .error-text{fill:#552222;stroke:#552222;}#mermaid-1785397006000 .edge-thickness-normal{stroke-width:1px;}#mermaid-1785397006000 .edge-thickness-thick{stroke-width:3.5px;}#mermaid-1785397006000 .edge-pattern-solid{stroke-dasharray:0;}#mermaid-1785397006000 .edge-thickness-invisible{stroke-width:0;fill:none;}#mermaid-1785397006000 .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-1785397006000 .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-1785397006000 .marker{fill:#666;stroke:#666;}#mermaid-1785397006000 .marker.cross{stroke:#666;}#mermaid-1785397006000 svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#mermaid-1785397006000 p{margin:0;}#mermaid-1785397006000 .label{font-family:"trebuchet ms",verdana,arial,sans-serif;color:#000000;}#mermaid-1785397006000 .cluster-label text{fill:#333;}#mermaid-1785397006000 .cluster-label span{color:#333;}#mermaid-1785397006000 .cluster-label span p{background-color:transparent;}#mermaid-1785397006000 .label text,#mermaid-1785397006000 span{fill:#000000;color:#000000;}#mermaid-1785397006000 .node rect,#mermaid-1785397006000 .node circle,#mermaid-1785397006000 .node ellipse,#mermaid-1785397006000 .node polygon,#mermaid-1785397006000 .node path{fill:#eee;stroke:#999;stroke-width:1px;}#mermaid-1785397006000 .rough-node .label text,#mermaid-1785397006000 .node .label text,#mermaid-1785397006000 .image-shape .label,#mermaid-1785397006000 .icon-shape .label{text-anchor:middle;}#mermaid-1785397006000 .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#mermaid-1785397006000 .rough-node .label,#mermaid-1785397006000 .node .label,#mermaid-1785397006000 .image-shape .label,#mermaid-1785397006000 .icon-shape .label{text-align:center;}#mermaid-1785397006000 .node.clickable{cursor:pointer;}#mermaid-1785397006000 .root .anchor path{fill:#666!important;stroke-width:0;stroke:#666;}#mermaid-1785397006000 .arrowheadPath{fill:#333333;}#mermaid-1785397006000 .edgePath .path{stroke:#666;stroke-width:1px;}#mermaid-1785397006000 .flowchart-link{stroke:#666;fill:none;}#mermaid-1785397006000 .edgeLabel{background-color:white;text-align:center;}#mermaid-1785397006000 .edgeLabel p{background-color:white;}#mermaid-1785397006000 .edgeLabel rect{opacity:0.5;background-color:white;fill:white;}#mermaid-1785397006000 .labelBkg{background-color:rgba(255, 255, 255, 0.5);}#mermaid-1785397006000 .cluster rect{fill:hsl(0, 0%, 98.9215686275%);stroke:#707070;stroke-width:1px;}#mermaid-1785397006000 .cluster text{fill:#333;}#mermaid-1785397006000 .cluster span{color:#333;}#mermaid-1785397006000 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:12px;background:hsl(-160, 0%, 93.3333333333%);border:1px solid #707070;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-1785397006000 .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#000000;}#mermaid-1785397006000 rect.text{fill:none;stroke-width:0;}#mermaid-1785397006000 .icon-shape,#mermaid-1785397006000 .image-shape{background-color:white;text-align:center;}#mermaid-1785397006000 .icon-shape p,#mermaid-1785397006000 .image-shape p{background-color:white;padding:2px;}#mermaid-1785397006000 .icon-shape .label rect,#mermaid-1785397006000 .image-shape .label rect{opacity:0.5;background-color:white;fill:white;}#mermaid-1785397006000 .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#mermaid-1785397006000 .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#mermaid-1785397006000 .node .neo-node{stroke:#999;}#mermaid-1785397006000 [data-look="neo"].node rect,#mermaid-1785397006000 [data-look="neo"].cluster rect,#mermaid-1785397006000 [data-look="neo"].node polygon{stroke:url(#mermaid-1785397006000-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785397006000 [data-look="neo"].swimlane.cluster rect{filter:none;}#mermaid-1785397006000 [data-look="neo"].node path{stroke:url(#mermaid-1785397006000-gradient);stroke-width:1px;}#mermaid-1785397006000 [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785397006000 [data-look="neo"].node .neo-line path{stroke:#999;filter:none;}#mermaid-1785397006000 [data-look="neo"].node circle{stroke:url(#mermaid-1785397006000-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785397006000 [data-look="neo"].node circle .state-start{fill:#000000;}#mermaid-1785397006000 [data-look="neo"].icon-shape .icon{fill:url(#mermaid-1785397006000-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785397006000 [data-look="neo"].icon-shape .icon-neo path{stroke:url(#mermaid-1785397006000-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785397006000 :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g><marker id="mermaid-1785397006000_flowchart-v2-pointEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1785397006000_flowchart-v2-pointStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1785397006000_flowchart-v2-pointEnd-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14" orient="auto"><path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1785397006000_flowchart-v2-pointStart-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14" orient="auto"><polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></polygon></marker><marker id="mermaid-1785397006000_flowchart-v2-circleEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1785397006000_flowchart-v2-circleStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1785397006000_flowchart-v2-circleEnd-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1785397006000_flowchart-v2-circleStart-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1785397006000_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1785397006000_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1785397006000_flowchart-v2-crossEnd-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5;"></path></marker><marker id="mermaid-1785397006000_flowchart-v2-crossStart-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5; stroke-dasharray: 1, 0;"></path></marker><g class="root"><g class="clusters"></g><g class="edgePaths"><path d="M112.672,62L112.672,66.167C112.672,70.333,112.672,78.667,215.366,90.196C318.061,101.726,523.45,116.452,626.144,123.814L728.838,131.177" id="mermaid-1785397006000-L_PM_USD_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_PM_USD_0" data-points="W3sieCI6MTEyLjY3MTg3NSwieSI6NjJ9LHsieCI6MTEyLjY3MTg3NSwieSI6ODd9LHsieCI6NzMyLjgyODEyNSwieSI6MTMxLjQ2MzQwMjgxMTQzOTY2fV0=" data-look="classic" marker-end="url(#mermaid-1785397006000_flowchart-v2-pointEnd)"></path><path d="M337.344,62L337.344,66.167C337.344,70.333,337.344,78.667,402.595,89.611C467.846,100.556,598.348,114.112,663.599,120.89L728.85,127.668" id="mermaid-1785397006000-L_Arch_USD_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_Arch_USD_0" data-points="W3sieCI6MzM3LjM0Mzc1LCJ5Ijo2Mn0seyJ4IjozMzcuMzQzNzUsInkiOjg3fSx7IngiOjczMi44MjgxMjUsInkiOjEyOC4wODA5NDk0ODI2NTM3fV0=" data-look="classic" marker-end="url(#mermaid-1785397006000_flowchart-v2-pointEnd)"></path><path d="M575.344,62L575.344,66.167C575.344,70.333,575.344,78.667,600.937,87.901C626.531,97.136,677.717,107.272,703.311,112.34L728.904,117.408" id="mermaid-1785397006000-L_MEP_USD_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_MEP_USD_0" data-points="W3sieCI6NTc1LjM0Mzc1LCJ5Ijo2Mn0seyJ4Ijo1NzUuMzQzNzUsInkiOjg3fSx7IngiOjczMi44MjgxMjUsInkiOjExOC4xODQ4MzkxOTkxMTkzOH1d" data-look="classic" marker-end="url(#mermaid-1785397006000_flowchart-v2-pointEnd)"></path><path d="M837.945,62L837.945,66.167C837.945,70.333,837.945,78.667,837.945,86.333C837.945,94,837.945,101,837.945,104.5L837.945,108" id="mermaid-1785397006000-L_Power_USD_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_Power_USD_0" data-points="W3sieCI6ODM3Ljk0NTMxMjUsInkiOjYyfSx7IngiOjgzNy45NDUzMTI1LCJ5Ijo4N30seyJ4Ijo4MzcuOTQ1MzEyNSwieSI6MTEyfV0=" data-look="classic" marker-end="url(#mermaid-1785397006000_flowchart-v2-pointEnd)"></path><path d="M1067.656,62L1067.656,66.167C1067.656,70.333,1067.656,78.667,1047.541,87.387C1027.425,96.107,987.195,105.214,967.079,109.768L946.964,114.321" id="mermaid-1785397006000-L_IT_USD_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_IT_USD_0" data-points="W3sieCI6MTA2Ny42NTYyNSwieSI6NjJ9LHsieCI6MTA2Ny42NTYyNSwieSI6ODd9LHsieCI6OTQzLjA2MjUsInkiOjExNS4yMDQ0Njg5MzE3NDE2Nn1d" data-look="classic" marker-end="url(#mermaid-1785397006000_flowchart-v2-pointEnd)"></path><path d="M1291.43,62L1291.43,66.167C1291.43,70.333,1291.43,78.667,1234.031,89.415C1176.632,100.164,1061.834,113.327,1004.435,119.909L947.036,126.491" id="mermaid-1785397006000-L_CFD_USD_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_CFD_USD_0" data-points="W3sieCI6MTI5MS40Mjk2ODc1LCJ5Ijo2Mn0seyJ4IjoxMjkxLjQyOTY4NzUsInkiOjg3fSx7IngiOjk0My4wNjI1LCJ5IjoxMjYuOTQ2NDU2MjU4ODI5Mn1d" data-look="classic" marker-end="url(#mermaid-1785397006000_flowchart-v2-pointEnd)"></path><path d="M1556.094,62L1556.094,66.167C1556.094,70.333,1556.094,78.667,1454.587,90.183C1353.08,101.7,1150.066,116.4,1048.559,123.75L947.052,131.1" id="mermaid-1785397006000-L_Viz_USD_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_Viz_USD_0" data-points="W3sieCI6MTU1Ni4wOTM3NSwieSI6NjJ9LHsieCI6MTU1Ni4wOTM3NSwieSI6ODd9LHsieCI6OTQzLjA2MjUsInkiOjEzMS4zODg2Mjk2MTM5MTZ9XQ==" data-look="classic" marker-end="url(#mermaid-1785397006000_flowchart-v2-pointEnd)"></path><path d="M837.945,166L837.945,170.167C837.945,174.333,837.945,182.667,837.945,190.333C837.945,198,837.945,205,837.945,208.5L837.945,212" id="mermaid-1785397006000-L_USD_Review_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_USD_Review_0" data-points="W3sieCI6ODM3Ljk0NTMxMjUsInkiOjE2Nn0seyJ4Ijo4MzcuOTQ1MzEyNSwieSI6MTkxfSx7IngiOjgzNy45NDUzMTI1LCJ5IjoyMTZ9XQ==" data-look="classic" marker-end="url(#mermaid-1785397006000_flowchart-v2-pointEnd)"></path></g><g class="edgeLabels"><g class="edgeLabel"><g class="label" data-id="L_PM_USD_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_Arch_USD_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_MEP_USD_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_Power_USD_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_IT_USD_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_CFD_USD_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_Viz_USD_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_USD_Review_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g></g><g class="nodes"><g class="node default  " id="mermaid-1785397006000-flowchart-PM-0" data-look="classic" transform="translate(112.671875, 35)"><rect class="basic label-container" style="" x="-104.671875" y="-27" width="209.34375" height="54"></rect><g class="label" style="" transform="translate(-74.671875, -12)"><rect></rect><foreignObject width="149.34375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>场景/BIM 协调负责人</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397006000-flowchart-USD-1" data-look="classic" transform="translate(837.9453125, 139)"><rect class="basic label-container" style="" x="-105.1171875" y="-27" width="210.234375" height="54"></rect><g class="label" style="" transform="translate(-75.1171875, -12)"><rect></rect><foreignObject width="150.234375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>USD 场景集成与发布</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397006000-flowchart-Arch-2" data-look="classic" transform="translate(337.34375, 35)"><rect class="basic label-container" style="" x="-70" y="-27" width="140" height="54"></rect><g class="label" style="" transform="translate(-40, -12)"><rect></rect><foreignObject width="80" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>建筑与结构</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397006000-flowchart-MEP-4" data-look="classic" transform="translate(575.34375, 35)"><rect class="basic label-container" style="" x="-118" y="-27" width="236" height="54"></rect><g class="label" style="" transform="translate(-88, -12)"><rect></rect><foreignObject width="176" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>暖通、给排水与工艺管道</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397006000-flowchart-Power-6" data-look="classic" transform="translate(837.9453125, 35)"><rect class="basic label-container" style="" x="-94.6015625" y="-27" width="189.203125" height="54"></rect><g class="label" style="" transform="translate(-64.6015625, -12)"><rect></rect><foreignObject width="129.203125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>电气与 ETAP 分析</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397006000-flowchart-IT-8" data-look="classic" transform="translate(1067.65625, 35)"><rect class="basic label-container" style="" x="-85.109375" y="-27" width="170.21875" height="54"></rect><g class="label" style="" transform="translate(-55.109375, -12)"><rect></rect><foreignObject width="110.21875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>IT、弱电与通信</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397006000-flowchart-CFD-10" data-look="classic" transform="translate(1291.4296875, 35)"><rect class="basic label-container" style="" x="-88.6640625" y="-27" width="177.328125" height="54"></rect><g class="label" style="" transform="translate(-58.6640625, -12)"><rect></rect><foreignObject width="117.328125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>CFD 热流体仿真</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397006000-flowchart-Viz-12" data-look="classic" transform="translate(1556.09375, 35)"><rect class="basic label-container" style="" x="-126" y="-27" width="252" height="54"></rect><g class="label" style="" transform="translate(-96, -12)"><rect></rect><foreignObject width="192" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>实时渲染、交互与数据工程</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397006000-flowchart-Review-15" data-look="classic" transform="translate(837.9453125, 255)"><rect class="basic label-container" style="" x="-130" y="-39" width="260" height="78"></rect><g class="label" style="" transform="translate(-100, -24)"><rect></rect><foreignObject width="200" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel "><p>空间协调、方案沟通、仿真可视化</p></span></div></foreignObject></g></g></g></g></g><defs><filter id="mermaid-1785397006000-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"></feDropShadow></filter></defs><defs><filter id="mermaid-1785397006000-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"></feDropShadow></filter></defs><linearGradient id="mermaid-1785397006000-gradient" gradientUnits="objectBoundingBox" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="hsl(0, 0%, 83.3333333333%)" stop-opacity="1"></stop><stop offset="100%" stop-color="hsl(0, 0%, 88.9215686275%)" stop-opacity="1"></stop></linearGradient></svg></pre>
+<table>
+<thead>
+<tr>
+<th>专业 / 角色</th>
+<th>所需背景与核心知识</th>
+<th>应向 USD 场景提供的内容</th>
+<th>本场景中的对应范围</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>场景/BIM 协调负责人</td>
+<td>BIM 协调、数据标准、模型发布与变更管理；理解各专业接口和空间净空</td>
+<td>坐标/单位/命名规则、版本基线、专业模型合并、问题闭环</td>
+<td><code>/World</code> 装配关系及各专业子树</td>
+</tr>
+<tr>
+<td>USD/Omniverse 技术人员</td>
+<td>USD 的 <code>payload</code>、<code>reference</code>、<code>instance</code>、<code>variant</code>、<code>sublayer</code>；Python/资产路径/性能优化</td>
+<td>将 BIM、CAD、仿真与设备资产整理成可加载、可复用、可发布的 USD 场景</td>
+<td>主装配层、<code>Families</code>、<code>Geometry</code>、<code>Looks</code></td>
+</tr>
+<tr>
+<td>建筑与结构工程师</td>
+<td>建筑、结构布置、构件族、设备洞口、检修与空间约束</td>
+<td>墙、楼板、屋顶、门、楼梯、柱、梁、基础及其空间边界</td>
+<td><code>DSX_ARCH_OMNI</code>、<code>DSX_STRU_OMNI</code>、<code>Building</code></td>
+</tr>
+<tr>
+<td>暖通/冷却工程师</td>
+<td>数据中心冷却架构、风系统、冷冻水/冷却水系统、风管与设备布置</td>
+<td>空调机组、冷却单元、CDU、加湿器、风管、风口及机房空间要求</td>
+<td><code>DSX_MECH_OMNI</code>、<code>DS9_Z0M0_*_EQUIPMENT</code></td>
+</tr>
+<tr>
+<td>管道/给排水/工艺工程师</td>
+<td>管道等级、管径、阀件、支吊架、保温、排水及检修净空；理解与 HVAC/设备接口</td>
+<td>管段、管件、阀门/附件、保温、CDU 连接及穿墙/穿楼板要求</td>
+<td><code>Pipes</code>、<code>PipeFittings</code>、<code>PipeAccessories</code>、<code>PipeInsulations</code></td>
+</tr>
+<tr>
+<td>电气工程师</td>
+<td>配电系统、设备布置、电缆路径、桥架、线管、接地、照明及安全净空</td>
+<td>UPS、RPP、MSB、RMU、变压器、开关柜、配电板、桥架、线管和灯具的空间模型与属性</td>
+<td><code>DSX_ELEC_OMNI_lit</code>、<code>DS9_Z0E0_*_EQUIPMENT</code></td>
+</tr>
+<tr>
+<td>电力系统分析工程师（ETAP）</td>
+<td>单线图、潮流、短路、保护配合、弧闪、谐波、可靠性/场景分析</td>
+<td>ETAP 的网络拓扑、设备额定参数、运行工况与计算结果；必要时映射到 USD 设备 ID</td>
+<td>与电气设备路径建立关联；不由当前 USD 单独推导</td>
+</tr>
+<tr>
+<td>CFD/热流体仿真工程师</td>
+<td>CFD 网格、边界条件、热负荷、送回风/液冷条件、收敛与结果验证</td>
+<td>几何简化模型、热源/边界条件、流场/温度/压力结果及可视化数据</td>
+<td><code>CFD_Layer</code>、<code>NV_DC_DS9_GB300_SinglePOD</code></td>
+</tr>
+<tr>
+<td>IT、弱电与通信工程师</td>
+<td>机柜、网络、通信、BMS/DCIM 接口、线缆和托盘布置</td>
+<td>HAC、GPU/GB 系列机柜、通信机柜、弱电设备、通信桥架/线管与标识</td>
+<td><code>DSX_Z0T0_AAA00_TWIN</code>、<code>DS9_Z0T0_BLDG_EQUIPMENT</code>、<code>Data_Center</code></td>
+</tr>
+<tr>
+<td>实时渲染/交互与数据工程师</td>
+<td>材质、灯光、相机、LOD、性能、交互筛选、数据接口与可视化</td>
+<td><code>Looks</code>、照明、相机、交互图层、指标面板及仿真结果展示</td>
+<td><code>Lighting</code>、<code>interactive_cameras</code>、<code>Looks</code></td>
+</tr>
+</tbody></table>
+<h3 id="7-1-etap-与-cfd-在-usd-中的正确定位">7.1 ETAP 与 CFD 在 USD 中的正确定位</h3>
+<table>
+<thead>
+<tr>
+<th>系统</th>
+<th>工程“源数据/真值”</th>
+<th>USD 的角色</th>
+<th>不能仅由 USD 确认的内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ETAP</td>
+<td>单线图、设备参数、运行方式与计算模型</td>
+<td>将设备位置、设备 ID、空间路径和计算结果摘要可视化；支持跨专业沟通</td>
+<td>回路连通性、A/B 路、短路电流、保护配合、容量和冗余是否满足要求</td>
+</tr>
+<tr>
+<td>CFD</td>
+<td>求解器模型、网格、边界条件、热负荷及收敛报告</td>
+<td>承载几何边界和 CFD 结果的三维展示，辅助定位热点和气流路径</td>
+<td>网格质量、边界条件合理性、收敛性与结果工程有效性</td>
+</tr>
+</tbody></table>
+<p>因此，ETAP 和 CFD 人员不必负责 USD 场景的全部制作；他们需要对<strong>输入条件、模型假设和结果解释</strong>负责。USD/Omniverse 人员则负责将这些经确认的数据正确映射到空间资产和可视化层中。</p>
+<h3 id="7-2-建议的最小协作闭环">7.2 建议的最小协作闭环</h3>
+<ol>
+<li>BIM 协调负责人确定坐标、单位、命名、版本与交付边界。</li>
+<li>建筑、结构、MEP、电气和 IT 专业发布经审核的空间模型与设备标识。</li>
+<li>CFD 与 ETAP 团队以受控版本的设备与空间信息建立各自工程分析模型。</li>
+<li>USD 技术人员将模型按专业分层并建立设备 ID/结果映射，不篡改工程源数据。</li>
+<li>团队在 USD 场景中进行空间协调、方案沟通与结果复核；工程结论回写至各自的源系统和正式报告。</li>
+</ol>
+<h3 id="7-3-启动试点所需的最小团队配置">7.3 启动试点所需的最小团队配置</h3>
+<p>不需要让所有人都成为 USD 专家。对一个数据厅/POD/设备房试点，以下是建议的<strong>职责配置</strong>；同一个人可以兼任多个角色，但每项责任必须有明确所有者。</p>
+<table>
+<thead>
+<tr>
+<th>角色</th>
+<th>是否必须</th>
+<th>需要具备的能力</th>
+<th>在试点中的具体职责</th>
+<th>不应承担的职责</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>项目负责人 / 产品负责人</td>
+<td>必须</td>
+<td>知道试点要解决什么业务问题；能推动跨团队决策</td>
+<td>选定试点区域和用例；确定成功标准；确保问题有人关闭</td>
+<td>不必亲自编辑 USD 或判断专业计算结论</td>
+</tr>
+<tr>
+<td>BIM/空间协调负责人</td>
+<td>必须</td>
+<td>熟悉 BIM 专业模型、坐标/单位、命名、模型发布和问题管理</td>
+<td>管理模型基线；组织协调会议；确认问题位置与责任专业</td>
+<td>不替代电气、CFD、结构等专业签核</td>
+</tr>
+<tr>
+<td>USD 场景集成技术人员</td>
+<td>必须</td>
+<td>USD 组合机制、资产路径、Python/自动化、性能和发布管理</td>
+<td>装配/发布场景；处理 payload/reference/material；建立视图、筛选与 ID 映射</td>
+<td>不替代 BIM 协调负责人或各专业工程师</td>
+</tr>
+<tr>
+<td>建筑/结构/MEP/电气/IT 专业代表</td>
+<td>必须，但可按试点范围参与</td>
+<td>能解释本专业模型、设备接口、净空和设计限制</td>
+<td>提供受控源模型；判断本专业问题；修改源模型并给出复核证据</td>
+<td>不必学习 USD 技术细节或承担全场景维护</td>
+</tr>
+<tr>
+<td>CFD 或 ETAP 代表</td>
+<td>按试点用例需要</td>
+<td>能解释分析模型假设、输入、结果和适用范围</td>
+<td>提供经确认的结果摘要及设备 ID 映射；解释结果边界</td>
+<td>不应仅依据 USD 画面认可仿真/电气结论</td>
+</tr>
+<tr>
+<td>施工/调试/运维代表</td>
+<td>进入施工、调试或运维阶段时需要</td>
+<td>熟悉现场工序、维护流程、测试记录或告警流程</td>
+<td>验证场景是否回答了真实现场问题；提供工作包/测试/资产数据</td>
+<td>不应把 USD 浏览视图当作安全作业许可</td>
+</tr>
+</tbody></table>
+<h3 id="7-4-人员能力要求-什么人需要学到什么程度">7.4 人员能力要求：什么人需要学到什么程度</h3>
+<table>
+<thead>
+<tr>
+<th>人员类型</th>
+<th>最低应掌握</th>
+<th>建议掌握</th>
+<th>不需要强求</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>PM/业主代表</td>
+<td>浏览场景；按区域/专业提问；理解版本、适用范围与“观察事实 vs 工程结论”</td>
+<td>用预设视图主持决策会；理解问题关闭状态</td>
+<td>建模、脚本、CFD/ETAP 计算细节</td>
+</tr>
+<tr>
+<td>BIM 协调负责人</td>
+<td>坐标、单位、命名、模型基线、问题单和专业接口</td>
+<td>USD 的 payload/reference/instance 基本概念；发布质量检查</td>
+<td>深度 Python 开发或渲染调优</td>
+</tr>
+<tr>
+<td>USD 技术人员</td>
+<td>USD 组成、层级、资产解析、材质、实例、变体、性能、发布/回滚</td>
+<td>Python <code>pxr</code> API、自动化质检、BIM/IFC/资产导入、数据接口</td>
+<td>对所有工程专业取得设计签字资格</td>
+</tr>
+<tr>
+<td>建筑/结构/MEP/电气/IT 专业人员</td>
+<td>在场景中定位自己专业的资产；使用筛选/剖切；提交可复核的问题</td>
+<td>设备 ID 映射、专业数据发布要求、结果叠加解读</td>
+<td>自己维护 USD 合成层或编写代码</td>
+</tr>
+<tr>
+<td>CFD/ETAP 人员</td>
+<td>关联结果与设备/空间位置；标明模型版本和结论边界</td>
+<td>将结果摘要、阈值、工况映射为可视化图层</td>
+<td>将 USD 当作求解器或源计算模型</td>
+</tr>
+<tr>
+<td>施工/调试/运维人员</td>
+<td>使用预设视图定位区域、设备、工作包和未完成项</td>
+<td>现场照片/扫描或测试记录的空间化提交</td>
+<td>BIM/USD 文件编制和工程计算</td>
+</tr>
+</tbody></table>
+<h3 id="7-5-建议培训路径">7.5 建议培训路径</h3>
+<p>培训应以当前项目的真实场景和真实问题为练习素材，而不是只学习通用软件菜单。以下时长为建议，可按团队成熟度缩短或合并。</p>
+<table>
+<thead>
+<tr>
+<th>模块</th>
+<th>参与者</th>
+<th align="right">建议时长</th>
+<th>培训内容</th>
+<th>完成后应能做到</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0. 共同认知与边界</td>
+<td>全体试点成员</td>
+<td align="right">1–2 小时</td>
+<td>USD 是什么；本场景包含哪些专业；版本/资源状态；什么是空间事实、什么必须由源系统确认</td>
+<td>不再把 USD 画面误读为施工图、ETAP 结论或 CFD 签核</td>
+</tr>
+<tr>
+<td>1. 场景浏览与沟通</td>
+<td>PM、专业代表、施工/运维代表</td>
+<td align="right">2–3 小时</td>
+<td>打开场景；专业显隐；相机、剖切、设备搜索；保存问题视角</td>
+<td>在 5 分钟内定位一个区域/设备，并描述观察到的空间问题</td>
+</tr>
+<tr>
+<td>2. BIM 协调工作法</td>
+<td>BIM 协调负责人、专业代表</td>
+<td align="right">半天</td>
+<td>坐标/单位/命名；版本基线；问题单；责任划分；复核闭环</td>
+<td>用一个真实桥架/管道/设备问题完成“发现—分派—修改—复核”</td>
+</tr>
+<tr>
+<td>3. 专业结果映射</td>
+<td>CFD、ETAP、MEP、电气代表</td>
+<td align="right">半天</td>
+<td>设备 ID 映射；结果摘要；工况/版本标识；结论边界</td>
+<td>将一份经批准的 CFD 或 ETAP 结果正确关联到空间设备</td>
+</tr>
+<tr>
+<td>4. USD 场景制作与发布</td>
+<td>USD 技术人员、备份人员</td>
+<td align="right">3–5 天 + 实操</td>
+<td><code>payload</code>、<code>reference</code>、<code>instance</code>、<code>variant</code>、<code>sublayer</code>；资产路径；材质；性能；Python 自动化；发布/回滚</td>
+<td>在隔离副本中新增一个专业层、处理依赖、发布可复现的测试场景</td>
+</tr>
+<tr>
+<td>5. 施工/调试/运维用例</td>
+<td>对应现场团队</td>
+<td align="right">2–4 小时/用例</td>
+<td>工作包视图、设备进场路径、调试状态、告警定位、变更方案层</td>
+<td>用预设模板完成一次施工交底、调试问题定位或扩容评审</td>
+</tr>
+</tbody></table>
+<h3 id="7-6-试点开始前的能力验收清单">7.6 试点开始前的能力验收清单</h3>
+<p>在正式召开协同会议前，建议用下面的小检查替代复杂考试：</p>
+<ul>
+<li><input disabled="" type="checkbox"> PM 能说明试点的两个具体目标，以及 USD 不承担哪些工程责任。</li>
+<li><input disabled="" type="checkbox"> BIM 协调负责人能指出当前发布版本、各专业来源和已知缺失资源。</li>
+<li><input disabled="" type="checkbox"> USD 技术人员能在不破坏主场景的前提下，重现发布、定位依赖问题并回滚测试修改。</li>
+<li><input disabled="" type="checkbox"> 每个专业代表能在场景中定位一项本专业设备/构件，并说明其源模型或负责团队。</li>
+<li><input disabled="" type="checkbox"> CFD/ETAP 代表能说明结果图层对应的模型版本、工况和不确定性边界。</li>
+<li><input disabled="" type="checkbox"> 所有人都能用同一份问题模板记录“观察事实、待确认事项、责任人和关闭证据”。</li>
+</ul>
+<h3 id="7-7-招聘或外包-usd-技术人员时的筛选标准">7.7 招聘或外包 USD 技术人员时的筛选标准</h3>
+<p>如果团队目前没有 USD 技术人员，优先寻找有以下组合能力的人，而不是只找“会做三维效果图”的人员：</p>
+<ol>
+<li>能解释并实际使用 USD 的 <code>payload</code>、<code>reference</code>、<code>instanceable</code>、<code>variant</code> 与 <code>sublayer</code>。</li>
+<li>有大型资产发布经验：资产路径、依赖检查、版本化、可复现发布和性能优化。</li>
+<li>能用 Python 自动化检查场景结构、资源缺失、命名或属性映射。</li>
+<li>能与 BIM 协调人员和工程师沟通，知道何时应把问题退回 Revit/IFC、ETAP、CFD 或施工系统。</li>
+<li>有实时渲染/交互经验更好，但这排在“数据可靠、可维护”之后。</li>
+</ol>
+<p>不建议把“是否会做漂亮渲染”作为首要标准；对本项目，<strong>可靠装配、版本治理、跨专业沟通和问题闭环</strong>更重要。</p>
+<h2 id="8-有了-usd-场景后可以开展的工作">8. 有了 USD 场景后可以开展的工作</h2>
+<p>USD 最有价值的定位是一个<strong>统一空间界面和协作载体</strong>：让不同团队在同一坐标、同一资产语义和同一版本基线上讨论问题。它本身不是施工图、ETAP 或 CFD 求解器，但可以把这些系统的输入、结果和任务放回同一空间语境中。</p>
+<pre class="mermaid" data-processed="true"><svg id="mermaid-1785397006119" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="flowchart" style="max-width: 1224.234375px;" viewBox="0 0 1224.234375 218" role="graphics-document document" aria-roledescription="flowchart-v2"><style>#mermaid-1785397006119{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#000000;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#mermaid-1785397006119 .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#mermaid-1785397006119 .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#mermaid-1785397006119 .error-icon{fill:#552222;}#mermaid-1785397006119 .error-text{fill:#552222;stroke:#552222;}#mermaid-1785397006119 .edge-thickness-normal{stroke-width:1px;}#mermaid-1785397006119 .edge-thickness-thick{stroke-width:3.5px;}#mermaid-1785397006119 .edge-pattern-solid{stroke-dasharray:0;}#mermaid-1785397006119 .edge-thickness-invisible{stroke-width:0;fill:none;}#mermaid-1785397006119 .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-1785397006119 .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-1785397006119 .marker{fill:#666;stroke:#666;}#mermaid-1785397006119 .marker.cross{stroke:#666;}#mermaid-1785397006119 svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#mermaid-1785397006119 p{margin:0;}#mermaid-1785397006119 .label{font-family:"trebuchet ms",verdana,arial,sans-serif;color:#000000;}#mermaid-1785397006119 .cluster-label text{fill:#333;}#mermaid-1785397006119 .cluster-label span{color:#333;}#mermaid-1785397006119 .cluster-label span p{background-color:transparent;}#mermaid-1785397006119 .label text,#mermaid-1785397006119 span{fill:#000000;color:#000000;}#mermaid-1785397006119 .node rect,#mermaid-1785397006119 .node circle,#mermaid-1785397006119 .node ellipse,#mermaid-1785397006119 .node polygon,#mermaid-1785397006119 .node path{fill:#eee;stroke:#999;stroke-width:1px;}#mermaid-1785397006119 .rough-node .label text,#mermaid-1785397006119 .node .label text,#mermaid-1785397006119 .image-shape .label,#mermaid-1785397006119 .icon-shape .label{text-anchor:middle;}#mermaid-1785397006119 .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#mermaid-1785397006119 .rough-node .label,#mermaid-1785397006119 .node .label,#mermaid-1785397006119 .image-shape .label,#mermaid-1785397006119 .icon-shape .label{text-align:center;}#mermaid-1785397006119 .node.clickable{cursor:pointer;}#mermaid-1785397006119 .root .anchor path{fill:#666!important;stroke-width:0;stroke:#666;}#mermaid-1785397006119 .arrowheadPath{fill:#333333;}#mermaid-1785397006119 .edgePath .path{stroke:#666;stroke-width:1px;}#mermaid-1785397006119 .flowchart-link{stroke:#666;fill:none;}#mermaid-1785397006119 .edgeLabel{background-color:white;text-align:center;}#mermaid-1785397006119 .edgeLabel p{background-color:white;}#mermaid-1785397006119 .edgeLabel rect{opacity:0.5;background-color:white;fill:white;}#mermaid-1785397006119 .labelBkg{background-color:rgba(255, 255, 255, 0.5);}#mermaid-1785397006119 .cluster rect{fill:hsl(0, 0%, 98.9215686275%);stroke:#707070;stroke-width:1px;}#mermaid-1785397006119 .cluster text{fill:#333;}#mermaid-1785397006119 .cluster span{color:#333;}#mermaid-1785397006119 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:12px;background:hsl(-160, 0%, 93.3333333333%);border:1px solid #707070;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-1785397006119 .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#000000;}#mermaid-1785397006119 rect.text{fill:none;stroke-width:0;}#mermaid-1785397006119 .icon-shape,#mermaid-1785397006119 .image-shape{background-color:white;text-align:center;}#mermaid-1785397006119 .icon-shape p,#mermaid-1785397006119 .image-shape p{background-color:white;padding:2px;}#mermaid-1785397006119 .icon-shape .label rect,#mermaid-1785397006119 .image-shape .label rect{opacity:0.5;background-color:white;fill:white;}#mermaid-1785397006119 .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#mermaid-1785397006119 .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#mermaid-1785397006119 .node .neo-node{stroke:#999;}#mermaid-1785397006119 [data-look="neo"].node rect,#mermaid-1785397006119 [data-look="neo"].cluster rect,#mermaid-1785397006119 [data-look="neo"].node polygon{stroke:url(#mermaid-1785397006119-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785397006119 [data-look="neo"].swimlane.cluster rect{filter:none;}#mermaid-1785397006119 [data-look="neo"].node path{stroke:url(#mermaid-1785397006119-gradient);stroke-width:1px;}#mermaid-1785397006119 [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785397006119 [data-look="neo"].node .neo-line path{stroke:#999;filter:none;}#mermaid-1785397006119 [data-look="neo"].node circle{stroke:url(#mermaid-1785397006119-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785397006119 [data-look="neo"].node circle .state-start{fill:#000000;}#mermaid-1785397006119 [data-look="neo"].icon-shape .icon{fill:url(#mermaid-1785397006119-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785397006119 [data-look="neo"].icon-shape .icon-neo path{stroke:url(#mermaid-1785397006119-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785397006119 :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g><marker id="mermaid-1785397006119_flowchart-v2-pointEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1785397006119_flowchart-v2-pointStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1785397006119_flowchart-v2-pointEnd-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14" orient="auto"><path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1785397006119_flowchart-v2-pointStart-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14" orient="auto"><polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></polygon></marker><marker id="mermaid-1785397006119_flowchart-v2-circleEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1785397006119_flowchart-v2-circleStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1785397006119_flowchart-v2-circleEnd-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1785397006119_flowchart-v2-circleStart-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1785397006119_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1785397006119_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1785397006119_flowchart-v2-crossEnd-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5;"></path></marker><marker id="mermaid-1785397006119_flowchart-v2-crossStart-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5; stroke-dasharray: 1, 0;"></path></marker><g class="root"><g class="clusters"></g><g class="edgePaths"><path d="M391.559,45L395.838,43.333C400.117,41.667,408.676,38.333,416.455,36.667C424.234,35,431.234,35,434.734,35L438.234,35" id="mermaid-1785397006119-L_A_B_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_A_B_0" data-points="W3sieCI6MzkxLjU1ODY5OTMyNDMyNDMsInkiOjQ1fSx7IngiOjQxNy4yMzQzNzUsInkiOjM1fSx7IngiOjQ0Mi4yMzQzNzUsInkiOjM1fV0=" data-look="classic" marker-end="url(#mermaid-1785397006119_flowchart-v2-pointEnd)"></path><path d="M582.234,35L586.401,35C590.568,35,598.901,35,606.568,35C614.234,35,621.234,35,624.734,35L628.234,35" id="mermaid-1785397006119-L_B_C_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_B_C_0" data-points="W3sieCI6NTgyLjIzNDM3NSwieSI6MzV9LHsieCI6NjA3LjIzNDM3NSwieSI6MzV9LHsieCI6NjMyLjIzNDM3NSwieSI6MzV9XQ==" data-look="classic" marker-end="url(#mermaid-1785397006119_flowchart-v2-pointEnd)"></path><path d="M836.234,35L840.401,35C844.568,35,852.901,35,860.568,35C868.234,35,875.234,35,878.734,35L882.234,35" id="mermaid-1785397006119-L_C_D_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_C_D_0" data-points="W3sieCI6ODM2LjIzNDM3NSwieSI6MzV9LHsieCI6ODYxLjIzNDM3NSwieSI6MzV9LHsieCI6ODg2LjIzNDM3NSwieSI6MzV9XQ==" data-look="classic" marker-end="url(#mermaid-1785397006119_flowchart-v2-pointEnd)"></path><path d="M1026.234,35L1030.401,35C1034.568,35,1042.901,35,1056.598,42.424C1070.295,49.847,1089.356,64.695,1098.886,72.118L1108.417,79.542" id="mermaid-1785397006119-L_D_E_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_D_E_0" data-points="W3sieCI6MTAyNi4yMzQzNzUsInkiOjM1fSx7IngiOjEwNTEuMjM0Mzc1LCJ5IjozNX0seyJ4IjoxMTExLjU3MjIxMjgzNzgzOCwieSI6ODJ9XQ==" data-look="classic" marker-end="url(#mermaid-1785397006119_flowchart-v2-pointEnd)"></path><path d="M1076.234,109L1072.068,109C1067.901,109,1059.568,109,1039.568,109C1019.568,109,987.901,109,956.234,109C924.568,109,892.901,109,855.901,109C818.901,109,776.568,109,734.234,109C691.901,109,649.568,109,612.568,109C575.568,109,543.901,109,512.234,109C480.568,109,448.901,109,429.41,107.575C409.918,106.151,402.602,103.301,398.944,101.876L395.286,100.452" id="mermaid-1785397006119-L_E_A_0" class=" edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_E_A_0" data-points="W3sieCI6MTA3Ni4yMzQzNzUsInkiOjEwOX0seyJ4IjoxMDUxLjIzNDM3NSwieSI6MTA5fSx7IngiOjk1Ni4yMzQzNzUsInkiOjEwOX0seyJ4Ijo4NjEuMjM0Mzc1LCJ5IjoxMDl9LHsieCI6NzM0LjIzNDM3NSwieSI6MTA5fSx7IngiOjYwNy4yMzQzNzUsInkiOjEwOX0seyJ4Ijo1MTIuMjM0Mzc1LCJ5IjoxMDl9LHsieCI6NDE3LjIzNDM3NSwieSI6MTA5fSx7IngiOjM5MS41NTg2OTkzMjQzMjQzLCJ5Ijo5OX1d" data-look="classic" marker-end="url(#mermaid-1785397006119_flowchart-v2-pointEnd)"></path><path d="M138.762,143L153.507,131.167C168.253,119.333,197.743,95.667,216.656,83.833C235.568,72,243.901,72,248.068,72L252.234,72" id="mermaid-1785397006119-L_U_A_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_U_A_0" data-points="W3sieCI6MTM4Ljc2MTcxODc1LCJ5IjoxNDN9LHsieCI6MjI3LjIzNDM3NSwieSI6NzJ9LHsieCI6MjUyLjIzNDM3NSwieSI6NzJ9XQ==" data-look="classic"></path><path d="M202.234,154.094L206.401,153.412C210.568,152.73,218.901,151.365,238.901,150.682C258.901,150,290.568,150,322.234,150C353.901,150,385.568,150,413.517,135.333C441.466,120.667,465.698,91.333,477.814,76.667L489.93,62" id="mermaid-1785397006119-L_U_B_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_U_B_0" data-points="W3sieCI6MjAyLjIzNDM3NSwieSI6MTU0LjA5NDQyNzczOTc0Nzk0fSx7IngiOjIyNy4yMzQzNzUsInkiOjE1MH0seyJ4IjozMjIuMjM0Mzc1LCJ5IjoxNTB9LHsieCI6NDE3LjIzNDM3NSwieSI6MTUwfSx7IngiOjQ4OS45MzAwMjcxNzM5MTMwNiwieSI6NjJ9XQ==" data-look="classic"></path><path d="M202.234,170L206.401,170C210.568,170,218.901,170,238.901,170C258.901,170,290.568,170,322.234,170C353.901,170,385.568,170,417.234,170C448.901,170,480.568,170,512.234,170C543.901,170,575.568,170,608.334,152C641.101,134,674.968,98,691.901,80L708.834,62" id="mermaid-1785397006119-L_U_C_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_U_C_0" data-points="W3sieCI6MjAyLjIzNDM3NSwieSI6MTcwfSx7IngiOjIyNy4yMzQzNzUsInkiOjE3MH0seyJ4IjozMjIuMjM0Mzc1LCJ5IjoxNzB9LHsieCI6NDE3LjIzNDM3NSwieSI6MTcwfSx7IngiOjUxMi4yMzQzNzUsInkiOjE3MH0seyJ4Ijo2MDcuMjM0Mzc1LCJ5IjoxNzB9LHsieCI6NzA4LjgzNDM3NSwieSI6NjJ9XQ==" data-look="classic"></path><path d="M202.234,185.906L206.401,186.588C210.568,187.27,218.901,188.635,238.901,189.318C258.901,190,290.568,190,322.234,190C353.901,190,385.568,190,417.234,190C448.901,190,480.568,190,512.234,190C543.901,190,575.568,190,612.568,190C649.568,190,691.901,190,734.234,190C776.568,190,818.901,190,853.143,168.667C887.385,147.333,913.535,104.667,926.611,83.333L939.686,62" id="mermaid-1785397006119-L_U_D_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_U_D_0" data-points="W3sieCI6MjAyLjIzNDM3NSwieSI6MTg1LjkwNTU3MjI2MDI1MjA2fSx7IngiOjIyNy4yMzQzNzUsInkiOjE5MH0seyJ4IjozMjIuMjM0Mzc1LCJ5IjoxOTB9LHsieCI6NDE3LjIzNDM3NSwieSI6MTkwfSx7IngiOjUxMi4yMzQzNzUsInkiOjE5MH0seyJ4Ijo2MDcuMjM0Mzc1LCJ5IjoxOTB9LHsieCI6NzM0LjIzNDM3NSwieSI6MTkwfSx7IngiOjg2MS4yMzQzNzUsInkiOjE5MH0seyJ4Ijo5MzkuNjg1OTg3OTAzMjI1OSwieSI6NjJ9XQ==" data-look="classic"></path><path d="M187.546,197L194.161,199.167C200.776,201.333,214.005,205.667,236.453,207.833C258.901,210,290.568,210,322.234,210C353.901,210,385.568,210,417.234,210C448.901,210,480.568,210,512.234,210C543.901,210,575.568,210,612.568,210C649.568,210,691.901,210,734.234,210C776.568,210,818.901,210,855.901,210C892.901,210,924.568,210,956.234,210C987.901,210,1019.568,210,1047.002,197.667C1074.436,185.333,1097.637,160.667,1109.238,148.333L1120.838,136" id="mermaid-1785397006119-L_U_E_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_U_E_0" data-points="W3sieCI6MTg3LjU0NjI4OTA2MjUsInkiOjE5N30seyJ4IjoyMjcuMjM0Mzc1LCJ5IjoyMTB9LHsieCI6MzIyLjIzNDM3NSwieSI6MjEwfSx7IngiOjQxNy4yMzQzNzUsInkiOjIxMH0seyJ4Ijo1MTIuMjM0Mzc1LCJ5IjoyMTB9LHsieCI6NjA3LjIzNDM3NSwieSI6MjEwfSx7IngiOjczNC4yMzQzNzUsInkiOjIxMH0seyJ4Ijo4NjEuMjM0Mzc1LCJ5IjoyMTB9LHsieCI6OTU2LjIzNDM3NSwieSI6MjEwfSx7IngiOjEwNTEuMjM0Mzc1LCJ5IjoyMTB9LHsieCI6MTEyMC44MzgzMzUzOTYwMzk2LCJ5IjoxMzZ9XQ==" data-look="classic"></path></g><g class="edgeLabels"><g class="edgeLabel"><g class="label" data-id="L_A_B_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_B_C_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_C_D_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_D_E_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(734.234375, 109)"><g class="label" data-id="L_E_A_0" transform="translate(-66.2265625, -12)"><foreignObject width="132.453125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "><p>现场变更/运行数据</p></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_U_A_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_U_B_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_U_C_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_U_D_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_U_E_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g></g><g class="nodes"><g class="node default  " id="mermaid-1785397006119-flowchart-A-0" data-look="classic" transform="translate(322.234375, 72)"><rect class="basic label-container" style="" x="-70" y="-27" width="140" height="54"></rect><g class="label" style="" transform="translate(-40, -12)"><rect></rect><foreignObject width="80" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>方案与设计</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397006119-flowchart-B-1" data-look="classic" transform="translate(512.234375, 35)"><rect class="basic label-container" style="" x="-70" y="-27" width="140" height="54"></rect><g class="label" style="" transform="translate(-40, -12)"><rect></rect><foreignObject width="80" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>跨专业协调</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397006119-flowchart-C-3" data-look="classic" transform="translate(734.234375, 35)"><rect class="basic label-container" style="" x="-102" y="-27" width="204" height="54"></rect><g class="label" style="" transform="translate(-72, -12)"><rect></rect><foreignObject width="144" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>施工准备与建设过程</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397006119-flowchart-D-5" data-look="classic" transform="translate(956.234375, 35)"><rect class="basic label-container" style="" x="-70" y="-27" width="140" height="54"></rect><g class="label" style="" transform="translate(-40, -12)"><rect></rect><foreignObject width="80" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>调试与验收</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397006119-flowchart-E-7" data-look="classic" transform="translate(1146.234375, 109)"><rect class="basic label-container" style="" x="-70" y="-27" width="140" height="54"></rect><g class="label" style="" transform="translate(-40, -12)"><rect></rect><foreignObject width="80" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>运维与扩容</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397006119-flowchart-U-10" data-look="classic" transform="translate(105.1171875, 170)"><rect class="basic label-container" style="" x="-97.1171875" y="-27" width="194.234375" height="54"></rect><g class="label" style="" transform="translate(-67.1171875, -12)"><rect></rect><foreignObject width="134.234375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>USD 统一空间场景</p></span></div></foreignObject></g></g></g></g></g><defs><filter id="mermaid-1785397006119-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"></feDropShadow></filter></defs><defs><filter id="mermaid-1785397006119-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"></feDropShadow></filter></defs><linearGradient id="mermaid-1785397006119-gradient" gradientUnits="objectBoundingBox" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="hsl(0, 0%, 83.3333333333%)" stop-opacity="1"></stop><stop offset="100%" stop-color="hsl(0, 0%, 88.9215686275%)" stop-opacity="1"></stop></linearGradient></svg></pre>
+<table>
+<thead>
+<tr>
+<th>建设阶段</th>
+<th>可基于 USD 开展的工作</th>
+<th>典型使用者</th>
+<th>需要额外接入的数据/前提</th>
+<th>主要产出</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>方案与概念设计</td>
+<td>方案漫游；园区、建筑、数据厅、机柜和冷却/供电方案对比；向非 BIM 专业人员解释空间关系</td>
+<td>业主、PM、架构师、设计负责人、销售/方案团队</td>
+<td>可选方案的统一坐标、设备占位与关键约束</td>
+<td>方案评审记录、方案差异清单、决策截图/演示</td>
+</tr>
+<tr>
+<td>详细设计与跨专业协调</td>
+<td>分专业显隐；设备、桥架、线管、管道、风管与结构的空间协调；检修空间、门洞、运输和维护路径评审</td>
+<td>建筑、结构、MEP、电气、IT、BIM 协调团队</td>
+<td>受控的专业模型版本、净空规则、问题编号机制</td>
+<td>协调问题清单、责任分配、修订后的模型基线</td>
+</tr>
+<tr>
+<td>工程分析结果沟通</td>
+<td>把 CFD 热点、气流路径、ETAP 设备结果摘要等叠加回设备位置；识别需要复核的空间影响</td>
+<td>CFD、ETAP、冷却、电气、设计审查团队</td>
+<td>CFD/ETAP 的正式源模型、设备 ID 映射、计算报告</td>
+<td>结果可视化、需复核区域和设计变更输入</td>
+</tr>
+<tr>
+<td>施工准备</td>
+<td>按区域/专业生成施工浏览视图；审查设备进场路线、吊装/搬运空间、预留预埋、安装顺序和工作面冲突</td>
+<td>总包、分包、施工 BIM、现场经理、安全团队</td>
+<td>施工组织设计、设备尺寸/重量、临时设施、作业面和安全规则</td>
+<td>施工交底视图、工作包空间说明、物流与安装风险清单</td>
+</tr>
+<tr>
+<td>建设过程</td>
+<td>将计划任务、区域和设备状态关联到场景，形成 4D 进度展示；记录现场问题、变更、照片或扫描复核位置</td>
+<td>项目经理、施工经理、业主代表、质量团队</td>
+<td>WBS/进度计划、设备/构件 ID、问题管理系统、现场采集数据</td>
+<td>分区进度看板、变更影响视图、现场问题定位</td>
+</tr>
+<tr>
+<td>调试与验收</td>
+<td>在空间中定位通电、通水、送风、网络和控制测试范围；串联设备、系统与测试记录</td>
+<td>调试经理、MEP/电气/控制工程师、业主验收团队</td>
+<td>调试计划、测试记录、设备序列号、BMS/DCIM 点位映射</td>
+<td>系统级调试视图、未完成项和验收证据索引</td>
+</tr>
+<tr>
+<td>运维、培训与扩容</td>
+<td>机房漫游、设备定位、维护路径/安全培训、改造方案预演；将实时或历史运行指标投射到资产位置</td>
+<td>运维、设施管理、DCIM/BMS 团队、培训与安全团队</td>
+<td>可靠的资产 ID、竣工模型、CMMS/BMS/DCIM 数据接口与变更治理</td>
+<td>空间化资产目录、维护培训场景、扩容影响评估</td>
+</tr>
+</tbody></table>
+<h3 id="8-1-分阶段说明-具体做什么-收益是什么">8.1 分阶段说明：具体做什么、收益是什么</h3>
+<h4 id="阶段-a-方案与概念设计-先把-要建成什么样-说清楚">阶段 A：方案与概念设计——先把“要建成什么样”说清楚</h4>
+<p><strong>具体做什么：</strong></p>
+<ol>
+<li>把园区、建筑壳体、数据厅、机柜、冷却设备和供配电设备按候选方案放入同一场景。</li>
+<li>为同一问题建立多个可切换的方案，例如不同机柜排布、冷却单元位置、供电设备房位置或场地设备位置。</li>
+<li>使用漫游视角、剖切/隐藏专业图层和相机预设，让业主、PM、设计团队在同一空间中讨论方案。</li>
+</ol>
+<p><strong>收益：</strong></p>
+<ul>
+<li>把“设备距离够不够、机柜通道有没有、设备房会不会太拥挤”从抽象表格变成可直接查看的空间问题。</li>
+<li>非工程背景的决策者不需要先读懂全部二维图纸，也能理解不同方案的差异。</li>
+<li>方案被确认后，可成为后续各专业建模、仿真和报价的空间基线，减少各团队各自理解不同的情况。</li>
+</ul>
+<p><strong>例子：</strong> 要比较两种冷却方案时，可以在 USD 中分别布置 CDU、冷却单元和机柜；团队先判断设备是否放得下、检修门是否能打开、管线是否有合理通道。之后再由暖通/CFD 团队计算冷却能力，而不是用三维画面替代计算。</p>
+<p><strong>不能替代：</strong> 建筑许可、设备选型、结构承载、ETAP 容量校核和 CFD 的正式结论。</p>
+<h4 id="阶段-b-详细设计与跨专业协调-在现场施工前发现-空间打架">阶段 B：详细设计与跨专业协调——在现场施工前发现“空间打架”</h4>
+<p><strong>具体做什么：</strong></p>
+<ol>
+<li>将建筑、结构、电气、机械、管道、弱电等专业模型按图层加载到同一坐标系。</li>
+<li>围绕具体区域检查设备与梁柱、桥架与风管、管道与墙洞、机柜与门/通道之间的关系。</li>
+<li>对每个问题创建带路径、视角、截图、责任人和截止日期的协调条目；由对应专业修改源模型后再复核。</li>
+<li>审查维护通道、阀门操作空间、设备更换路径和消防/安全相关的空间要求。</li>
+</ol>
+<p><strong>收益：</strong></p>
+<ul>
+<li>将问题从“现场发现后拆改”前移为“模型阶段调整”。通常越早解决，成本、工期和协调难度越低。</li>
+<li>每一个问题都能准确定位到房间、设备或构件，避免会议中反复确认“你说的是哪一处”。</li>
+<li>可以按专业、区域或设备系统筛选，会议更聚焦，不必打开所有模型。</li>
+</ul>
+<p><strong>例子：</strong> 电缆桥架拟从一排机柜上方经过，但该区域已有送风管和结构梁。USD 场景能先暴露它们在同一空间重叠或净空不足；电气、暖通和结构团队再共同决定桥架高度、风管标高或梁下通道的调整方案。</p>
+<p><strong>不能替代：</strong> 精确碰撞、法定净空、消防规范和施工图审查仍应使用经过确认的设计模型、规则和工程签核。本场景的包围盒重叠只能作为“需要复核的候选”。</p>
+<h4 id="阶段-c-施工准备与建设过程-把计划-作业面和现场问题放回空间">阶段 C：施工准备与建设过程——把计划、作业面和现场问题放回空间</h4>
+<p><strong>具体做什么：</strong></p>
+<ol>
+<li>按楼层、房间、数据厅或设备系统切分场景，生成施工班组可理解的工作包视图。</li>
+<li>结合施工进度计划（WBS），把“本周/本月要安装什么”映射到具体区域、设备和构件；这就是常说的 <strong>4D</strong>（三维空间 + 时间计划）。</li>
+<li>在设备进场前检查运输路线、门洞、转弯半径、吊装空间、临时堆放区和安装顺序。</li>
+<li>用场景位置关联现场照片、激光扫描、质量问题和设计变更，便于设计、总包和分包围绕同一事实协作。</li>
+</ol>
+<p><strong>收益：</strong></p>
+<ul>
+<li>施工班组能直观看到自己的工作范围及与前后工序的关系，减少不同专业同时抢占同一作业面的概率。</li>
+<li>对大型 UPS、变压器、CDU 或机柜等设备，可提前发现“设备能否从入口运到安装点”的风险。</li>
+<li>PM 能从“进度表上的任务名称”切换到“现场具体位置和受影响设备”，更容易判断延误或变更的范围。</li>
+</ul>
+<p><strong>例子：</strong> 一台 UPS 已计划安装，但它的运输路径需要经过一扇门和一段走廊。将设备的外廓尺寸、门洞和路线放入场景中，可以在进场前确认是否需要调整门洞、拆除临时障碍或改变运输顺序。</p>
+<p><strong>不能替代：</strong> 施工组织设计、吊装方案、安全审批、现场测量和监理验收。USD 只提供更直观的共同空间依据。</p>
+<h4 id="阶段-d-调试与验收-确认-装好了-能否组成可运行的系统">阶段 D：调试与验收——确认“装好了”能否组成可运行的系统</h4>
+<p><strong>具体做什么：</strong></p>
+<ol>
+<li>按系统而非只按房间组织视图，例如一套冷却链路、一个 UPS/RPP 供电范围或一组网络机柜。</li>
+<li>将调试计划、设备序列号、测试记录和未完成项关联到空间中的设备或区域。</li>
+<li>在联调会议中逐项查看：哪些设备已安装、已接线、已通水/送风、已通电、已完成控制或网络测试。</li>
+<li>将 CFD 结果、温度测点或 BMS/DCIM 数据摘要定位到对应机柜和设备，帮助讨论异常位置。</li>
+</ol>
+<p><strong>收益：</strong></p>
+<ul>
+<li>调试人员可以从“测试编号”迅速定位到真实设备和相邻接口，减少跨专业排查时间。</li>
+<li>未完成项不再只是表格中的一行，而是附带空间位置、责任系统和现场证据。</li>
+<li>业主能够更清楚地看到验收范围和系统边界。</li>
+</ul>
+<p><strong>例子：</strong> 某排机柜的温度异常，可以在场景中同时查看该排机柜、相邻 HAC、送回风通道和相关传感器位置，再由冷却与运维团队结合真实数据判断原因。</p>
+<p><strong>不能替代：</strong> 调试规程、性能测试、受电/送电许可、功能测试和正式验收文件。</p>
+<h4 id="阶段-e-运维-培训与扩容-让竣工模型继续产生价值">阶段 E：运维、培训与扩容——让竣工模型继续产生价值</h4>
+<p><strong>具体做什么：</strong></p>
+<ol>
+<li>将竣工后的设备 ID、型号、序列号、维护工单或 DCIM/BMS 点位与 USD Prim 关联。</li>
+<li>为运维人员提供“从房间找设备”或“从告警找位置”的入口，并预设维护路线和安全培训漫游。</li>
+<li>在扩容或设备替换前，复制一个方案层，预演新机柜、新桥架、新管道或新冷却设备对既有空间的影响。</li>
+<li>在现场变更完成后，更新资产位置、状态和版本，使模型逐步接近可用的竣工空间底图。</li>
+</ol>
+<p><strong>收益：</strong></p>
+<ul>
+<li>新运维人员可以更快理解复杂数据厅和设备房的空间关系。</li>
+<li>规划扩容时能在改造前评估路径、检修空间和相邻系统影响，降低停机和返工风险。</li>
+<li>资产信息、运维记录和空间位置形成关联，减少“知道设备编号但找不到设备”或“到了现场但不知道影响哪一套系统”的时间。</li>
+</ul>
+<p><strong>例子：</strong> 计划新增一列 GPU 机柜时，可先在场景中放置候选机柜、供电桥架和冷却连接，检查其对通道、维护距离、既有风道/管道和周边设备的影响；正式容量、散热和供电结论再回到 CFD、ETAP 和设计评审流程中确认。</p>
+<p><strong>不能替代：</strong> CMMS/DCIM/BMS 的业务系统、变更审批、运维规程及现场安全责任。</p>
+<h3 id="8-2-典型案例库-把-usd-用到具体问题上">8.2 典型案例库：把 USD 用到具体问题上</h3>
+<p>下表中的“场景操作”是团队在 USD 中实际会做的浏览、筛选、标记、叠加或方案切换动作；它们用于帮助团队做决策，不等于自动生成工程结论。</p>
+<table>
+<thead>
+<tr>
+<th align="right">#</th>
+<th>真实问题 / 触发点</th>
+<th>团队在 USD 中具体怎么做</th>
+<th>要形成的决策或行动</th>
+<th>直接收益</th>
+<th>仍需以谁的源数据为准</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="right">1</td>
+<td>业主问：“这间数据厅还能再放一排机柜吗？”</td>
+<td>加载候选机柜、现有通道、桥架、风管和冷却设备；从维护通道和端门两个视角漫游</td>
+<td>确认是否进入正式扩容方案，或要求调整机柜位置/数量</td>
+<td>让决策者先理解空间代价，再投入详细设计</td>
+<td>容量、供电、冷却余量：ETAP、CFD 和正式设计</td>
+</tr>
+<tr>
+<td align="right">2</td>
+<td>机房门打开后会不会撞到机柜或配电柜？</td>
+<td>显示门的开启几何、相邻设备外廓和通道；按实际进出方向查看</td>
+<td>调整门扇方向、门洞位置或设备布置</td>
+<td>提前消除最直观的使用冲突</td>
+<td>建筑规范、消防/疏散要求：建筑设计与审查文件</td>
+</tr>
+<tr>
+<td align="right">3</td>
+<td>一段大风管和结构梁位置重叠</td>
+<td>仅加载结构和机械图层；截取冲突区域并记录两者路径和标高</td>
+<td>机械、结构团队确定改风管、改标高或改结构方案的责任人</td>
+<td>避免现场发现后返工</td>
+<td>精确净空、结构安全：专业设计与签核</td>
+</tr>
+<tr>
+<td align="right">4</td>
+<td>CDU 顶部管道需要穿越楼板/墙体</td>
+<td>同时显示 CDU、<code>Pipes</code>、墙/楼板和预留洞；用剖切查看穿越点</td>
+<td>形成洞口、套管、防火封堵和施工顺序的协调事项</td>
+<td>将“管道到哪里去”变成可定位的工作项</td>
+<td>管径、坡度、管材、防火构造：管道/建筑设计</td>
+</tr>
+<tr>
+<td align="right">5</td>
+<td>电缆桥架、风管、喷淋/管道都要经过走廊上方</td>
+<td>将电气、机械、管道图层叠加，并按标高逐层隐藏/显示</td>
+<td>确定综合支吊架空间、各系统的优先级和标高方案</td>
+<td>减少走廊吊顶内的多专业反复冲突</td>
+<td>规范间距、荷载、支吊架设计：MEP/结构专业</td>
+</tr>
+<tr>
+<td align="right">6</td>
+<td>UPS、变压器或大型 CDU 能否搬进设备房？</td>
+<td>以设备外廓模拟运输路径，逐段检查门洞、走廊、转弯和临时障碍</td>
+<td>提前确定进场路线、门洞调整、设备进场时间和临时拆除项</td>
+<td>避免设备到了现场却无法就位</td>
+<td>重量、重心、吊装能力与安全方案：厂家/总包/吊装单位</td>
+</tr>
+<tr>
+<td align="right">7</td>
+<td>一个分包说“自己的施工面已准备好”，另一个分包不同意</td>
+<td>将施工区域、构件状态和前置任务显示为颜色/标签；仅显示该工作包</td>
+<td>明确谁还未完成前置工作，重新排序或协调班组交接</td>
+<td>把争议从口头描述转为具体区域和构件</td>
+<td>现场实际状态、合同界面和进度基线：总包项目管理系统</td>
+</tr>
+<tr>
+<td align="right">8</td>
+<td>设计变更：机柜尺寸或型号改了</td>
+<td>建立变更前后两个 USD 方案层；比较新外廓对通道、桥架、冷却接口和邻近机柜的影响</td>
+<td>决定是否接受变更，以及需要同步修改的专业范围</td>
+<td>快速识别“改一台设备牵动哪些东西”</td>
+<td>厂家数据表、正式设计变更单、供配电/冷却计算</td>
+</tr>
+<tr>
+<td align="right">9</td>
+<td>CFD 显示某机柜排可能有热点</td>
+<td>将 CFD 结果叠加到对应数据厅，显示机柜、HAC、送回风路径和测点位置</td>
+<td>决定是否需要调整气流组织、机柜负载或开展现场测量</td>
+<td>让非 CFD 专家能把色彩图与真实位置对应起来</td>
+<td>网格、边界条件、收敛性、热负荷和结论：CFD 报告</td>
+</tr>
+<tr>
+<td align="right">10</td>
+<td>ETAP 分析指出一组设备需重点复核</td>
+<td>以设备 ID 在 USD 中高亮相关 UPS、RPP、MSB/开关设备及所在房间；显示结果摘要链接</td>
+<td>组织电气、运维和项目团队审查空间影响、检修与改造范围</td>
+<td>将单线图/报告中的设备快速落到现场空间</td>
+<td>回路、保护、短路、弧闪、容量：ETAP 模型和电气设计</td>
+</tr>
+<tr>
+<td align="right">11</td>
+<td>需要向管理层说明“延误影响到哪里”</td>
+<td>将延期 WBS 任务关联到场景区域/设备，并按计划与实际状态着色</td>
+<td>说明受影响区域、后续接口和恢复优先级</td>
+<td>PM 可用空间语言解释计划风险，而非只报百分比</td>
+<td>正式进度计划、资源计划和现场状态</td>
+</tr>
+<tr>
+<td align="right">12</td>
+<td>某台设备已安装但调试未完成</td>
+<td>点击该设备显示安装、接线、通水、通电、控制/网络测试等状态与证据链接</td>
+<td>明确未完成项、责任人和下一步测试条件</td>
+<td>减少“设备看起来装好了，但系统还不能用”的误解</td>
+<td>调试计划、测试记录、送电/送水许可</td>
+</tr>
+<tr>
+<td align="right">13</td>
+<td>发生告警或温度异常，值班人员需快速定位</td>
+<td>从告警设备 ID 或 BMS/DCIM 点位跳转到 USD Prim；查看周围机柜、空调、阀门和维护通道</td>
+<td>安排到场人员、准备隔离/检查范围，并记录事件位置</td>
+<td>缩短从告警文本到现场位置的定位时间</td>
+<td>BMS/DCIM 实时数据、SOP 和现场安全授权</td>
+</tr>
+<tr>
+<td align="right">14</td>
+<td>新员工不熟悉数据厅和设备房</td>
+<td>通过预设相机和专业图层完成“入口—设备房—数据厅—应急出口—关键设备”的漫游培训</td>
+<td>提升空间认知，作为入场/安全培训的辅助材料</td>
+<td>降低只靠平面图熟悉现场的学习成本</td>
+<td>正式安全培训、门禁和应急预案</td>
+</tr>
+<tr>
+<td align="right">15</td>
+<td>计划在不停机条件下扩容</td>
+<td>创建隔离的扩容方案层，标出新增设备、施工围挡、运输路径、既有运行设备和受影响接口</td>
+<td>审查施工窗口、隔离边界、风险点和回退方案</td>
+<td>在动现场之前把复杂改造“走一遍”</td>
+<td>变更审批、停电/切换方案、MOP/SOP、容量与风险评估</td>
+</tr>
+</tbody></table>
+<h3 id="8-3-可复用的协同会议流程">8.3 可复用的协同会议流程</h3>
+<p>对一个具体问题，推荐按下面的顺序开会；这比直接在大模型里“到处找问题”更有效。</p>
+<ol>
+<li><strong>提出问题。</strong> 用一句可验证的话描述，例如“CDU-02 上方管道与梁的可用净空是否满足安装和检修？”</li>
+<li><strong>锁定版本。</strong> 记录当前 USD 发布版本、参与专业模型版本和问题发生区域；避免团队查看不同版本。</li>
+<li><strong>准备空间视图。</strong> 只显示相关专业，保存一个总览相机和一个局部剖切相机；必要时显示设备 ID、尺寸或分析结果摘要。</li>
+<li><strong>区分事实与判断。</strong> 场景中观察到的是位置、几何和相邻关系；“是否合规、是否满足容量”必须由相应工程负责人确认。</li>
+<li><strong>形成行动。</strong> 为问题指定责任专业、修改方案、截止日期和需要复核的证据。</li>
+<li><strong>回写并关闭。</strong> 专业团队先修改源模型/工程文件，再发布新 USD 版本，由协调人复核并关闭问题。</li>
+</ol>
+<p>一个适合放入问题管理系统的最小记录模板：</p>
+<pre><code class="language-text">问题编号：CLASH-MECH-023
+标题：CDU-02 顶部管道与结构梁净空待确认
+位置：USD Prim 路径 /World/.../Pipes/...
+版本：USD v2026.xx；机械 v...；结构 v...
+观察事实：在当前空间视图中，管道外廓与梁区域重叠/净空不足。
+需要确认：所需最小净空、可接受的调整方案及对其他专业的影响。
+责任人：机械 / 结构 / BIM 协调（分别填写）
+截止日期：YYYY-MM-DD
+关闭证据：更新后的源模型、工程签核及新 USD 视图链接。
+</code></pre>
+<h3 id="8-4-数据中心建设周期中的重点价值">8.4 数据中心建设周期中的重点价值</h3>
+<ol>
+<li><strong>让问题更早暴露。</strong> 在设备进场前协调桥架、管道、风管、结构和检修空间，避免把空间问题留到现场。</li>
+<li><strong>把抽象的工程结果变得可讨论。</strong> CFD 的热点或 ETAP 中的关键设备可以回到具体房间、机柜或设备位置，方便项目团队判断影响范围。</li>
+<li><strong>让施工沟通以“位置”为中心。</strong> PM、施工班组和设计团队可以围绕同一个区域、设备或路径讨论，而不是在多个二维图纸、表格和截图中来回定位。</li>
+<li><strong>支持变更影响评估。</strong> 当设备尺寸、位置或方案改变时，可快速查看受影响的建筑、管线、电缆路径、作业面和仿真边界。</li>
+<li><strong>把竣工资产连续带入运维。</strong> 若建设阶段持续维护设备 ID、版本和变更记录，竣工 USD 可以成为 DCIM/BMS/CMMS 的空间入口，而不是一次性展示模型。</li>
+</ol>
+<h3 id="8-5-从-好看的三维模型-走向项目管理工具所需的条件">8.5 从“好看的三维模型”走向项目管理工具所需的条件</h3>
+<table>
+<thead>
+<tr>
+<th>能力</th>
+<th>最小要求</th>
+<th>缺失时的后果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>版本基线</td>
+<td>每次发布的日期、来源专业、版本号、适用范围和变更说明</td>
+<td>团队无法判断看到的是不是最新/可施工版本</td>
+</tr>
+<tr>
+<td>统一资产 ID</td>
+<td>USD Prim、BIM 构件、设备表、ETAP/CFD 结果、进度任务尽量共享或可映射的 ID</td>
+<td>场景只能浏览，不能可靠关联任务、状态和结果</td>
+</tr>
+<tr>
+<td>问题闭环</td>
+<td>每个空间问题有编号、位置、责任人、截止日期和关闭证据</td>
+<td>协调会议变成演示，无法形成可追踪行动</td>
+</tr>
+<tr>
+<td>进度/现场数据映射</td>
+<td>WBS 或施工任务绑定区域、构件或设备；现场照片/扫描有位置与时间</td>
+<td>无法形成可信的 4D 施工进度或竣工核验</td>
+</tr>
+<tr>
+<td>模型治理</td>
+<td>单位、坐标、命名、LOD/LOI、显隐和资源路径有发布规范</td>
+<td>模型难以组合，性能下降，跨团队信息失真</td>
+</tr>
+</tbody></table>
+<h2 id="9-建议-以-小范围协同试点-使用-usd-而非一次性建设全功能平台">9. 建议：以“小范围协同试点”使用 USD，而非一次性建设全功能平台</h2>
+<h3 id="9-1-结论">9.1 结论</h3>
+<p><strong>建议保留并继续使用当前 USD 场景，但第一阶段只把它定位为“跨团队空间协调与沟通底图”。</strong></p>
+<p>不建议在一开始就要求它承担完整 BIM 平台、施工管理系统、ETAP、CFD、DCIM 或 CMMS 的职责。这样会使项目陷入大量接口、数据清洗和维护工作，却迟迟看不到价值。</p>
+<p>当前场景已经具备建筑、结构、电气、机械、管道、IT/通信、场地、相机和 CFD 层，适合立即开展空间化协同；但也发现了部分外部资源缺失，因此应先建立资源完整性和版本基线，再扩大使用范围。</p>
+<pre class="mermaid" data-processed="true"><svg id="mermaid-1785397006188" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="flowchart" style="max-width: 1468.25px;" viewBox="0 0 1468.25 262" role="graphics-document document" aria-roledescription="flowchart-v2"><style>#mermaid-1785397006188{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#000000;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#mermaid-1785397006188 .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#mermaid-1785397006188 .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#mermaid-1785397006188 .error-icon{fill:#552222;}#mermaid-1785397006188 .error-text{fill:#552222;stroke:#552222;}#mermaid-1785397006188 .edge-thickness-normal{stroke-width:1px;}#mermaid-1785397006188 .edge-thickness-thick{stroke-width:3.5px;}#mermaid-1785397006188 .edge-pattern-solid{stroke-dasharray:0;}#mermaid-1785397006188 .edge-thickness-invisible{stroke-width:0;fill:none;}#mermaid-1785397006188 .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-1785397006188 .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-1785397006188 .marker{fill:#666;stroke:#666;}#mermaid-1785397006188 .marker.cross{stroke:#666;}#mermaid-1785397006188 svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#mermaid-1785397006188 p{margin:0;}#mermaid-1785397006188 .label{font-family:"trebuchet ms",verdana,arial,sans-serif;color:#000000;}#mermaid-1785397006188 .cluster-label text{fill:#333;}#mermaid-1785397006188 .cluster-label span{color:#333;}#mermaid-1785397006188 .cluster-label span p{background-color:transparent;}#mermaid-1785397006188 .label text,#mermaid-1785397006188 span{fill:#000000;color:#000000;}#mermaid-1785397006188 .node rect,#mermaid-1785397006188 .node circle,#mermaid-1785397006188 .node ellipse,#mermaid-1785397006188 .node polygon,#mermaid-1785397006188 .node path{fill:#eee;stroke:#999;stroke-width:1px;}#mermaid-1785397006188 .rough-node .label text,#mermaid-1785397006188 .node .label text,#mermaid-1785397006188 .image-shape .label,#mermaid-1785397006188 .icon-shape .label{text-anchor:middle;}#mermaid-1785397006188 .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#mermaid-1785397006188 .rough-node .label,#mermaid-1785397006188 .node .label,#mermaid-1785397006188 .image-shape .label,#mermaid-1785397006188 .icon-shape .label{text-align:center;}#mermaid-1785397006188 .node.clickable{cursor:pointer;}#mermaid-1785397006188 .root .anchor path{fill:#666!important;stroke-width:0;stroke:#666;}#mermaid-1785397006188 .arrowheadPath{fill:#333333;}#mermaid-1785397006188 .edgePath .path{stroke:#666;stroke-width:1px;}#mermaid-1785397006188 .flowchart-link{stroke:#666;fill:none;}#mermaid-1785397006188 .edgeLabel{background-color:white;text-align:center;}#mermaid-1785397006188 .edgeLabel p{background-color:white;}#mermaid-1785397006188 .edgeLabel rect{opacity:0.5;background-color:white;fill:white;}#mermaid-1785397006188 .labelBkg{background-color:rgba(255, 255, 255, 0.5);}#mermaid-1785397006188 .cluster rect{fill:hsl(0, 0%, 98.9215686275%);stroke:#707070;stroke-width:1px;}#mermaid-1785397006188 .cluster text{fill:#333;}#mermaid-1785397006188 .cluster span{color:#333;}#mermaid-1785397006188 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:12px;background:hsl(-160, 0%, 93.3333333333%);border:1px solid #707070;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-1785397006188 .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#000000;}#mermaid-1785397006188 rect.text{fill:none;stroke-width:0;}#mermaid-1785397006188 .icon-shape,#mermaid-1785397006188 .image-shape{background-color:white;text-align:center;}#mermaid-1785397006188 .icon-shape p,#mermaid-1785397006188 .image-shape p{background-color:white;padding:2px;}#mermaid-1785397006188 .icon-shape .label rect,#mermaid-1785397006188 .image-shape .label rect{opacity:0.5;background-color:white;fill:white;}#mermaid-1785397006188 .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#mermaid-1785397006188 .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#mermaid-1785397006188 .node .neo-node{stroke:#999;}#mermaid-1785397006188 [data-look="neo"].node rect,#mermaid-1785397006188 [data-look="neo"].cluster rect,#mermaid-1785397006188 [data-look="neo"].node polygon{stroke:url(#mermaid-1785397006188-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785397006188 [data-look="neo"].swimlane.cluster rect{filter:none;}#mermaid-1785397006188 [data-look="neo"].node path{stroke:url(#mermaid-1785397006188-gradient);stroke-width:1px;}#mermaid-1785397006188 [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785397006188 [data-look="neo"].node .neo-line path{stroke:#999;filter:none;}#mermaid-1785397006188 [data-look="neo"].node circle{stroke:url(#mermaid-1785397006188-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785397006188 [data-look="neo"].node circle .state-start{fill:#000000;}#mermaid-1785397006188 [data-look="neo"].icon-shape .icon{fill:url(#mermaid-1785397006188-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785397006188 [data-look="neo"].icon-shape .icon-neo path{stroke:url(#mermaid-1785397006188-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785397006188 :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g><marker id="mermaid-1785397006188_flowchart-v2-pointEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1785397006188_flowchart-v2-pointStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1785397006188_flowchart-v2-pointEnd-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14" orient="auto"><path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1785397006188_flowchart-v2-pointStart-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14" orient="auto"><polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></polygon></marker><marker id="mermaid-1785397006188_flowchart-v2-circleEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1785397006188_flowchart-v2-circleStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1785397006188_flowchart-v2-circleEnd-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1785397006188_flowchart-v2-circleStart-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1785397006188_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1785397006188_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1785397006188_flowchart-v2-crossEnd-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5;"></path></marker><marker id="mermaid-1785397006188_flowchart-v2-crossStart-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5; stroke-dasharray: 1, 0;"></path></marker><g class="root"><g class="clusters"></g><g class="edgePaths"><path d="M244,131L248.167,131C252.333,131,260.667,131,268.333,131C276,131,283,131,286.5,131L290,131" id="mermaid-1785397006188-L_P0_P1_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_P0_P1_0" data-points="W3sieCI6MjQ0LCJ5IjoxMzF9LHsieCI6MjY5LCJ5IjoxMzF9LHsieCI6Mjk0LCJ5IjoxMzF9XQ==" data-look="classic" marker-end="url(#mermaid-1785397006188_flowchart-v2-pointEnd)"></path><path d="M530.016,131L534.182,131C538.349,131,546.682,131,554.349,131C562.016,131,569.016,131,572.516,131L576.016,131" id="mermaid-1785397006188-L_P1_G_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_P1_G_0" data-points="W3sieCI6NTMwLjAxNTYyNSwieSI6MTMxfSx7IngiOjU1NS4wMTU2MjUsInkiOjEzMX0seyJ4Ijo1ODAuMDE1NjI1LCJ5IjoxMzF9XQ==" data-look="classic" marker-end="url(#mermaid-1785397006188_flowchart-v2-pointEnd)"></path><path d="M790.234,95.218L801.697,90.515C813.161,85.812,836.088,76.406,852.385,71.703C868.682,67,878.349,67,883.182,67L888.016,67" id="mermaid-1785397006188-L_G_P2_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_G_P2_0" data-points="W3sieCI6NzkwLjIzMzgwNjgxODE4MTgsInkiOjk1LjIxODE4MTgxODE4MTgyfSx7IngiOjg1OS4wMTU2MjUsInkiOjY3fSx7IngiOjg5Mi4wMTU2MjUsInkiOjY3fV0=" data-look="classic" marker-end="url(#mermaid-1785397006188_flowchart-v2-pointEnd)"></path><path d="M790.234,166.782L801.697,171.485C813.161,176.188,836.088,185.594,856.163,190.297C876.237,195,893.458,195,902.069,195L910.68,195" id="mermaid-1785397006188-L_G_R_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_G_R_0" data-points="W3sieCI6NzkwLjIzMzgwNjgxODE4MTgsInkiOjE2Ni43ODE4MTgxODE4MTgxOH0seyJ4Ijo4NTkuMDE1NjI1LCJ5IjoxOTV9LHsieCI6OTE0LjY3OTY4NzUsInkiOjE5NX1d" data-look="classic" marker-end="url(#mermaid-1785397006188_flowchart-v2-pointEnd)"></path><path d="M1152.016,67L1156.182,67C1160.349,67,1168.682,67,1176.349,67C1184.016,67,1191.016,67,1194.516,67L1198.016,67" id="mermaid-1785397006188-L_P2_P3_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_P2_P3_0" data-points="W3sieCI6MTE1Mi4wMTU2MjUsInkiOjY3fSx7IngiOjExNzcuMDE1NjI1LCJ5Ijo2N30seyJ4IjoxMjAyLjAxNTYyNSwieSI6Njd9XQ==" data-look="classic" marker-end="url(#mermaid-1785397006188_flowchart-v2-pointEnd)"></path></g><g class="edgeLabels"><g class="edgeLabel"><g class="label" data-id="L_P0_P1_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_P1_G_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(859.015625, 67)"><g class="label" data-id="L_G_P2_0" transform="translate(-8, -12)"><foreignObject width="16" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "><p>是</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(859.015625, 195)"><g class="label" data-id="L_G_R_0" transform="translate(-8, -12)"><foreignObject width="16" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "><p>否</p></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_P2_P3_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g></g><g class="nodes"><g class="node default  " id="mermaid-1785397006188-flowchart-P0-0" data-look="classic" transform="translate(126, 131)"><rect class="basic label-container" style="" x="-118" y="-39" width="236" height="78"></rect><g class="label" style="" transform="translate(-88, -24)"><rect></rect><foreignObject width="176" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>第 0 步：确定基线<br>版本、坐标、资源完整性</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397006188-flowchart-P1-1" data-look="classic" transform="translate(412.0078125, 131)"><rect class="basic label-container" style="" x="-118.0078125" y="-39" width="236.015625" height="78"></rect><g class="label" style="" transform="translate(-88.0078125, -24)"><rect></rect><foreignObject width="176.015625" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>第 1 步：空间协调试点<br>一个 POD/数据厅/设备房</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397006188-flowchart-G-3" data-look="classic" transform="translate(703.015625, 131)"><polygon points="123,0 246,-123 123,-246 0,-123" class="label-container" transform="translate(-122.5, 123)"></polygon><g class="label" style="" transform="translate(-96, -12)"><rect></rect><foreignObject width="192" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>试点是否产生可量化价值？</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397006188-flowchart-P2-5" data-look="classic" transform="translate(1022.015625, 67)"><rect class="basic label-container" style="" x="-130" y="-39" width="260" height="78"></rect><g class="label" style="" transform="translate(-100, -24)"><rect></rect><foreignObject width="200" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel "><p>第 2 步：问题闭环 + 分区进度</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397006188-flowchart-R-7" data-look="classic" transform="translate(1022.015625, 195)"><rect class="basic label-container" style="" x="-107.3359375" y="-39" width="214.671875" height="78"></rect><g class="label" style="" transform="translate(-77.3359375, -24)"><rect></rect><foreignObject width="154.671875" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>回到现有 BIM 工具<br>缩小或停止 USD 范围</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785397006188-flowchart-P3-9" data-look="classic" transform="translate(1331.1328125, 67)"><rect class="basic label-container" style="" x="-129.1171875" y="-27" width="258.234375" height="54"></rect><g class="label" style="" transform="translate(-99.1171875, -12)"><rect></rect><foreignObject width="198.234375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>第 3 步：调试/运维数据映射</p></span></div></foreignObject></g></g></g></g></g><defs><filter id="mermaid-1785397006188-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"></feDropShadow></filter></defs><defs><filter id="mermaid-1785397006188-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"></feDropShadow></filter></defs><linearGradient id="mermaid-1785397006188-gradient" gradientUnits="objectBoundingBox" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="hsl(0, 0%, 83.3333333333%)" stop-opacity="1"></stop><stop offset="100%" stop-color="hsl(0, 0%, 88.9215686275%)" stop-opacity="1"></stop></linearGradient></svg></pre>
+<h3 id="9-2-第-0-步-先把场景变成-可信的共同底图">9.2 第 0 步：先把场景变成“可信的共同底图”</h3>
+<table>
+<thead>
+<tr>
+<th>要做的事</th>
+<th>负责人</th>
+<th>完成标志</th>
+<th>为什么必要</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>确定场景基线</td>
+<td>PM + BIM 协调</td>
+<td>发布日期、适用区域、各专业源模型版本、变更说明明确</td>
+<td>防止会议里每个人看到不同版本</td>
+</tr>
+<tr>
+<td>记录资源完整性</td>
+<td>USD 技术人员</td>
+<td>已知缺失 payload/材质形成清单，并标明对浏览/渲染的影响</td>
+<td>避免把“资源没加载”误认为设计缺失</td>
+</tr>
+<tr>
+<td>统一 ID 与命名映射</td>
+<td>BIM/专业负责人 + USD 技术人员</td>
+<td>关键设备至少能从 USD Prim 找到 BIM/设备表中的对应 ID</td>
+<td>后续才能关联问题、ETAP/CFD 结果和进度</td>
+</tr>
+<tr>
+<td>设定场景使用边界</td>
+<td>PM + 专业负责人</td>
+<td>明确哪些内容只作展示，哪些可作为协调依据，哪些必须回到工程源系统确认</td>
+<td>避免把模型画面误作工程签核</td>
+</tr>
+<tr>
+<td>确定试点区域</td>
+<td>PM</td>
+<td>选定一个数据厅、一个 POD 或一个设备房，而非全园区同时启动</td>
+<td>降低组织和技术复杂度，尽快验证价值</td>
+</tr>
+</tbody></table>
+<h3 id="9-3-第-1-步-只做三类高价值试点">9.3 第 1 步：只做三类高价值试点</h3>
+<p>建议在一个确定区域内，从下面三类问题中选两到三类开始。它们都能利用当前 USD 的既有专业层，不需要先接入所有企业系统。</p>
+<table>
+<thead>
+<tr>
+<th>试点</th>
+<th>具体执行方式</th>
+<th>一次会议的产出</th>
+<th>成功标准示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>空间协调</td>
+<td>每周只看该区域的管道、风管、桥架、结构和设备；每个问题保存相机视角和 Prim 路径</td>
+<td>带责任人、期限和复核要求的问题清单</td>
+<td>多个问题在现场施工前完成源模型修订和复核</td>
+</tr>
+<tr>
+<td>设备进场/维护路径</td>
+<td>对 UPS、CDU、变压器、机柜等大设备，从入口模拟至安装/维护位置</td>
+<td>运输路径、临时拆除项、门洞/转弯风险及责任人</td>
+<td>在进场前解决路径问题，避免现场临时改造</td>
+</tr>
+<tr>
+<td>CFD/ETAP 结果空间沟通</td>
+<td>将一份经批准的 CFD 或 ETAP 结果摘要映射到相关设备/机柜位置</td>
+<td>待复核区域、相关设备和下一步工程审查任务</td>
+<td>非专业 PM 也能准确说出结果影响的房间、设备和负责人</td>
+</tr>
+</tbody></table>
+<p><strong>建议的会议节奏：</strong> 每周一次 30–45 分钟，仅处理已经准备好空间视图的问题；每项问题必须在会后回到 BIM、ETAP、CFD 或施工管理源系统闭环。USD 不应成为另一个孤立的问题台账。</p>
+<h3 id="9-4-如何判断试点是否值得继续">9.4 如何判断试点是否值得继续</h3>
+<p>试点结束后，不要以“模型很好看”作为判断标准，而应回顾下面四个问题：</p>
+<table>
+<thead>
+<tr>
+<th>判断问题</th>
+<th>值得继续的信号</th>
+<th>不值得扩大的信号</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>是否更早发现问题？</td>
+<td>有明确问题在施工前被定位、分派、修改并复核</td>
+<td>只产生截图，没有实际修改或责任归属</td>
+</tr>
+<tr>
+<td>是否减少沟通时间？</td>
+<td>PM/专业人员能快速定位区域和构件，会议缩短且结论清楚</td>
+<td>仍需反复在图纸、表格和模型之间找位置</td>
+</tr>
+<tr>
+<td>版本是否可信？</td>
+<td>参与者知道当前版本、适用范围和资源缺失情况</td>
+<td>各团队继续使用不同版本，模型无法作为会议依据</td>
+</tr>
+<tr>
+<td>是否有明确使用者？</td>
+<td>BIM 协调、现场经理、调试或运维团队主动在流程中使用</td>
+<td>只有 USD 技术人员维护，其他团队仍依赖原有方式</td>
+</tr>
+</tbody></table>
+<p>若上述多数问题的答案是“否”，建议停止扩大 USD 范围，把精力放回既有 BIM 协调工具和数据治理；这不是失败，而是避免维护一个没有实际使用者的平台。</p>
+<h3 id="9-5-第二-三阶段再逐步增加能力">9.5 第二、三阶段再逐步增加能力</h3>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>只有在什么条件满足后才做</th>
+<th>新增能力</th>
+<th>不要做什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>第 2 阶段：施工协同</td>
+<td>试点中的版本和问题闭环已稳定，且 WBS 可映射到区域/设备</td>
+<td>分区进度、现场照片/扫描定位、施工工作包视图</td>
+<td>不要用手工颜色替代正式进度计划</td>
+</tr>
+<tr>
+<td>第 3 阶段：调试与运维</td>
+<td>设备 ID 在竣工模型、设备表和测试记录中保持一致</td>
+<td>调试状态、测试证据、BMS/DCIM/CMMS 空间入口</td>
+<td>不要把 USD 当作 BMS、DCIM 或 CMMS 的替代品</td>
+</tr>
+<tr>
+<td>第 4 阶段：持续数字孪生</td>
+<td>已有稳定的数据接口、变更治理和明确运维使用者</td>
+<td>实时/历史数据的空间化、扩容方案预演、培训</td>
+<td>不要接入无人维护或无业务价值的“全量数据”</td>
+</tr>
+</tbody></table>
+<h3 id="9-6-对当前项目的最小下一步">9.6 对当前项目的最小下一步</h3>
+<ol>
+<li>选定一个可代表典型问题的区域：建议是一个数据厅/POD 或包含 UPS、桥架、CDU 的设备房。</li>
+<li>为该区域建立一个发布基线：当前 USD 版本、专业版本、已知缺失资源与适用范围。</li>
+<li>从“桥架/风管/管道/结构协调”“大型设备进场路径”“一项 CFD 或 ETAP 结果空间化”中选择两项。</li>
+<li>连续运行 3–4 次短周期协调会议，并记录问题从发现到关闭的证据。</li>
+<li>由 PM 根据第 9.4 节的标准决定是否进入施工进度或调试/运维数据集成。</li>
+</ol>
+<h2 id="10-后续待补充">10. 后续待补充</h2>
+<ul>
+<li><input disabled="" type="checkbox"> 各专业模块的入口文件、payload 与 sublayer 清单</li>
+<li><input disabled="" type="checkbox"> 关键设备族的路径、实例数量和空间范围</li>
+<li><input disabled="" type="checkbox"> 各类设备的可见性、材质和变体策略</li>
+<li><input disabled="" type="checkbox"> 缺失资源的完整清单与修复状态</li>
+<li><input disabled="" type="checkbox"> 面向团队沟通的场景浏览、筛选和图层使用说明</li>
+</ul>
+</main></div></body>
+</html>

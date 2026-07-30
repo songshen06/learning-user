@@ -1,5 +1,19 @@
 [
   {
+    "id": "dsx-usd-data-center",
+    "title": "DSX USD 数据中心培训材料",
+    "desc": "DSX/USD 场景组成、GB200 Day 0 布局入门与 Day 1 液冷培训页面",
+    "has_en": false,
+    "has_zh": true,
+    "files": [
+      "USD_SCENE_MASTER.html",
+      "GB200_USD_DAY0_TRAINING.html",
+      "GB200_USD_DAY1_COOLING_TRAINING.html"
+    ],
+    "updated": "2026-07-30",
+    "repo_url": "https://github.com/NVIDIA-Omniverse-blueprints/omniverse-dsx-blueprint-for-ai-factories"
+  },
+  {
     "id": "nemoclaw",
     "title": "NemoClaw",
     "desc": "NVIDIA NemoClaw — sandboxed AI agent platform · User Guide + Developer Guide",
