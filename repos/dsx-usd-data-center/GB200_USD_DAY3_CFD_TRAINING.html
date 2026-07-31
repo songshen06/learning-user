@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GB200 USD Day 3：CFD 与热工结果</title>
+  <style>
+    :root { color-scheme: light; --bg:#f5f7fb; --paper:#fff; --ink:#1c2430; --muted:#637084; --line:#dce2ea; --brand:#2369d8; --code:#eff3f8; }
+    * { box-sizing:border-box; } body { margin:0; color:var(--ink); background:var(--bg); font:16px/1.72 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif; }
+    header { position:sticky; top:0; z-index:5; display:flex; align-items:center; gap:16px; padding:12px max(24px,calc((100vw - 1440px)/2)); color:#fff; background:#13233c; box-shadow:0 1px 8px #13233c44; }
+    header strong { font-size:15px; } header span { margin-left:auto; color:#c9d6ea; font-size:13px; }
+    .layout { display:grid; grid-template-columns:260px minmax(0,980px); gap:28px; max-width:1300px; margin:0 auto; padding:28px 24px 56px; }
+    nav { position:sticky; top:70px; align-self:start; max-height:calc(100vh - 90px); overflow:auto; padding:14px; border:1px solid var(--line); border-radius:10px; background:var(--paper); }
+    nav h2 { margin:0 0 8px; font-size:14px; } nav a { display:block; padding:3px 0; color:var(--muted); font-size:13px; text-decoration:none; } nav a:hover { color:var(--brand); text-decoration:underline; }
+    main { min-width:0; padding:44px 56px; border:1px solid var(--line); border-radius:12px; background:var(--paper); box-shadow:0 4px 18px #1d32480d; }
+    h1,h2,h3,h4 { line-height:1.28; scroll-margin-top:76px; } h1 { margin-top:0; font-size:30px; } h2 { margin-top:46px; padding-bottom:8px; border-bottom:1px solid var(--line); font-size:24px; } h3 { margin-top:32px; font-size:19px; } h4 { margin-top:24px; font-size:16px; }
+    a { color:var(--brand); } blockquote { margin:18px 0; padding:10px 16px; border-left:4px solid var(--brand); background:#f0f6ff; color:#43546d; }
+    table { width:100%; margin:18px 0; border-collapse:collapse; font-size:14px; } th,td { padding:10px 12px; border:1px solid var(--line); vertical-align:top; text-align:left; } th { background:#edf3fc; } tr:nth-child(even) { background:#fafbfd; }
+    main img { display:block; width:100%; max-width:100%; height:auto; margin:22px auto; border:1px solid var(--line); border-radius:8px; background:#fff; }
+    code { padding:2px 5px; border-radius:4px; background:var(--code); font:0.9em ui-monospace,SFMono-Regular,Consolas,monospace; } pre { overflow:auto; padding:16px; border-radius:8px; background:#172033; color:#e9f0fb; line-height:1.5; } pre code { padding:0; background:transparent; color:inherit; }
+    pre.mermaid { padding:18px; background:#fff; color:inherit; text-align:center; } pre.mermaid svg { max-width:100%; height:auto; }
+    @media(max-width:860px) { header { padding:12px 16px; } header span { display:none; } .layout { display:block; padding:16px; } nav { position:static; max-height:220px; margin-bottom:16px; } main { padding:26px 20px; } h1 { font-size:25px; } h2 { font-size:21px; } table { display:block; overflow:auto; } }
+    @media print { header,nav { display:none; } body { background:#fff; } .layout { display:block; padding:0; } main { border:0; box-shadow:none; padding:0; } main img { break-inside:avoid; margin:14px auto; } }
+  </style>
+</head>
+<body><header><strong>GB200 USD Day 3：CFD 与热工结果</strong><span>单文件 HTML 版本</span></header><div class="layout"><nav aria-label="文档目录"><h2>目录</h2><a href="#day-3-培训-cfd-如何让-ai-factory-的热量-看得见" style="padding-left: 0px;">Day 3 培训：CFD 如何让 AI Factory 的热量“看得见”</a><a href="#1-cfd-是什么-不是一张-热力图-而是对空气与热量的计算" style="padding-left: 12px;">1. CFD 是什么：不是一张“热力图”，而是对空气与热量的计算</a><a href="#1-1-cfd-和普通三维渲染有什么不同" style="padding-left: 24px;">1.1 CFD 和普通三维渲染有什么不同</a><a href="#2-为什么-ai-factory-要做-cfd" style="padding-left: 12px;">2. 为什么 AI Factory 要做 CFD</a><a href="#2-1-ai-rack-把热量集中在更小的空间里" style="padding-left: 24px;">2.1 AI rack 把热量集中在更小的空间里</a><a href="#2-2-cfd-要替团队回答的-通常不是一个问题" style="padding-left: 24px;">2.2 CFD 要替团队回答的，通常不是一个问题</a><a href="#2-3-对-ai-factory-来说-cfd-是-生产环境的热工试车场" style="padding-left: 24px;">2.3 对 AI factory 来说，CFD 是“生产环境的热工试车场”</a><a href="#3-当前-cfd-数据源-它实际上是什么格式" style="padding-left: 12px;">3. 当前 CFD 数据源：它实际上是什么格式</a><a href="#3-1-当前接入链路" style="padding-left: 24px;">3.1 当前接入链路</a><a href="#3-2-cgns-文件里有什么" style="padding-left: 24px;">3.2 CGNS 文件里有什么</a><a href="#3-3-40-60-80-100-是什么" style="padding-left: 24px;">3.3 40、60、80、100 是什么</a><a href="#3-4-这个数据与当前数据大厅是什么关系" style="padding-left: 24px;">3.4 这个数据与当前数据大厅是什么关系</a><a href="#4-客户在-usd-里最终看到什么" style="padding-left: 12px;">4. 客户在 USD 里最终看到什么</a><a href="#4-1-客户看到的是-被放回空间里的计算结果" style="padding-left: 24px;">4.1 客户看到的是“被放回空间里的计算结果”</a><a href="#4-2-客户可以得到什么帮助" style="padding-left: 24px;">4.2 客户可以得到什么帮助</a><a href="#4-3-客户不应该从这张图得到什么" style="padding-left: 24px;">4.3 客户不应该从这张图得到什么</a><a href="#5-day-3-课堂走读-从一个色块回到工程问题" style="padding-left: 12px;">5. Day 3 课堂走读：从一个色块回到工程问题</a><a href="#6-如果要把新的-cfd-结果交给-dsx-需要准备什么" style="padding-left: 12px;">6. 如果要把新的 CFD 结果交给 DSX，需要准备什么</a><a href="#7-课堂结束时应记住的五句话" style="padding-left: 12px;">7. 课堂结束时应记住的五句话</a><a href="#8-术语表" style="padding-left: 12px;">8. 术语表</a><a href="#9-参考与使用边界" style="padding-left: 12px;">9. 参考与使用边界</a></nav><main><h1 id="day-3-培训-cfd-如何让-ai-factory-的热量-看得见">Day 3 培训：CFD 如何让 AI Factory 的热量“看得见”</h1>
+<blockquote>
+<p>适用对象：完成 Day 0–Day 2 的 PM、业主代表、设施/运维、IT、BIM 协调、冷却/CFD、电气与施工管理团队。<br>建议时长：3.5–4 小时（含三维结果走读与讨论）。<br>这一讲要解决的问题：<strong>CFD 是什么？为什么高密度 GPU 数据中心需要它？当前 USD 中的 CFD 数据从哪里来？客户最终看到的是什么，又能据此推动什么决策？</strong></p>
+</blockquote>
+<p>阅读页：<a href="USD_SCENE_READER.html?doc=GB200_USD_DAY3_CFD_TRAINING.md"><code>USD_SCENE_READER.html?doc=GB200_USD_DAY3_CFD_TRAINING.md</code></a></p>
+<hr>
+<h2 id="1-cfd-是什么-不是一张-热力图-而是对空气与热量的计算">1. CFD 是什么：不是一张“热力图”，而是对空气与热量的计算</h2>
+<p>CFD 是 <strong>Computational Fluid Dynamics，计算流体力学</strong>。它用计算机把一个空间拆成大量小单元，在每个单元中计算空气或液体如何流动、温度如何变化、压力怎样分布，再把结果组合成整个空间的流场和温度场。</p>
+<p>可以把它想成：如果在数据大厅里放进数百万个非常小、看不见的“测量格子”，并让计算机在每个格子里回答四个问题：</p>
+<ol>
+<li>这里的空气往哪个方向走？</li>
+<li>这里有多少热量进入或离开？</li>
+<li>这里的温度是多少？</li>
+<li>空气或冷却液要通过这里，需要克服多大压力差？</li>
+</ol>
+<p>现实中不能在设计阶段把数百万个传感器放满整个机房，所以 CFD 用设备几何、热负载、送回风条件、液冷与空气侧边界条件等资料，建立一个可计算的近似模型。</p>
+<pre class="mermaid" data-processed="true"><svg id="mermaid-1785464965612" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="flowchart" style="max-width: 1075.328125px;" viewBox="0 0 1075.328125 550" role="graphics-document document" aria-roledescription="flowchart-v2"><style>#mermaid-1785464965612{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#000000;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#mermaid-1785464965612 .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#mermaid-1785464965612 .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#mermaid-1785464965612 .error-icon{fill:#552222;}#mermaid-1785464965612 .error-text{fill:#552222;stroke:#552222;}#mermaid-1785464965612 .edge-thickness-normal{stroke-width:1px;}#mermaid-1785464965612 .edge-thickness-thick{stroke-width:3.5px;}#mermaid-1785464965612 .edge-pattern-solid{stroke-dasharray:0;}#mermaid-1785464965612 .edge-thickness-invisible{stroke-width:0;fill:none;}#mermaid-1785464965612 .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-1785464965612 .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-1785464965612 .marker{fill:#666;stroke:#666;}#mermaid-1785464965612 .marker.cross{stroke:#666;}#mermaid-1785464965612 svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#mermaid-1785464965612 p{margin:0;}#mermaid-1785464965612 .label{font-family:"trebuchet ms",verdana,arial,sans-serif;color:#000000;}#mermaid-1785464965612 .cluster-label text{fill:#333;}#mermaid-1785464965612 .cluster-label span{color:#333;}#mermaid-1785464965612 .cluster-label span p{background-color:transparent;}#mermaid-1785464965612 .label text,#mermaid-1785464965612 span{fill:#000000;color:#000000;}#mermaid-1785464965612 .node rect,#mermaid-1785464965612 .node circle,#mermaid-1785464965612 .node ellipse,#mermaid-1785464965612 .node polygon,#mermaid-1785464965612 .node path{fill:#eee;stroke:#999;stroke-width:1px;}#mermaid-1785464965612 .rough-node .label text,#mermaid-1785464965612 .node .label text,#mermaid-1785464965612 .image-shape .label,#mermaid-1785464965612 .icon-shape .label{text-anchor:middle;}#mermaid-1785464965612 .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#mermaid-1785464965612 .rough-node .label,#mermaid-1785464965612 .node .label,#mermaid-1785464965612 .image-shape .label,#mermaid-1785464965612 .icon-shape .label{text-align:center;}#mermaid-1785464965612 .node.clickable{cursor:pointer;}#mermaid-1785464965612 .root .anchor path{fill:#666!important;stroke-width:0;stroke:#666;}#mermaid-1785464965612 .arrowheadPath{fill:#333333;}#mermaid-1785464965612 .edgePath .path{stroke:#666;stroke-width:1px;}#mermaid-1785464965612 .flowchart-link{stroke:#666;fill:none;}#mermaid-1785464965612 .edgeLabel{background-color:white;text-align:center;}#mermaid-1785464965612 .edgeLabel p{background-color:white;}#mermaid-1785464965612 .edgeLabel rect{opacity:0.5;background-color:white;fill:white;}#mermaid-1785464965612 .labelBkg{background-color:rgba(255, 255, 255, 0.5);}#mermaid-1785464965612 .cluster rect{fill:hsl(0, 0%, 98.9215686275%);stroke:#707070;stroke-width:1px;}#mermaid-1785464965612 .cluster text{fill:#333;}#mermaid-1785464965612 .cluster span{color:#333;}#mermaid-1785464965612 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:12px;background:hsl(-160, 0%, 93.3333333333%);border:1px solid #707070;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-1785464965612 .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#000000;}#mermaid-1785464965612 rect.text{fill:none;stroke-width:0;}#mermaid-1785464965612 .icon-shape,#mermaid-1785464965612 .image-shape{background-color:white;text-align:center;}#mermaid-1785464965612 .icon-shape p,#mermaid-1785464965612 .image-shape p{background-color:white;padding:2px;}#mermaid-1785464965612 .icon-shape .label rect,#mermaid-1785464965612 .image-shape .label rect{opacity:0.5;background-color:white;fill:white;}#mermaid-1785464965612 .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#mermaid-1785464965612 .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#mermaid-1785464965612 .node .neo-node{stroke:#999;}#mermaid-1785464965612 [data-look="neo"].node rect,#mermaid-1785464965612 [data-look="neo"].cluster rect,#mermaid-1785464965612 [data-look="neo"].node polygon{stroke:url(#mermaid-1785464965612-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785464965612 [data-look="neo"].swimlane.cluster rect{filter:none;}#mermaid-1785464965612 [data-look="neo"].node path{stroke:url(#mermaid-1785464965612-gradient);stroke-width:1px;}#mermaid-1785464965612 [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785464965612 [data-look="neo"].node .neo-line path{stroke:#999;filter:none;}#mermaid-1785464965612 [data-look="neo"].node circle{stroke:url(#mermaid-1785464965612-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785464965612 [data-look="neo"].node circle .state-start{fill:#000000;}#mermaid-1785464965612 [data-look="neo"].icon-shape .icon{fill:url(#mermaid-1785464965612-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785464965612 [data-look="neo"].icon-shape .icon-neo path{stroke:url(#mermaid-1785464965612-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785464965612 :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g><marker id="mermaid-1785464965612_flowchart-v2-pointEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1785464965612_flowchart-v2-pointStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1785464965612_flowchart-v2-pointEnd-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14" orient="auto"><path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1785464965612_flowchart-v2-pointStart-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14" orient="auto"><polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></polygon></marker><marker id="mermaid-1785464965612_flowchart-v2-circleEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1785464965612_flowchart-v2-circleStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1785464965612_flowchart-v2-circleEnd-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1785464965612_flowchart-v2-circleStart-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1785464965612_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1785464965612_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1785464965612_flowchart-v2-crossEnd-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5;"></path></marker><marker id="mermaid-1785464965612_flowchart-v2-crossStart-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5; stroke-dasharray: 1, 0;"></path></marker><g class="root"><g class="clusters"></g><g class="edgePaths"><path d="M268,59L272.167,59C276.333,59,284.667,59,301.594,88.887C318.522,118.774,344.043,178.548,356.804,208.434L369.565,238.321" id="mermaid-1785464965612-L_A_E_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_A_E_0" data-points="W3sieCI6MjY4LCJ5Ijo1OX0seyJ4IjoyOTMsInkiOjU5fSx7IngiOjM3MS4xMzU4MjU4OTI4NTcxNiwieSI6MjQyfV0=" data-look="classic" marker-end="url(#mermaid-1785464965612_flowchart-v2-pointEnd)"></path><path d="M266.672,199L271.06,199C275.448,199,284.224,199,297.266,205.756C310.309,212.513,327.618,226.026,336.272,232.782L344.926,239.539" id="mermaid-1785464965612-L_B_E_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_B_E_0" data-points="W3sieCI6MjY2LjY3MTg3NSwieSI6MTk5fSx7IngiOjI5MywieSI6MTk5fSx7IngiOjM0OC4wNzkzNTI2Nzg1NzE0LCJ5IjoyNDJ9XQ==" data-look="classic" marker-end="url(#mermaid-1785464965612_flowchart-v2-pointEnd)"></path><path d="M268,339L272.167,339C276.333,339,284.667,339,297.488,332.244C310.309,325.487,327.618,311.974,336.272,305.218L344.926,298.461" id="mermaid-1785464965612-L_C_E_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_C_E_0" data-points="W3sieCI6MjY4LCJ5IjozMzl9LHsieCI6MjkzLCJ5IjozMzl9LHsieCI6MzQ4LjA3OTM1MjY3ODU3MTQsInkiOjI5Nn1d" data-look="classic" marker-end="url(#mermaid-1785464965612_flowchart-v2-pointEnd)"></path><path d="M268,491L272.167,491C276.333,491,284.667,491,301.71,459.118C318.754,427.236,344.507,363.473,357.384,331.591L370.261,299.709" id="mermaid-1785464965612-L_D_E_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_D_E_0" data-points="W3sieCI6MjY4LCJ5Ijo0OTF9LHsieCI6MjkzLCJ5Ijo0OTF9LHsieCI6MzcxLjc1ODk3MzgxNzU2NzU1LCJ5IjoyOTZ9XQ==" data-look="classic" marker-end="url(#mermaid-1785464965612_flowchart-v2-pointEnd)"></path><path d="M447.328,269L451.495,269C455.661,269,463.995,269,471.661,269C479.328,269,486.328,269,489.828,269L493.328,269" id="mermaid-1785464965612-L_E_F_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_E_F_0" data-points="W3sieCI6NDQ3LjMyODEyNSwieSI6MjY5fSx7IngiOjQ3Mi4zMjgxMjUsInkiOjI2OX0seyJ4Ijo0OTcuMzI4MTI1LCJ5IjoyNjl9XQ==" data-look="classic" marker-end="url(#mermaid-1785464965612_flowchart-v2-pointEnd)"></path><path d="M740.257,218L747.269,214.833C754.281,211.667,768.304,205.333,778.816,202.167C789.328,199,796.328,199,799.828,199L803.328,199" id="mermaid-1785464965612-L_F_G_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_F_G_0" data-points="W3sieCI6NzQwLjI1NjY5NjQyODU3MTQsInkiOjIxOH0seyJ4Ijo3ODIuMzI4MTI1LCJ5IjoxOTl9LHsieCI6ODA3LjMyODEyNSwieSI6MTk5fV0=" data-look="classic" marker-end="url(#mermaid-1785464965612_flowchart-v2-pointEnd)"></path><path d="M740.257,320L747.269,323.167C754.281,326.333,768.304,332.667,783.483,335.833C798.661,339,814.995,339,823.161,339L831.328,339" id="mermaid-1785464965612-L_F_H_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_F_H_0" data-points="W3sieCI6NzQwLjI1NjY5NjQyODU3MTQsInkiOjMyMH0seyJ4Ijo3ODIuMzI4MTI1LCJ5IjozMzl9LHsieCI6ODM1LjMyODEyNSwieSI6MzM5fV0=" data-look="classic" marker-end="url(#mermaid-1785464965612_flowchart-v2-pointEnd)"></path></g><g class="edgeLabels"><g class="edgeLabel"><g class="label" data-id="L_A_E_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_B_E_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_C_E_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_D_E_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_E_F_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_F_G_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_F_H_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g></g><g class="nodes"><g class="node default  " id="mermaid-1785464965612-flowchart-A-0" data-look="classic" transform="translate(138, 59)"><rect class="basic label-container" style="" x="-130" y="-51" width="260" height="102"></rect><g class="label" style="" transform="translate(-100, -36)"><rect></rect><foreignObject width="200" height="72"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel "><p>几何与布局<br>机柜、HAC、CRAH、CDU、管道、房间</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785464965612-flowchart-E-1" data-look="classic" transform="translate(382.6640625, 269)"><rect class="basic label-container" style="" x="-64.6640625" y="-27" width="129.328125" height="54"></rect><g class="label" style="" transform="translate(-34.6640625, -12)"><rect></rect><foreignObject width="69.328125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>CFD 模型</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785464965612-flowchart-B-2" data-look="classic" transform="translate(138, 199)"><rect class="basic label-container" style="" x="-128.671875" y="-39" width="257.34375" height="78"></rect><g class="label" style="" transform="translate(-98.671875, -24)"><rect></rect><foreignObject width="197.34375" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>热负载<br>GPU rack、网络、辅助设备</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785464965612-flowchart-C-4" data-look="classic" transform="translate(138, 339)"><rect class="basic label-container" style="" x="-130" y="-51" width="260" height="102"></rect><g class="label" style="" transform="translate(-100, -36)"><rect></rect><foreignObject width="200" height="72"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel "><p>边界条件<br>送风、回风、温度、流量、压力</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785464965612-flowchart-D-6" data-look="classic" transform="translate(138, 491)"><rect class="basic label-container" style="" x="-130" y="-51" width="260" height="102"></rect><g class="label" style="" transform="translate(-100, -36)"><rect></rect><foreignObject width="200" height="72"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel "><p>工况<br>当前布局、负载等级、故障或变更方案</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785464965612-flowchart-F-9" data-look="classic" transform="translate(627.328125, 269)"><rect class="basic label-container" style="" x="-130" y="-51" width="260" height="102"></rect><g class="label" style="" transform="translate(-100, -36)"><rect></rect><foreignObject width="200" height="72"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel "><p>结果<br>温度、压力、速度、热点、流量路径</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785464965612-flowchart-G-11" data-look="classic" transform="translate(937.328125, 199)"><rect class="basic label-container" style="" x="-130" y="-51" width="260" height="102"></rect><g class="label" style="" transform="translate(-100, -36)"><rect></rect><foreignObject width="200" height="72"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel "><p>工程判断<br>是否满足设计目标、哪里需要调整</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785464965612-flowchart-H-13" data-look="classic" transform="translate(937.328125, 339)"><rect class="basic label-container" style="" x="-102" y="-39" width="204" height="78"></rect><g class="label" style="" transform="translate(-72, -24)"><rect></rect><foreignObject width="144" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>USD 视图<br>把结果放回三维空间</p></span></div></foreignObject></g></g></g></g></g><defs><filter id="mermaid-1785464965612-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"></feDropShadow></filter></defs><defs><filter id="mermaid-1785464965612-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"></feDropShadow></filter></defs><linearGradient id="mermaid-1785464965612-gradient" gradientUnits="objectBoundingBox" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="hsl(0, 0%, 83.3333333333%)" stop-opacity="1"></stop><stop offset="100%" stop-color="hsl(0, 0%, 88.9215686275%)" stop-opacity="1"></stop></linearGradient></svg></pre>
+<h3 id="1-1-cfd-和普通三维渲染有什么不同">1.1 CFD 和普通三维渲染有什么不同</h3>
+<table>
+<thead>
+<tr>
+<th>比较项</th>
+<th>普通三维渲染</th>
+<th>CFD 结果可视化</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>目的</td>
+<td>让人看懂设备外观、位置与空间</td>
+<td>让工程团队分析热量、流动和压力等物理现象</td>
+</tr>
+<tr>
+<td>主要输入</td>
+<td>几何、材质、灯光、相机</td>
+<td>几何、热负载、边界条件、流体属性、求解设置</td>
+</tr>
+<tr>
+<td>画面中的颜色</td>
+<td>材质或视觉设计</td>
+<td>通常代表温度、压力、速度等数值范围</td>
+</tr>
+<tr>
+<td>能否直接作工程结论</td>
+<td>不能</td>
+<td>也不能只凭截图；必须结合工况、模型质量、收敛性和设计准则</td>
+</tr>
+<tr>
+<td>USD 的作用</td>
+<td>组合和展示资产</td>
+<td>将经确认的 CFD 结果与真实空间、设备和通道关联</td>
+</tr>
+</tbody></table>
+<p><strong>最容易发生的误解：</strong> 看到红色区域，不等于马上可以宣布“这里过热”；看到蓝色区域，也不等于一定“冷却充足”。先要知道它代表哪个字段、单位是什么、色标范围是什么、对应什么负载和什么边界条件，以及该结果是否由 CFD 专家确认。</p>
+<hr>
+<h2 id="2-为什么-ai-factory-要做-cfd">2. 为什么 AI Factory 要做 CFD</h2>
+<h3 id="2-1-ai-rack-把热量集中在更小的空间里">2.1 AI rack 把热量集中在更小的空间里</h3>
+<p>AI factory 持续把电能转化成算力，而绝大多数输入电能最终会变成热量。随着 GPU rack 功率密度上升，热量更集中，机柜附近的气流、液冷接口、HAC、顶部服务和冷却设备不能再靠经验“看起来差不多”判断。</p>
+<p>Day 1 用 GB200 Reference Architecture 的培训量级说明过这一点：一个含 8 台 rack 的 SU 热设计功耗为 1.2 MW，平均约 150 kW/rack。该数字仅用于帮助理解高密度量级，不是当前 USD 场景的实测值或项目容量承诺。<a href="https://docs.nvidia.com/dgx-superpod/reference-architecture-scalable-infrastructure-gb200/latest/_downloads/238ab33ee345a7241fc2f15eedc2ff6c/RA11338001-DSPGB200-ReferenceArch.pdf#page=5">NVIDIA GB200 Reference Architecture（PDF，p. 4–5）</a></p>
+<h3 id="2-2-cfd-要替团队回答的-通常不是一个问题">2.2 CFD 要替团队回答的，通常不是一个问题</h3>
+<table>
+<thead>
+<tr>
+<th>想问的问题</th>
+<th>CFD 可以提供什么</th>
+<th>PM/客户能如何使用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>新增一排 GPU rack 后会怎样？</td>
+<td>特定布局与负载工况下的温度/流动变化</td>
+<td>决定是否需要进一步修改布局、冷却接口或施工计划</td>
+</tr>
+<tr>
+<td>HAC 的门、顶板或开口是否合理？</td>
+<td>空气是否按预期进入冷通道、回到热通道或形成旁路</td>
+<td>让建筑、设施与施工团队讨论围护和通道细节</td>
+</tr>
+<tr>
+<td>某处是否可能形成热点？</td>
+<td>在设定边界条件下的高温区域或回流风险</td>
+<td>指导复核传感器位置、设备方向、风量或布局方案</td>
+</tr>
+<tr>
+<td>冷却设备或送回风布置改变会怎样？</td>
+<td>不同方案的相对差异</td>
+<td>在施工前比较多个方案，而不是现场反复试错</td>
+</tr>
+<tr>
+<td>一部分设备故障或降载时会怎样？</td>
+<td>特定故障/降级工况下的趋势</td>
+<td>用于风险讨论、应急预案与运行演练；不取代正式运行规程</td>
+</tr>
+</tbody></table>
+<h3 id="2-3-对-ai-factory-来说-cfd-是-生产环境的热工试车场">2.3 对 AI factory 来说，CFD 是“生产环境的热工试车场”</h3>
+<p>工厂在正式投产前会做产线节拍、物流和安全验证；AI factory 在大量 GPU rack 上电前，也需要验证热量是否能在设计工况下被带走。CFD 就像热工维度的试车场：在不真正改变现场的情况下，先把新 rack、不同负载、HAC 开口、设备布置或冷却策略放进模型里比较。</p>
+<p>它的收益不是“保证永远不会出问题”，而是把问题从现场风险提前为可讨论、可计算、可复核的工程问题。</p>
+<hr>
+<h2 id="3-当前-cfd-数据源-它实际上是什么格式">3. 当前 CFD 数据源：它实际上是什么格式</h2>
+<h3 id="3-1-当前接入链路">3.1 当前接入链路</h3>
+<p>当前 DSX 主场景通过 payload 挂入 CFD 图层：</p>
+<pre><code class="language-text">DSX_BP/Assembly/DSX_Main_BP.usda
+  └─ /World/CFD_Layer
+       └─ payload → simulation/CFD_Layer.usda
+            └─ payload → simulation/NV_DC_DS9_GB300_SinglePOD.usda
+                 └─ 读取 → simulation/NV_DC_DS9-GB300_R0-GPU-SinglePOD.cgns
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>层级</th>
+<th>文件/格式</th>
+<th>做什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>主场景组合层</td>
+<td><code>DSX_Main_BP.usda</code>，USD ASCII</td>
+<td>在 <code>/World/CFD_Layer</code> 上声明 CFD payload，使其可以随主场景按需加载</td>
+</tr>
+<tr>
+<td>CFD 场景层</td>
+<td><code>CFD_Layer.usda</code>，USD ASCII</td>
+<td>放置 CFD 场景、设置坐标变换、色图、相机和 CAE 可视化配置</td>
+</tr>
+<tr>
+<td>CGNS 包装层</td>
+<td><code>NV_DC_DS9_GB300_SinglePOD.usda</code>，USD ASCII</td>
+<td>用 Omniverse CAE schema 描述怎样读取 CGNS 网格和字段</td>
+</tr>
+<tr>
+<td>原始结果</td>
+<td><code>NV_DC_DS9-GB300_R0-GPU-SinglePOD.cgns</code>，CGNS/HDF5，约 269 MB</td>
+<td>保存 CFD 非结构体网格、坐标、单元连接关系和数值场</td>
+</tr>
+<tr>
+<td>体渲染程序</td>
+<td><code>xac/irregular_volume_dcdt.xac</code></td>
+<td>在多个负载级别的温度场之间插值，并按色图显示体积结果</td>
+</tr>
+</tbody></table>
+<h3 id="3-2-cgns-文件里有什么">3.2 CGNS 文件里有什么</h3>
+<p>CGNS 是 CFD 领域常见的数据交换标准；当前文件底层为 HDF5。它不是“模型贴图”，而是一份可供 CAE 工具读取的体网格与物理场数据。</p>
+<p>当前 USD 包装层明确描述：</p>
+<table>
+<thead>
+<tr>
+<th>数据</th>
+<th>存储位置</th>
+<th>当前含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>CoordinatesX / Y / Z</code></td>
+<td>顶点</td>
+<td>体网格中每个顶点的位置</td>
+</tr>
+<tr>
+<td><code>ElementConnectivity</code></td>
+<td>网格连接关系</td>
+<td>哪些顶点组成一个体单元</td>
+</tr>
+<tr>
+<td><code>HEXA_8</code></td>
+<td>单元类型</td>
+<td>每个单元是 8 个顶点构成的六面体</td>
+</tr>
+<tr>
+<td>1,783,104 个单元</td>
+<td>元素范围 1–1,783,104</td>
+<td>当前 CFD 可视化使用的大型非结构体体网格</td>
+</tr>
+<tr>
+<td><code>Pressure(Pa)-40/60/80/100</code></td>
+<td>单元中心</td>
+<td>四个负载级别下的压力场</td>
+</tr>
+<tr>
+<td><code>Temperature(C)-40/60/80/100</code></td>
+<td>单元中心</td>
+<td>四个负载级别下的温度场；当前体渲染主要使用它</td>
+</tr>
+</tbody></table>
+<p><strong>当前包装层没有接入速度矢量场。</strong> 这不等于 CGNS 原始文件一定完全没有速度数据；更准确的说法是：在目前 USD/CAE 包装配置中，明确可见并被引用的是温度和压力，体渲染绑定的是温度字段。若要展示速度箭头、流线或速度大小，需要确认原始 CGNS 是否包含相应字段，并在 USD CAE 包装层中增加字段映射与可视化方式。</p>
+<h3 id="3-3-40-60-80-100-是什么">3.3 40、60、80、100 是什么</h3>
+<p>当前 <code>irregular_volume_dcdt.xac</code> 代码把 40、60、80、100 当作 <code>load_level</code> 场景：</p>
+<pre><code class="language-text">40–60：在 Temperature(C)-40 与 Temperature(C)-60 之间插值
+60–80：在 Temperature(C)-60 与 Temperature(C)-80 之间插值
+80–100：在 Temperature(C)-80 与 Temperature(C)-100 之间插值
+</code></pre>
+<p>因此，它更像四个负载等级的结果集，而不是 60 fps 的时间序列动画。数字究竟对应 IT 负载百分比、某种设备工况还是其他定义，仍需向 CFD 交付方确认；当前文件名和插值程序足以证明它们被当作可连续切换的负载级别使用。</p>
+<h3 id="3-4-这个数据与当前数据大厅是什么关系">3.4 这个数据与当前数据大厅是什么关系</h3>
+<p>当前 CFD 文件名为 <code>GB300 SinglePOD</code>，而 Day 0–Day 2 的培训还使用了 GB200 参考资产和不同的数据大厅内容。因此不能把这份体积云图直接说成“当前 GB200 数据大厅的温度结果”。它可用于演示 <strong>CGNS CFD 结果如何进入 USD</strong>，但任何面向项目的热工结论都必须确认：几何版本、机柜类型与位置、热负载、冷却配置、边界条件、求解版本和交付日期是否一致。</p>
+<hr>
+<h2 id="4-客户在-usd-里最终看到什么">4. 客户在 USD 里最终看到什么</h2>
+<h3 id="4-1-客户看到的是-被放回空间里的计算结果">4.1 客户看到的是“被放回空间里的计算结果”</h3>
+<p>客户不需要直接打开 HDF5 或阅读数百万单元的网格。USD 将 CFD 结果变成与机柜、通道、HAC 和设备布局可叠加的三维体积对象。对客户来说，最直观的画面通常是：</p>
+<pre class="mermaid" data-processed="true"><svg id="mermaid-1785464966213" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="flowchart" style="max-width: 1102px;" viewBox="0 0 1102 222" role="graphics-document document" aria-roledescription="flowchart-v2"><style>#mermaid-1785464966213{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#000000;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#mermaid-1785464966213 .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#mermaid-1785464966213 .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#mermaid-1785464966213 .error-icon{fill:#552222;}#mermaid-1785464966213 .error-text{fill:#552222;stroke:#552222;}#mermaid-1785464966213 .edge-thickness-normal{stroke-width:1px;}#mermaid-1785464966213 .edge-thickness-thick{stroke-width:3.5px;}#mermaid-1785464966213 .edge-pattern-solid{stroke-dasharray:0;}#mermaid-1785464966213 .edge-thickness-invisible{stroke-width:0;fill:none;}#mermaid-1785464966213 .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-1785464966213 .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-1785464966213 .marker{fill:#666;stroke:#666;}#mermaid-1785464966213 .marker.cross{stroke:#666;}#mermaid-1785464966213 svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#mermaid-1785464966213 p{margin:0;}#mermaid-1785464966213 .label{font-family:"trebuchet ms",verdana,arial,sans-serif;color:#000000;}#mermaid-1785464966213 .cluster-label text{fill:#333;}#mermaid-1785464966213 .cluster-label span{color:#333;}#mermaid-1785464966213 .cluster-label span p{background-color:transparent;}#mermaid-1785464966213 .label text,#mermaid-1785464966213 span{fill:#000000;color:#000000;}#mermaid-1785464966213 .node rect,#mermaid-1785464966213 .node circle,#mermaid-1785464966213 .node ellipse,#mermaid-1785464966213 .node polygon,#mermaid-1785464966213 .node path{fill:#eee;stroke:#999;stroke-width:1px;}#mermaid-1785464966213 .rough-node .label text,#mermaid-1785464966213 .node .label text,#mermaid-1785464966213 .image-shape .label,#mermaid-1785464966213 .icon-shape .label{text-anchor:middle;}#mermaid-1785464966213 .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#mermaid-1785464966213 .rough-node .label,#mermaid-1785464966213 .node .label,#mermaid-1785464966213 .image-shape .label,#mermaid-1785464966213 .icon-shape .label{text-align:center;}#mermaid-1785464966213 .node.clickable{cursor:pointer;}#mermaid-1785464966213 .root .anchor path{fill:#666!important;stroke-width:0;stroke:#666;}#mermaid-1785464966213 .arrowheadPath{fill:#333333;}#mermaid-1785464966213 .edgePath .path{stroke:#666;stroke-width:1px;}#mermaid-1785464966213 .flowchart-link{stroke:#666;fill:none;}#mermaid-1785464966213 .edgeLabel{background-color:white;text-align:center;}#mermaid-1785464966213 .edgeLabel p{background-color:white;}#mermaid-1785464966213 .edgeLabel rect{opacity:0.5;background-color:white;fill:white;}#mermaid-1785464966213 .labelBkg{background-color:rgba(255, 255, 255, 0.5);}#mermaid-1785464966213 .cluster rect{fill:hsl(0, 0%, 98.9215686275%);stroke:#707070;stroke-width:1px;}#mermaid-1785464966213 .cluster text{fill:#333;}#mermaid-1785464966213 .cluster span{color:#333;}#mermaid-1785464966213 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:12px;background:hsl(-160, 0%, 93.3333333333%);border:1px solid #707070;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-1785464966213 .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#000000;}#mermaid-1785464966213 rect.text{fill:none;stroke-width:0;}#mermaid-1785464966213 .icon-shape,#mermaid-1785464966213 .image-shape{background-color:white;text-align:center;}#mermaid-1785464966213 .icon-shape p,#mermaid-1785464966213 .image-shape p{background-color:white;padding:2px;}#mermaid-1785464966213 .icon-shape .label rect,#mermaid-1785464966213 .image-shape .label rect{opacity:0.5;background-color:white;fill:white;}#mermaid-1785464966213 .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#mermaid-1785464966213 .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#mermaid-1785464966213 .node .neo-node{stroke:#999;}#mermaid-1785464966213 [data-look="neo"].node rect,#mermaid-1785464966213 [data-look="neo"].cluster rect,#mermaid-1785464966213 [data-look="neo"].node polygon{stroke:url(#mermaid-1785464966213-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785464966213 [data-look="neo"].swimlane.cluster rect{filter:none;}#mermaid-1785464966213 [data-look="neo"].node path{stroke:url(#mermaid-1785464966213-gradient);stroke-width:1px;}#mermaid-1785464966213 [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785464966213 [data-look="neo"].node .neo-line path{stroke:#999;filter:none;}#mermaid-1785464966213 [data-look="neo"].node circle{stroke:url(#mermaid-1785464966213-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785464966213 [data-look="neo"].node circle .state-start{fill:#000000;}#mermaid-1785464966213 [data-look="neo"].icon-shape .icon{fill:url(#mermaid-1785464966213-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785464966213 [data-look="neo"].icon-shape .icon-neo path{stroke:url(#mermaid-1785464966213-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#mermaid-1785464966213 :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g><marker id="mermaid-1785464966213_flowchart-v2-pointEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1785464966213_flowchart-v2-pointStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1785464966213_flowchart-v2-pointEnd-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14" orient="auto"><path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1785464966213_flowchart-v2-pointStart-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14" orient="auto"><polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></polygon></marker><marker id="mermaid-1785464966213_flowchart-v2-circleEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1785464966213_flowchart-v2-circleStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1785464966213_flowchart-v2-circleEnd-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1785464966213_flowchart-v2-circleStart-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"></circle></marker><marker id="mermaid-1785464966213_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1785464966213_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"></path></marker><marker id="mermaid-1785464966213_flowchart-v2-crossEnd-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5;"></path></marker><marker id="mermaid-1785464966213_flowchart-v2-crossStart-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5; stroke-dasharray: 1, 0;"></path></marker><g class="root"><g class="clusters"></g><g class="edgePaths"><path d="M268,59L272.167,59C276.333,59,284.667,59,298.192,64.815C311.716,70.63,330.433,82.259,339.791,88.074L349.149,93.889" id="mermaid-1785464966213-L_A_C_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_A_C_0" data-points="W3sieCI6MjY4LCJ5Ijo1OX0seyJ4IjoyOTMsInkiOjU5fSx7IngiOjM1Mi41NDY4NzUsInkiOjk2fV0=" data-look="classic" marker-end="url(#mermaid-1785464966213_flowchart-v2-pointEnd)"></path><path d="M262.227,187L267.355,187C272.484,187,282.742,187,297.229,181.185C311.716,175.37,330.433,163.741,339.791,157.926L349.149,152.111" id="mermaid-1785464966213-L_B_C_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_B_C_0" data-points="W3sieCI6MjYyLjIyNjU2MjUsInkiOjE4N30seyJ4IjoyOTMsInkiOjE4N30seyJ4IjozNTIuNTQ2ODc1LCJ5IjoxNTB9XQ==" data-look="classic" marker-end="url(#mermaid-1785464966213_flowchart-v2-pointEnd)"></path><path d="M474,123L478.167,123C482.333,123,490.667,123,498.333,123C506,123,513,123,516.5,123L520,123" id="mermaid-1785464966213-L_C_D_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_C_D_0" data-points="W3sieCI6NDc0LCJ5IjoxMjN9LHsieCI6NDk5LCJ5IjoxMjN9LHsieCI6NTI0LCJ5IjoxMjN9XQ==" data-look="classic" marker-end="url(#mermaid-1785464966213_flowchart-v2-pointEnd)"></path><path d="M784,123L788.167,123C792.333,123,800.667,123,808.333,123C816,123,823,123,826.5,123L830,123" id="mermaid-1785464966213-L_D_E_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_D_E_0" data-points="W3sieCI6Nzg0LCJ5IjoxMjN9LHsieCI6ODA5LCJ5IjoxMjN9LHsieCI6ODM0LCJ5IjoxMjN9XQ==" data-look="classic" marker-end="url(#mermaid-1785464966213_flowchart-v2-pointEnd)"></path></g><g class="edgeLabels"><g class="edgeLabel"><g class="label" data-id="L_A_C_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_B_C_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_C_D_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_D_E_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel "></span></div></foreignObject></g></g></g><g class="nodes"><g class="node default  " id="mermaid-1785464966213-flowchart-A-0" data-look="classic" transform="translate(138, 59)"><rect class="basic label-container" style="" x="-130" y="-51" width="260" height="102"></rect><g class="label" style="" transform="translate(-100, -36)"><rect></rect><foreignObject width="200" height="72"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel "><p>数据大厅三维布局<br>机柜、HAC、通道、冷却设备</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785464966213-flowchart-C-1" data-look="classic" transform="translate(396, 123)"><rect class="basic label-container" style="" x="-78" y="-27" width="156" height="54"></rect><g class="label" style="" transform="translate(-48, -12)"><rect></rect><foreignObject width="96" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>同一空间坐标</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785464966213-flowchart-B-2" data-look="classic" transform="translate(138, 187)"><rect class="basic label-container" style="" x="-124.2265625" y="-27" width="248.453125" height="54"></rect><g class="label" style="" transform="translate(-94.2265625, -12)"><rect></rect><foreignObject width="188.453125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel "><p>CGNS CFD 温度/压力结果</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785464966213-flowchart-D-5" data-look="classic" transform="translate(654, 123)"><rect class="basic label-container" style="" x="-130" y="-51" width="260" height="102"></rect><g class="label" style="" transform="translate(-100, -36)"><rect></rect><foreignObject width="200" height="72"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel "><p>三维温度体积云图<br>色图、裁切、透明度、负载级别</p></span></div></foreignObject></g></g><g class="node default  " id="mermaid-1785464966213-flowchart-E-7" data-look="classic" transform="translate(964, 123)"><rect class="basic label-container" style="" x="-130" y="-51" width="260" height="102"></rect><g class="label" style="" transform="translate(-100, -36)"><rect></rect><foreignObject width="200" height="72"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel "><p>客户讨论<br>哪里热、为什么、改哪里、谁确认</p></span></div></foreignObject></g></g></g></g></g><defs><filter id="mermaid-1785464966213-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"></feDropShadow></filter></defs><defs><filter id="mermaid-1785464966213-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"></feDropShadow></filter></defs><linearGradient id="mermaid-1785464966213-gradient" gradientUnits="objectBoundingBox" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="hsl(0, 0%, 83.3333333333%)" stop-opacity="1"></stop><stop offset="100%" stop-color="hsl(0, 0%, 88.9215686275%)" stop-opacity="1"></stop></linearGradient></svg></pre>
+<p>在当前配置中，体渲染使用温度字段，并由色图把温度范围映射为不同颜色和透明度。画面可以帮助人直观看到高温区域的大致空间位置、它是否接近某排 rack、HAC、门、顶部服务或冷却设备。</p>
+<h3 id="4-2-客户可以得到什么帮助">4.2 客户可以得到什么帮助</h3>
+<table>
+<thead>
+<tr>
+<th>客户/团队</th>
+<th>在三维 CFD 视图中最关心什么</th>
+<th>得到的帮助</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>业主/管理层</td>
+<td>风险或方案差异发生在哪里，是否影响关键区域</td>
+<td>不必先读求解报告，也能理解问题的空间范围与优先级</td>
+</tr>
+<tr>
+<td>PM</td>
+<td>哪个变更需要拉哪些专业、何时做确认</td>
+<td>把“温度可能有问题”转成有位置、有对象、有责任人的问题单</td>
+</tr>
+<tr>
+<td>设施/运维</td>
+<td>告警/热点区域附近有哪些设备、通道和维护限制</td>
+<td>规划现场核查、传感器复核、维护和隔离路线</td>
+</tr>
+<tr>
+<td>IT/网络</td>
+<td>哪些 rack 区域可能受热工条件影响</td>
+<td>与作业安排、设备布置和扩容计划进行沟通；不据此自行调整运行策略</td>
+</tr>
+<tr>
+<td>BIM/施工</td>
+<td>风险区域与管道、桥架、围护、门和施工空间有什么关系</td>
+<td>在施工前复核接口、支撑、围护和安装顺序</td>
+</tr>
+<tr>
+<td>CFD/MEP 专家</td>
+<td>结果能否被其他团队准确理解并回溯到设备空间</td>
+<td>使工程结论不止停留在报告截图，而能关联到项目场景</td>
+</tr>
+</tbody></table>
+<h3 id="4-3-客户不应该从这张图得到什么">4.3 客户不应该从这张图得到什么</h3>
+<p>CFD 三维画面不是“绿灯/红灯看板”。客户不应仅凭颜色：</p>
+<ul>
+<li>宣布当前设计已通过或不通过；</li>
+<li>认定某排 rack 一定会宕机；</li>
+<li>改变设备负载、阀门、空调或保护策略；</li>
+<li>把 GB300 SinglePOD 的演示结果外推为当前 GB200 大厅的正式结论；</li>
+<li>忽略色标范围、单位、负载等级、边界条件、模型版本和求解质量。</li>
+</ul>
+<p><strong>正确的客户问题是：</strong> “这个色图对应哪一个工况？它在什么空间位置？附近哪些设备和路径受影响？下一步由谁用哪份工程资料确认？”</p>
+<hr>
+<h2 id="5-day-3-课堂走读-从一个色块回到工程问题">5. Day 3 课堂走读：从一个色块回到工程问题</h2>
+<ol>
+<li>先看三维数据大厅，识别 rack、HAC、通道、顶部桥架/管道和冷却设备。  </li>
+<li>再打开 CFD Layer，确认画面显示的是温度体积结果，而不是材质或装饰效果。  </li>
+<li>选择一个颜色较高的区域，先不下结论，只让学员回答：它位于哪排 rack 附近？靠近什么通道、围护或服务路线？  </li>
+<li>追问：当前显示的是 40、60、80 还是 100 的负载级别？色标单位与范围是什么？模型对应什么布局版本？  </li>
+<li>将问题交给 CFD/MEP：该工况的边界条件、负载、收敛性和设计判据是什么？  </li>
+<li>将空间问题交给施工/运维：现场传感器、通道、隔离和维护如何安排？</li>
+</ol>
+<p>一个合格的课堂记录应类似：</p>
+<blockquote>
+<p>USD/CFD 观察：在某一负载级别的温度体渲染中，某区域颜色较高，空间上靠近一排 rack 与 HAC/顶部服务。<br>尚未确认：色标阈值、该区域是否超过设计准则、几何与热负载是否对应当前项目版本。<br>下一步：CFD 专家确认工况与判据；MEP/设施确认冷却路径；BIM/施工/运维确认相关对象、通道和现场核查方式。</p>
+</blockquote>
+<hr>
+<h2 id="6-如果要把新的-cfd-结果交给-dsx-需要准备什么">6. 如果要把新的 CFD 结果交给 DSX，需要准备什么</h2>
+<table>
+<thead>
+<tr>
+<th>交付项</th>
+<th>为什么需要</th>
+<th>最低应写清楚的内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>原始结果文件</td>
+<td>提供可追溯的数值场</td>
+<td>CGNS/HDF5 或双方约定的格式、校验值、交付版本</td>
+</tr>
+<tr>
+<td>网格与字段说明</td>
+<td>确保 USD/CAE 层知道怎样读取</td>
+<td>网格类型、坐标单位、字段名称、字段位置（顶点/单元中心）、单位</td>
+</tr>
+<tr>
+<td>工况说明</td>
+<td>让颜色和数值有工程语境</td>
+<td>rack 负载、冷却设定、送回风/液冷边界、故障或正常工况</td>
+</tr>
+<tr>
+<td>布局版本关联</td>
+<td>防止结果套到错误大厅</td>
+<td>BIM/USD 版本、机柜排、HAC、冷却设备与变更记录</td>
+</tr>
+<tr>
+<td>USD CAE 包装层</td>
+<td>把数值场带进 DSX</td>
+<td>CGNS 字段路径、坐标变换、体渲染或切片配置、色标</td>
+</tr>
+<tr>
+<td>可视化规则</td>
+<td>让客户不会误读</td>
+<td>单位、色标范围、透明度、裁切方式、默认负载级别、图例</td>
+</tr>
+<tr>
+<td>工程结论与边界</td>
+<td>分清展示与签字结论</td>
+<td>设计准则、是否收敛、适用范围、审批人、复核日期</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="7-课堂结束时应记住的五句话">7. 课堂结束时应记住的五句话</h2>
+<ol>
+<li>CFD 是计算热量和流动的工程模型，不是一张漂亮的热力图。  </li>
+<li>USD 负责把结果放回机柜、通道、HAC 和设备所在的空间；它不替代 CFD 求解。  </li>
+<li>当前接入数据的原始格式是 CGNS/HDF5，使用非结构 <code>HEXA_8</code> 体网格，并暴露温度与压力场。  </li>
+<li>当前可见的 40、60、80、100 是负载级别结果集的插值逻辑，不应误读为实时温度或视频时间帧。  </li>
+<li>客户看到结果后最有价值的动作，是提出正确问题并组织正确专业确认，而不是直接根据颜色作运行决定。</li>
+</ol>
+<h2 id="8-术语表">8. 术语表</h2>
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>简明解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CFD</td>
+<td>计算流体力学，用计算机近似计算流体、热量与压力的分布</td>
+</tr>
+<tr>
+<td>CGNS</td>
+<td>CFD 常用的数据交换标准；当前文件底层为 HDF5</td>
+</tr>
+<tr>
+<td>HDF5</td>
+<td>用于存储大型层级数值数据的文件格式</td>
+</tr>
+<tr>
+<td>非结构体网格</td>
+<td>网格单元不要求排成规则方阵，适合复杂设备与房间几何</td>
+</tr>
+<tr>
+<td><code>HEXA_8</code></td>
+<td>8 个顶点构成的六面体单元</td>
+</tr>
+<tr>
+<td>单元中心字段</td>
+<td>每个网格单元保存一个数值，如温度或压力</td>
+</tr>
+<tr>
+<td>边界条件</td>
+<td>CFD 计算给系统规定的入口、出口、温度、流量、压力、热负载等条件</td>
+</tr>
+<tr>
+<td>色图</td>
+<td>把数值范围转换成颜色和透明度的显示规则</td>
+</tr>
+<tr>
+<td>LOD</td>
+<td>Level of Detail，模型细节等级；与 CFD 网格密度不是同一个概念</td>
+</tr>
+</tbody></table>
+<h2 id="9-参考与使用边界">9. 参考与使用边界</h2>
+<ul>
+<li>当前 CFD/USD 资源：<code>DSX_BP/simulation/CFD_Layer.usda</code>、<code>NV_DC_DS9_GB300_SinglePOD.usda</code>、<code>NV_DC_DS9-GB300_R0-GPU-SinglePOD.cgns</code>。</li>
+<li><a href="https://docs.nvidia.com/dgx-superpod/reference-architecture-scalable-infrastructure-gb200/latest/_downloads/238ab33ee345a7241fc2f15eedc2ff6c/RA11338001-DSPGB200-ReferenceArch.pdf">NVIDIA DGX SuperPOD GB200 Reference Architecture（PDF）</a></li>
+</ul>
+<blockquote>
+<p>本材料用于培训和跨团队空间沟通，不构成 CFD 设计报告、热工验收结论或运行控制指令。任何项目结论均须由负责 CFD/MEP 的授权专业人员，依据受控模型、工况、设计准则和审查流程确认。</p>
+</blockquote>
+</main></div></body>
+</html>

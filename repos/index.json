@@ -9,7 +9,8 @@
       "USD_SCENE_MASTER.html",
       "GB200_USD_DAY0_TRAINING.html",
       "GB200_USD_DAY1_COOLING_TRAINING.html",
-      "GB200_USD_DAY2_ELECTRICAL_TRAINING.html"
+      "GB200_USD_DAY2_ELECTRICAL_TRAINING.html",
+      "GB200_USD_DAY3_CFD_TRAINING.html"
     ],
     "updated": "2026-07-30",
     "repo_url": "https://github.com/NVIDIA-Omniverse-blueprints/omniverse-dsx-blueprint-for-ai-factories"
